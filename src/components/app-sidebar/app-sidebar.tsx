@@ -1,23 +1,51 @@
+'use client';
+
+import { NavMain } from '@/components/app-sidebar/nav-main';
+import { NavSecondary } from '@/components/app-sidebar/nav-secondary';
+import { NavUser } from '@/components/app-sidebar/nav-user';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarTrigger,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { ServicesSection } from './services-section';
-import { SettingsSection } from './settings-section';
-import { SidebarHeaderSection } from './sidebar-header-section';
+import { Command } from 'lucide-react';
+import Link from 'next/link';
+import * as React from 'react';
+import { data } from './data';
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar variant="floating" collapsible="icon">
-      <SidebarHeaderSection />
+    <Sidebar
+      className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
+      {...props}
+    >
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link href="/dashboard">
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <Command className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">Q-OCR</span>
+                  <span className="truncate text-xs">v0.0.1 🌈</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
-        <ServicesSection />
-        <SettingsSection />
+        <NavMain items={data.navMain} />
+        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter className="content-center justify-center items-start">
-        <SidebarTrigger />
+      <SidebarFooter>
+        <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
   );

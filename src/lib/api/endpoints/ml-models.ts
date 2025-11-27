@@ -30,3 +30,28 @@ export const getModelById = async (
     );
   }
 };
+
+export const selectModelVersion = async (
+  modelId: number,
+  version: string,
+): Promise<MLModelResponse> => {
+  try {
+    const response = await APIClient.labelstudio.post<MLModelResponse>(
+      `${ML_MODELS_PREFIX}/${modelId}/select`,
+      {
+        data: { version },
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error(
+      `Failed for selectModelVersion (id: ${modelId}, version: ${version}):`,
+      error,
+    );
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(
+      0,
+      `Failed to select model version ${version} by id: ${modelId}. Details: ${String(error)}`,
+    );
+  }
+};

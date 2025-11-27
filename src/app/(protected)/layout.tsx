@@ -1,8 +1,8 @@
 'use client';
 
 import { AppSidebar } from '@/components/app-sidebar/app-sidebar';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { getCurrentUser } from '@/lib/api/endpoints/users';
+import { SiteHeader } from '@/components/app-sidebar/site-header';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 export default function ProtectedLayout({
   children,
@@ -30,9 +30,16 @@ export default function ProtectedLayout({
   }, [router]);
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <AppSidebar />
-      <main className="flex-1">{children}</main>
-    </SidebarProvider>
+    <div className="[--header-height:calc(--spacing(14))]">
+      <SidebarProvider className="flex flex-col">
+        <SiteHeader />
+        <div className="flex flex-1">
+          <AppSidebar animateOnHover={false} />
+          <SidebarInset>
+            <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    </div>
   );
 }

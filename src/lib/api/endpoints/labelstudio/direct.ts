@@ -1,15 +1,20 @@
 import { getCookie } from '@/lib/utils/cookie.util';
-import { APIClient, ApiError } from '../client';
+import { APIClient, ApiError } from '../../client';
 
 export const directLogin = async (
   email: string,
   password: string,
 ): Promise<string> => {
   try {
-    const _ = await APIClient.direct.post<void>('/user/login', {
-      email: email,
-      password: password,
-      persist_session: 'on',
+    // Create form data for Django form submission
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', csrfMiddlewareToken);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('persist_session', 'on');
+
+    const _ = await APIClient.direct.post<void>('/user/login/', {
+      data: formData,
     });
 
     const csrfToken = getCookie('csrftoken');

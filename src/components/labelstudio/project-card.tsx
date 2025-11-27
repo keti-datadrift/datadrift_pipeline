@@ -16,6 +16,7 @@ export function ProjectCard({
   onEditSubmit?: (project: Project) => Promise<Project | null>;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <>
@@ -60,17 +61,23 @@ export function ProjectCard({
         project={project}
         open={isDialogOpen}
         setIsOpen={setIsDialogOpen}
+        loading={isLoading}
         onSubmit={async (e) => {
           if (onEditSubmit) {
-            const result = await onEditSubmit({
-              ...project,
-              title: e.title,
-              type: e.type,
-            });
+            setIsLoading(true);
+            try {
+              const result = await onEditSubmit({
+                ...project,
+                title: e.title,
+                type: e.type,
+              });
 
-            // Close the dialog if the update was successful
-            if (result) {
-              setIsDialogOpen(false);
+              // Close the dialog if the update was successful
+              if (result) {
+                setIsDialogOpen(false);
+              }
+            } finally {
+              setIsLoading(false);
             }
           }
         }}

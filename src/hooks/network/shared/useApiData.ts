@@ -222,30 +222,107 @@ export function useApiItem<TResponse, TEntity>({
   return { data, loading, error, refetch: fetchData };
 }
 
+// Overload for single parameter without transform
+export function useApiMutation<
+  TRequest = unknown,
+  TResponse = unknown,
+>(config: {
+  mutationFn: (data: TRequest) => Promise<TResponse>;
+  onSuccess?: (data: TResponse) => void;
+  onError?: (error: Error) => void;
+}): {
+  mutate: (data: TRequest) => Promise<TResponse>;
+  loading: boolean;
+  error: string | null;
+};
+
+// Overload for single parameter with transform
+export function useApiMutation<
+  TRequest = unknown,
+  TResponse = unknown,
+  TEntity = TResponse,
+>(config: {
+  mutationFn: (data: TRequest) => Promise<TResponse>;
+  transformFn: (response: TResponse) => TEntity;
+  onSuccess?: (data: TEntity) => void;
+  onError?: (error: Error) => void;
+}): {
+  mutate: (data: TRequest) => Promise<TEntity>;
+  loading: boolean;
+  error: string | null;
+};
+
+// Overload for multiple parameters without transform
+export function useApiMutation<
+  TArgs extends any[],
+  TResponse = unknown,
+>(config: {
+  mutationFn: (...args: TArgs) => Promise<TResponse>;
+  onSuccess?: (data: TResponse) => void;
+  onError?: (error: Error) => void;
+}): {
+  mutate: (...args: TArgs) => Promise<TResponse>;
+  loading: boolean;
+  error: string | null;
+};
+
+// Overload for multiple parameters with transform
+export function useApiMutation<
+  TArgs extends any[],
+  TResponse = unknown,
+  TEntity = TResponse,
+>(config: {
+  mutationFn: (...args: TArgs) => Promise<TResponse>;
+  transformFn: (response: TResponse) => TEntity;
+  onSuccess?: (data: TEntity) => void;
+  onError?: (error: Error) => void;
+}): {
+  mutate: (...args: TArgs) => Promise<TEntity>;
+  loading: boolean;
+  error: string | null;
+};
+
 /**
- * Hook for API operations with mutations (create, update, delete)
- * @template TRequest - The request payload type
- * @template TResponse - The API response type
+ * Unified hook for API operations with mutations (create, update, delete)
+ * Supports both single parameter and multiple parameter patterns
+ * Optionally transforms API response to UI entity using transformFn
+ *
+ * @template TRequest - The request payload type (for single parameter)
+ * @template TArgs - The arguments tuple type (for multiple parameters)
+ * @template TResponse - The raw API response type
+ * @template TEntity - The transformed entity type for UI consumption
+ *
+ * @example
+ * // Single parameter pattern without transform
+ * const { mutate } = useApiMutation({
+ *   mutationFn: (data: CreateUserRequest) => createUser(data)
+ * });
+ * mutate(userData);
+ *
+ * @example
+ * // Multiple parameters pattern with transform
+ * const { mutate } = useApiMutation({
+ *   mutationFn: (id: string, data: UpdateUserRequest) => updateUser(id, data),
+ *   transformFn: (response) => ({ ...response, displayName: response.name })
+ * });
+ * mutate(userId, userData);
  */
-export function useApiMutation<TRequest = unknown, TResponse = unknown>({
+export function useApiMutation<
+  TArgs extends any[] = [unknown],
+  TResponse = unknown,
+  TEntity = TResponse,
+>({
   mutationFn,
+  transformFn,
   onSuccess,
   onError,
 }: {
-  /**
-   * Function that performs the mutation
-   */
-  mutationFn: (data: TRequest) => Promise<TResponse>;
-  /**
-   * Callback function called on successful mutation
-   */
-  onSuccess?: (data: TResponse) => void;
-  /**
-   * Callback function called on failed mutation
-   */
+  mutationFn: (...args: TArgs) => Promise<TResponse>;
+  transformFn?: (response: TResponse) => TEntity;
+  onSuccess?: (data: TEntity) => void;
   onError?: (error: Error) => void;
 }): {
-  mutate: (data: TRequest) => Promise<void>;
+  mutate: (...args: TArgs) => Promise<TEntity>;
   loading: boolean;
   error: string | null;
 } {
@@ -253,16 +330,21 @@ export function useApiMutation<TRequest = unknown, TResponse = unknown>({
   const [error, setError] = useState<string | null>(null);
 
   const mutate = useCallback(
-    async (data: TRequest) => {
+    async (...args: TArgs): Promise<TEntity> => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await mutationFn(data);
+        const response = await mutationFn(...args);
+        const transformedData = transformFn
+          ? transformFn(response)
+          : (response as unknown as TEntity);
 
         if (onSuccess) {
-          onSuccess(response);
+          onSuccess(transformedData);
         }
+
+        return transformedData;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Mutation failed';
@@ -273,11 +355,12 @@ export function useApiMutation<TRequest = unknown, TResponse = unknown>({
         }
 
         console.error('Mutation failed:', err);
+        throw err;
       } finally {
         setLoading(false);
       }
     },
-    [mutationFn, onSuccess, onError],
+    [mutationFn, transformFn, onSuccess, onError],
   );
 
   return { mutate, loading, error };

@@ -1,54 +1,64 @@
-import { Bot } from 'lucide-react';
+import { BookOpen, BrainCircuit, Database, SquareTerminal } from 'lucide-react';
 
-import { GradioIcon, LabelStudioIcon, SwaggerIcon } from '@/components/icons';
-import { Settings2 } from 'lucide-react';
-import type { MenuItem, ServiceItem } from './types';
-
-export const services: ServiceItem[] = [
-  {
-    title: 'LabelStudio',
-    url: '/services/labelstudio',
-    icon: LabelStudioIcon,
+export const data = {
+  user: {
+    name: 'admin',
+    email: 'qocr@admin.com',
+    avatar: '/next.svg',
   },
-  {
-    title: 'API docs',
-    url: '/services/swagger',
-    icon: SwaggerIcon,
-  },
-  {
-    title: 'Demo',
-    url: '/services/gradio',
-    icon: GradioIcon,
-  },
-];
-
-export const menuItems: MenuItem[] = [
-  {
-    title: 'Label Studio',
-    url: '/labelstudio',
-    icon: Settings2,
-    isActive: true,
-    children: [
-      {
-        title: 'Projects',
-        url: '#',
-      },
-    ],
-  },
-  {
-    title: 'Models',
-    url: '/dashboard/models',
-    icon: Bot,
-    isActive: true,
-    children: [
-      {
-        title: 'Versions',
-        url: '#',
-      },
-      {
-        title: 'Logs',
-        url: '#',
-      },
-    ],
-  },
-];
+  navMain: [
+    {
+      title: 'Data',
+      url: '/dashboard/projects',
+      icon: Database,
+      isActive: true,
+      items: [
+        {
+          title: 'Import',
+          url: '/dashboard/projects/import',
+        },
+        {
+          title: 'Export',
+          url: '/dashboard/projects/export',
+        },
+      ],
+    },
+    {
+      title: 'Models',
+      url: '/dashboard/models',
+      icon: BrainCircuit,
+      items: [
+        {
+          title: 'Training',
+          url: '/dashboard/models/train',
+        },
+      ],
+    },
+    {
+      title: 'Monitoring',
+      url: '/dashboard/monitoring',
+      icon: BookOpen,
+      items: [
+        {
+          title: 'Default Models',
+          url: '/dashboard/monitoring/default',
+        },
+        {
+          title: 'Training Status',
+          url: '/dashboard/monitoring/status',
+        },
+        {
+          title: 'Logs',
+          url: '/dashboard/monitoring/logs',
+        },
+      ],
+    },
+    {
+      title: 'Playground',
+      url: '/services/gradio',
+      icon: SquareTerminal,
+      items: [],
+    },
+  ],
+  navSecondary: [],
+};

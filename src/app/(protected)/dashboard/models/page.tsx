@@ -186,7 +186,7 @@ export default function ModelsPage() {
           {} as Record<string, string>,
         );
         const queryParams = new URLSearchParams(stringified);
-        router.push(`/models/${id}?${queryParams.toString()}`);
+        router.push(`/dashboard/models/${id}?${queryParams.toString()}`);
       }
     },
     [data],

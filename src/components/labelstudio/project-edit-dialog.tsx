@@ -40,11 +40,13 @@ export default function ProjectEditDialog({
   open,
   setIsOpen,
   onSubmit,
+  loading = false,
 }: {
   project: Project;
   open: boolean;
   setIsOpen: (open: boolean) => void;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
+  loading?: boolean;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -122,7 +124,11 @@ export default function ProjectEditDialog({
               />
             </div>
             <DialogFooter>
-              <Button type="submit" className="cursor-pointer">
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                loading={loading}
+              >
                 Save
               </Button>
             </DialogFooter>
