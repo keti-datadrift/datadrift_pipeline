@@ -1,5 +1,11 @@
-import apiClientInstance, { ApiError } from '../client';
-import { MLModelPageResponse, MLModelVersionPageResponse } from '../types';
+import { APIClient, ApiError, SSEEvent } from '../client';
+import {
+  MLModelPageResponse,
+  MLModelResponse,
+  MLModelVersionPageResponse,
+} from '../types';
+
+const ML_MODELS_PREFIX = '/ml_models';
 
 export const getModels = async (): Promise<MLModelPageResponse> => {
   try {
@@ -53,5 +59,31 @@ export const selectModelVersion = async (
       0,
       `Failed to select model version ${version} by id: ${modelId}. Details: ${String(error)}`,
     );
+  }
+};
+
+export const invokeTraining = async function* (
+  mlBackendId: number,
+  taskIds: number[],
+  modelVersionID?: number,
+): AsyncGenerator<SSEEvent<string>, void, unknown> {
+  try {
+    const response = APIClient.labelstudio.postStream<string>(
+      `${ML_MODELS_PREFIX}/${mlBackendId}/train`,
+      {
+        data: {
+          task_ids: taskIds,
+          ml_model_version: modelVersionID,
+        },
+        query: {
+          stream: true,
+        },
+      },
+    );
+    yield* response;
+  } catch (error) {
+    console.error('Failed to invoke training for model');
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(0, 'Failed to invoke training for model');
   }
 };

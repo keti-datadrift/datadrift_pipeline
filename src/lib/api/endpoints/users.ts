@@ -26,3 +26,23 @@ export const getCurrentUser = async (): Promise<User> => {
     throw new APIError(0, 'Failed to fetch current user');
   }
 };
+
+/**
+ * 로그아웃을 수행합니다.
+ * 서버 상에서만 로그아웃 처리가 진행됩니다. 클라이언트 측 로그아웃은 따로 처리가 필요합니다.
+ *
+ * @returns 로그아웃 후 리다이렉트 URL
+ */
+export const logout = async (): Promise<string> => {
+  try {
+    const redirectUri = await APIClient.direct.get<string>('/logout');
+    return redirectUri;
+  } catch (error) {
+    if (error instanceof APIError) {
+      // APIClient에서 발생시킨 에러는 그대로 전달
+      throw error;
+    }
+    // 그 외 네트워크 에러 등
+    throw new APIError(0, 'Failed to logout');
+  }
+};

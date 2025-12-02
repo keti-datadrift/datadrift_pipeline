@@ -14,6 +14,21 @@ interface BaseRequestConfig {
   signal?: AbortSignal;
 }
 
+/** SSE-specific configuration */
+interface SSEConfig extends BaseRequestConfig {
+  /** If true (default), will attempt JSON.parse on SSE data payloads */
+  parseJson?: boolean;
+  /** Optional expected content-type check; if true (default), requires text/event-stream */
+  requireEventStream?: boolean;
+}
+
+/** SSE event structure */
+export interface SSEEvent<T = any> {
+  data: T;
+  event?: string;
+  id?: string;
+}
+
 /** Configuration for requests with body (POST, PUT, PATCH) */
 interface RequestWithBodyConfig extends BaseRequestConfig {
   /** Request body data */
@@ -40,10 +55,266 @@ export class ApiClient {
   }
 
   /**
+   * Internal SSE stream reader
+   */
+  private async *streamSSE<T>(
+    endpoint: string,
+    config: SSEConfig & { data?: any },
+    method: 'GET' | 'POST' = 'GET',
+  ): AsyncGenerator<SSEEvent<T>, void, unknown> {
+    const {
+      headers = {},
+      signal,
+      query,
+      parseJson = true,
+      requireEventStream = true,
+      data,
+    } = config;
+
+    const queryString = this.buildQueryString(query);
+    const normalizedEndpoint = endpoint.startsWith('/')
+      ? endpoint
+      : `/${endpoint}`;
+    const requestUrl = `${this.baseURL}${normalizedEndpoint}${queryString}`;
+
+    const controller = new AbortController();
+    const cleanup = () => {
+      if (signal) signal.removeEventListener('abort', handleAbort);
+    };
+    const handleAbort = () => {
+      controller.abort();
+      cleanup();
+    };
+
+    if (signal?.aborted) {
+      controller.abort();
+    } else if (signal) {
+      signal.addEventListener('abort', handleAbort, { once: true });
+    }
+
+    try {
+      const requestOptions: RequestInit = {
+        method,
+        headers: {
+          'Cache-Control': 'no-cache',
+          ...headers,
+        },
+        signal: controller.signal,
+        credentials: 'include',
+      };
+
+      if (method === 'POST' && data !== undefined) {
+        if (data instanceof FormData) {
+          requestOptions.body = data;
+          // Don't set Content-Type, let browser set it for FormData with boundary
+        } else {
+          requestOptions.body = JSON.stringify(data);
+          requestOptions.headers = {
+            ...requestOptions.headers,
+            'Content-Type': 'application/json',
+          };
+        }
+
+        // Add CSRF token for POST requests
+        const csrfToken = getCookie('csrftoken');
+        if (csrfToken) {
+          requestOptions.headers = {
+            ...requestOptions.headers,
+            'X-CSRFToken': csrfToken,
+          };
+        }
+      }
+
+      console.log('🌐 SSE Request:', {
+        url: requestUrl,
+        method,
+        headers: requestOptions.headers,
+        hasBody: !!requestOptions.body,
+      });
+
+      const response = await fetch(requestUrl, requestOptions);
+
+      console.log('📥 SSE Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        contentType: response.headers.get('content-type'),
+        headers: Object.fromEntries(response.headers.entries()),
+      });
+
+      if (!response.ok) {
+        await this.handleErrorResponse(response);
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (requireEventStream && !contentType.includes('text/event-stream')) {
+        throw new ApiError(
+          0,
+          'Invalid SSE response',
+          `Expected text/event-stream, got ${contentType || 'unknown'}`,
+        );
+      }
+
+      if (!response.body) {
+        throw new ApiError(0, 'Stream error', 'Missing response body for SSE');
+      }
+
+      yield* this.parseSSEStream<T>(response.body, parseJson);
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      const message = error instanceof Error ? error.message : String(error);
+      throw new ApiError(0, 'SSE connection failed', message);
+    } finally {
+      cleanup();
+    }
+  }
+
+  /**
+   * Parse SSE stream from ReadableStream
+   */
+  private async *parseSSEStream<T>(
+    body: ReadableStream<Uint8Array>,
+    parseJson: boolean,
+  ): AsyncGenerator<SSEEvent<T>, void, unknown> {
+    const reader = body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let chunkCount = 0;
+    let eventCount = 0;
+
+    console.log('🔄 Starting SSE stream parsing...');
+
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          console.log(
+            '✅ SSE stream completed after',
+            chunkCount,
+            'chunks and',
+            eventCount,
+            'events',
+          );
+          break;
+        }
+
+        chunkCount++;
+        const chunk = decoder.decode(value, { stream: true });
+        console.log(
+          `📦 Chunk #${chunkCount} (${chunk.length} chars):`,
+          JSON.stringify(chunk.substring(0, 100)),
+        );
+
+        buffer += chunk;
+
+        // Process complete events (separated by double newlines)
+        let eventEnd = buffer.indexOf('\n\n');
+        while (eventEnd !== -1) {
+          const rawEvent = buffer.slice(0, eventEnd);
+          buffer = buffer.slice(eventEnd + 2);
+
+          console.log(
+            `🎯 Raw SSE event #${eventCount + 1}:`,
+            JSON.stringify(rawEvent),
+          );
+
+          const event = this.parseSSEEvent<T>(rawEvent, parseJson);
+          if (event) {
+            eventCount++;
+            console.log(`✨ Parsed SSE event #${eventCount}:`, event);
+            yield event;
+          }
+
+          eventEnd = buffer.indexOf('\n\n');
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
+  /**
+   * Parse individual SSE event
+   */
+  private parseSSEEvent<T>(
+    rawEvent: string,
+    parseJson: boolean,
+  ): SSEEvent<T> | null {
+    const lines = rawEvent.split(/\r?\n/);
+    const dataLines: string[] = [];
+    let event: string | undefined;
+    let id: string | undefined;
+
+    for (const line of lines) {
+      if (!line || line.startsWith(':')) continue; // Skip comments and empty lines
+
+      if (line.startsWith('data:')) {
+        dataLines.push(line.slice(5).trimStart());
+      } else if (line.startsWith('event:')) {
+        event = line.slice(6).trimStart();
+      } else if (line.startsWith('id:')) {
+        id = line.slice(3).trimStart();
+      }
+      // Ignore retry and other fields
+    }
+
+    if (dataLines.length === 0) return null;
+
+    const dataStr = dataLines.join('\n');
+    let data: unknown = dataStr;
+
+    if (parseJson && dataStr) {
+      try {
+        data = JSON.parse(dataStr);
+      } catch {
+        // Keep raw string if JSON parsing fails
+      }
+    }
+
+    return { data: data as T, event, id };
+  }
+
+  /**
+   * Handle error responses consistently
+   */
+  private async handleErrorResponse(response: Response): Promise<never> {
+    let message = `HTTP ${response.status}`;
+    let details: string | undefined;
+    const contentType = response.headers.get('content-type') || '';
+
+    try {
+      if (contentType.includes('application/json')) {
+        const parsed: unknown = await response.json();
+        if (this.isErrorObject(parsed)) {
+          message = parsed.error || message;
+          details = parsed.message || parsed.details;
+        }
+      } else {
+        const text = await response.text();
+        if (text) message = text;
+      }
+    } catch {
+      // Use defaults if parsing fails
+    }
+
+    throw new ApiError(response.status, message, details);
+  }
+
+  /**
+   * Type guard for error objects
+   */
+  private isErrorObject(obj: unknown): obj is Record<string, unknown> & {
+    error?: string;
+    message?: string;
+    details?: string;
+  } {
+    return typeof obj === 'object' && obj !== null;
+  }
+
+  /**
    * Builds query string from object parameters
    * Handles arrays, null/undefined values, and proper URL encoding
    */
-  private buildQueryString(query?: Record<string, any>): string {
+  private buildQueryString(query?: Record<string, unknown>): string {
     if (!query || Object.keys(query).length === 0) return '';
 
     const params = new URLSearchParams();
@@ -113,29 +384,7 @@ export class ApiClient {
       const response = await fetch(requestUrl, config);
 
       if (!response.ok) {
-        let errorData: any;
-        const contentType = response.headers.get('content-type');
-
-        try {
-          if (contentType?.includes('application/json')) {
-            errorData = await response.json();
-          } else {
-            errorData = {
-              error: (await response.text()) || response.statusText,
-            };
-          }
-        } catch {
-          errorData = {
-            error: `HTTP ${response.status}`,
-            details: response.statusText,
-          };
-        }
-
-        throw new ApiError(
-          response.status,
-          errorData.error || `HTTP ${response.status}`,
-          errorData.details || errorData.message,
-        );
+        await this.handleErrorResponse(response);
       }
 
       // Handle empty responses
@@ -151,7 +400,7 @@ export class ApiClient {
       if (contentType?.includes('application/json')) {
         return await response.json();
       }
-      return response.text() as unknown as T;
+      return (await response.text()) as unknown as T;
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;
@@ -165,7 +414,7 @@ export class ApiClient {
   }
 
   /**
-   * GET request with optional query parameters
+   * GET request
    * @param endpoint - API endpoint path
    * @param config - Request configuration
    */
@@ -177,6 +426,18 @@ export class ApiClient {
       ...config,
       method: 'GET',
     });
+  }
+
+  /**
+   * GET request with Server-Sent Events streaming
+   * @param endpoint - API endpoint path
+   * @param config - SSE configuration
+   */
+  getStream<T = any>(
+    endpoint: string,
+    config: SSEConfig = {},
+  ): AsyncGenerator<SSEEvent<T>, void, unknown> {
+    return this.streamSSE<T>(endpoint, config);
   }
 
   /**
@@ -194,6 +455,19 @@ export class ApiClient {
       method: 'POST',
       body: data,
     });
+  }
+
+  /**
+   * POST request with Server-Sent Events streaming
+   * @param endpoint - API endpoint path
+   * @param config - SSE configuration with optional data
+   */
+  postStream<T = any>(
+    endpoint: string,
+    config: SSEConfig & { data?: any } = {},
+  ): AsyncGenerator<SSEEvent<T>, void, unknown> {
+    // Note: POST SSE is uncommon but supported
+    return this.streamSSE<T>(endpoint, config, 'POST');
   }
 
   /**

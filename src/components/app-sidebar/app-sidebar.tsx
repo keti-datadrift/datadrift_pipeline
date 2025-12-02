@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { logout } from '@/lib/api/endpoints';
 import { Command } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
@@ -45,7 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={data.user} logout={logout} />
       </SidebarFooter>
     </Sidebar>
   );

@@ -5,8 +5,8 @@ import { PaginatedResponse } from './pagination';
 import { formatRelativeTime } from '@/utils/time.util';
 
 export interface MLModelVersionResponse {
-  id: string;
-  model_id: number;
+  id: number;
+  ml_model: number;
   trained_at: string;
   weight: string;
   version: string;
@@ -24,6 +24,8 @@ export namespace MLModelVersionResponse {
       id: response.id,
       version: response.version,
       trainedAt: formatRelativeTime(response.trained_at),
+      trainingMetrics: trainingMetrics,
+      modelId: response.ml_model,
     };
   }
 }

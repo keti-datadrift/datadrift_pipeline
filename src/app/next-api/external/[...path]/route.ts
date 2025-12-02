@@ -89,16 +89,27 @@ async function handleProxy(request: NextRequest) {
       console.log('[PROXY] Set-Cookie found:', setCookieHeader);
       responseHeaders.set('set-cookie', setCookieHeader);
     }
-    
-    // 응답 본문 처리
-    const responseBody = await proxyResponse.arrayBuffer();
-    
-    return new NextResponse(responseBody, {
-      status: proxyResponse.status,
-      statusText: proxyResponse.statusText,
-      headers: responseHeaders,
-    });
-    
+
+    // 응답 본문 처리 - SSE 스트림을 위해 조건부 처리
+    const contentType = proxyResponse.headers.get('content-type') || '';
+
+    if (contentType.includes('text/event-stream')) {
+      // SSE 스트림인 경우 응답 본문을 직접 스트리밍
+      console.log('[PROXY] SSE stream detected, passing through response body');
+      return new NextResponse(proxyResponse.body, {
+        status: proxyResponse.status,
+        statusText: proxyResponse.statusText,
+        headers: responseHeaders,
+      });
+    } else {
+      // 일반 응답인 경우 기존 방식 사용
+      const responseBody = await proxyResponse.arrayBuffer();
+      return new NextResponse(responseBody, {
+        status: proxyResponse.status,
+        statusText: proxyResponse.statusText,
+        headers: responseHeaders,
+      });
+    }
   } catch (error) {
     console.error('[PROXY] Error:', error);
     return NextResponse.json(

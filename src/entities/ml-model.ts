@@ -60,7 +60,9 @@ export type Model = {
 };
 
 export type ModelVersion = {
-  id: string;
+  id: number;
   version: string;
   trainedAt: string;
+  trainingMetrics: TrainingMetrics;
+  modelId: number;
 };
