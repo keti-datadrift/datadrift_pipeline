@@ -59,10 +59,32 @@ export type Model = {
   description?: string;
 };
 
+export interface TrainingMetrics {
+  epochs: number | null;
+  trainingTime: number | null;
+  precision: number | null;
+  recall: number | null;
+  map50: number | null;
+  map50to95: number | null;
+}
+
+export interface TrainingArgs {
+  imageSize: number | null;
+  optimizer: string | null;
+  nbs: number | null;
+  iou: number | null;
+  cls: number | null;
+  dfl: number | null;
+  lr0: number | null;
+  lrf: number | null;
+  box: number | null;
+}
+
 export type ModelVersion = {
   id: number;
   version: string;
   trainedAt: string;
   trainingMetrics: TrainingMetrics;
+  trainingArgs: TrainingArgs;
   modelId: number;
 };

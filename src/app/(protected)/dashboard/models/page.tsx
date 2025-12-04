@@ -75,7 +75,7 @@ function useColumnFilters() {
  */
 function ModelsPageSkeleton() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto">
       <div className="mb-8">
         <Skeleton className="h-8 w-48 mb-2" />
         <Skeleton className="h-4 w-32" />
@@ -120,7 +120,7 @@ function ModelsPageError({
   onRetry: () => void;
 }) {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto">
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold text-gray-900">Models</h1>
         <p className="text-sm text-gray-600">Models</p>
@@ -189,7 +189,7 @@ export default function ModelsPage() {
         router.push(`/dashboard/models/${id}?${queryParams.toString()}`);
       }
     },
-    [data],
+    [data, router],
   );
 
   if (loading) {

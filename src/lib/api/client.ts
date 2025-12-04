@@ -134,11 +134,24 @@ export class ApiClient {
 
       const response = await fetch(requestUrl, requestOptions);
 
+      // Create a safe headers log: mocks may not implement headers.entries()
+      let headersLog: Record<string, string> | undefined;
+      try {
+        const entries = (response.headers as any)?.entries?.();
+        if (entries && typeof entries[Symbol.iterator] === 'function') {
+          headersLog = Object.fromEntries(
+            entries as Iterable<[string, string]>,
+          );
+        }
+      } catch {
+        // Ignore logging headers if not iterable
+      }
+
       console.log('📥 SSE Response:', {
         status: response.status,
         statusText: response.statusText,
         contentType: response.headers.get('content-type'),
-        headers: Object.fromEntries(response.headers.entries()),
+        headers: headersLog,
       });
 
       if (!response.ok) {
@@ -287,6 +300,20 @@ export class ApiClient {
         if (this.isErrorObject(parsed)) {
           message = parsed.error || message;
           details = parsed.message || parsed.details;
+
+          // Handle special authentication error that requires redirect
+          if (
+            parsed.error === 'AUTHENTICATION_REQUIRED' &&
+            typeof window !== 'undefined'
+          ) {
+            const redirectTo = (parsed as any).redirectTo || '/login';
+            console.log(
+              '[API] Authentication required, redirecting to:',
+              redirectTo,
+            );
+            window.location.href = redirectTo;
+            // Still throw the error after initiating redirect
+          }
         }
       } else {
         const text = await response.text();

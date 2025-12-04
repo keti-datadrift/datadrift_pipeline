@@ -81,7 +81,7 @@ export function useApiData<TResponse, TEntity>({
 
       const message = err instanceof Error ? err.message : errorMessage;
       setError(message);
-      console.debug(`${errorMessage}:`, err);
+      console.error(`${errorMessage}:`, err);
     } finally {
       // Check if request was aborted before updating state
       if (!abortControllerRef.current?.signal.aborted) {

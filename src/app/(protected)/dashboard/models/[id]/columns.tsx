@@ -89,17 +89,30 @@ SelectHeader.displayName = 'SelectHeader';
 
 const VersionCell = memo(({ row }: { row: Row<ModelVersion> }) => {
   const version = row.original.version;
-  return <div className="font-mono text-sm">v{version}</div>;
+  return (
+    <div className="font-mono text-sm truncate" title={`v${version}`}>
+      v{version}
+    </div>
+  );
 });
 VersionCell.displayName = 'VersionCell';
 
 const TrainedAtCell = memo(({ row }: { row: Row<ModelVersion> }) => {
-  return <div>{row.original.trainedAt}</div>;
+  return (
+    <div className="truncate" title={row.original.trainedAt}>
+      {row.original.trainedAt}
+    </div>
+  );
 });
 TrainedAtCell.displayName = 'TrainedAtCell';
 
 const MetricsCell = memo(({ metric }: { metric: number | null }) => {
-  return <div>{metric || '-'}</div>;
+  const value = metric ?? '-';
+  return (
+    <div className="truncate" title={String(value)}>
+      {value}
+    </div>
+  );
 });
 MetricsCell.displayName = 'MetricsCell';
 
@@ -119,59 +132,77 @@ export const columns = (
         aria-label="Select version cell"
       />
     ),
-    minSize: 50,
-    maxSize: 50,
+    size: 60,
+    minSize: 60,
+    maxSize: 60,
   },
   {
     header: 'Version',
     cell: ({ row }) => <VersionCell row={row} />,
-    minSize: 80,
-    maxSize: 80,
+    size: 100,
+    minSize: 100,
+    maxSize: 100,
   },
   {
     header: 'Epochs',
     cell: ({ row }) => (
       <MetricsCell metric={row.original.trainingMetrics.epochs} />
     ),
-    minSize: 60,
+    size: 80,
+    minSize: 80,
+    maxSize: 80,
   },
   {
     header: 'Training Time',
     cell: ({ row }) => (
-      <MetricsCell metric={row.original.trainingMetrics.epochs} />
+      <MetricsCell metric={row.original.trainingMetrics.trainingTime} />
     ),
-    minSize: 60,
+    size: 120,
+    minSize: 120,
+    maxSize: 120,
   },
   {
     header: 'Precision',
     cell: ({ row }) => (
-      <MetricsCell metric={row.original.trainingMetrics.epochs} />
+      <MetricsCell metric={row.original.trainingMetrics.precision} />
     ),
-    minSize: 60,
+    size: 90,
+    minSize: 90,
+    maxSize: 90,
   },
   {
     header: 'Recall',
     cell: ({ row }) => (
-      <MetricsCell metric={row.original.trainingMetrics.epochs} />
+      <MetricsCell metric={row.original.trainingMetrics.recall} />
     ),
-    minSize: 60,
+    size: 80,
+    minSize: 80,
+    maxSize: 80,
   },
   {
     header: 'mAP50',
     cell: ({ row }) => (
-      <MetricsCell metric={row.original.trainingMetrics.epochs} />
+      <MetricsCell metric={row.original.trainingMetrics.map50} />
     ),
-    minSize: 60,
+    size: 80,
+    minSize: 80,
+    maxSize: 80,
   },
   {
     header: 'mAP50-95',
     cell: ({ row }) => (
-      <MetricsCell metric={row.original.trainingMetrics.epochs} />
+      <MetricsCell metric={row.original.trainingMetrics.map50to95} />
     ),
-    minSize: 60,
+    size: 100,
+    minSize: 100,
+    maxSize: 100,
   },
   {
     accessorKey: 'trainedAt',
     header: 'Trained At',
+    cell: ({ row }) => <TrainedAtCell row={row} />,
+    size: 150,
+    minSize: 150,
+    maxSize: 150,
   },
 ];

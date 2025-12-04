@@ -60,7 +60,7 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div className="rounded-md border">
-        <Table>
+        <Table style={{ tableLayout: 'fixed', width: '100%' }}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -68,8 +68,9 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="py-3"
+                      className="py-3 text-gray-500"
                       style={{
+                        width: header.column.columnDef.size,
                         minWidth: header.column.columnDef.minSize,
                         maxWidth: header.column.columnDef.maxSize,
                       }}
@@ -99,6 +100,7 @@ export function DataTable<TData, TValue>({
                     <TableCell
                       key={cell.id}
                       style={{
+                        width: cell.column.columnDef.size,
                         minWidth: cell.column.columnDef.minSize,
                         maxWidth: cell.column.columnDef.maxSize,
                       }}

@@ -151,14 +151,22 @@ export const columns: ColumnDef<Model>[] = [
     },
     cell: ({ row }) => {
       const id = row.getValue('id') as Model['id'];
-      return <div className="ml-4">{id}</div>;
+      return <div className="ml-4 truncate">{id}</div>;
     },
-    maxSize: 50,
+    size: 80,
+    minSize: 80,
+    maxSize: 80,
   },
   {
     accessorKey: 'name',
     header: 'Model Name',
-    cell: ({ row }) => <div className="font-medium">{row.original.name}</div>,
+    cell: ({ row }) => (
+      <div className="font-medium truncate" title={row.original.name}>
+        {row.original.name}
+      </div>
+    ),
+    size: 250,
+    minSize: 250,
     maxSize: 250,
   },
   {
@@ -169,25 +177,42 @@ export const columns: ColumnDef<Model>[] = [
       if (!value || value.length === 0) return true;
       return value.includes(row.getValue(id));
     },
-    maxSize: 100,
+    size: 120,
+    minSize: 120,
+    maxSize: 120,
   },
   {
     accessorKey: 'version',
     header: 'Version',
     cell: ({ row }) => (
-      <div className="font-mono text-sm">v{row.getValue('version')}</div>
+      <div
+        className="font-mono text-sm truncate"
+        title={`v${row.getValue('version')}`}
+      >
+        v{row.getValue('version')}
+      </div>
     ),
+    size: 100,
+    minSize: 100,
     maxSize: 100,
   },
   {
     accessorKey: 'updatedAt',
     header: 'Last Update',
-    cell: ({ row }) => row.getValue('updatedAt'),
-    maxSize: 100,
+    cell: ({ row }) => (
+      <div className="truncate" title={row.getValue('updatedAt')}>
+        {row.getValue('updatedAt')}
+      </div>
+    ),
+    size: 150,
+    minSize: 150,
+    maxSize: 150,
   },
   {
     id: 'actions',
     cell: ({ row }) => <ModelActionsCell model={row.original} />,
-    maxSize: 40,
+    size: 60,
+    minSize: 60,
+    maxSize: 60,
   },
 ];

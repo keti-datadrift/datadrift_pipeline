@@ -66,15 +66,16 @@ export const DataTable = memo(
     return (
       <div>
         <div className="rounded-md border">
-          <Table>
+          <Table style={{ tableLayout: 'fixed', width: '100%' }}>
             <TableHeader>
               {headerGroups.map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className={`py-3 ${header.column.columnDef.header === 'Version' ? 'text-left' : 'text-center'}`}
+                      className={`py-3 ${header.column.columnDef.header === 'Version' ? 'text-left' : 'text-center'} text-gray-500`}
                       style={{
+                        width: header.column.columnDef.size,
                         minWidth: header.column.columnDef.minSize,
                         maxWidth: header.column.columnDef.maxSize,
                       }}
@@ -96,13 +97,14 @@ export const DataTable = memo(
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && 'selected'}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-gray-50 transition-colors h-16"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
                         className={`py-2 ${cell.column.columnDef.header === 'Version' ? 'text-left' : 'text-center'}`}
                         style={{
+                          width: cell.column.columnDef.size,
                           minWidth: cell.column.columnDef.minSize,
                           maxWidth: cell.column.columnDef.maxSize,
                         }}

@@ -19,4 +19,4 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/bun.lock ./bun.lock
 COPY --from=builder /app/next.config.ts ./next.config.ts
 
-RUN bun install --production
+RUN bun install --frozen-lockfile

@@ -6,9 +6,15 @@ import { TrainingStatusPanel } from '@/components/training/TrainingStatusPanel';
 import { ModelType } from '@/entities/ml-model';
 import { useBackgroundTraining } from '@/hooks/train/use-background-training';
 import { useTrainingSetup } from '@/hooks/train/use-training-setup';
-import { useMemo } from 'react';
+import { useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-export default function ModelTrainingPage() {
+function ModelTrainingPageContent() {
+  const searchParams = useSearchParams();
+  const type = searchParams.get('type');
+  const modelId = searchParams.get('modelId');
+  const versionId = searchParams.get('versionId');
+
   const tasks = useMemo(() => {
     return ModelType.allCases().map((type) => {
       return {
@@ -92,5 +98,13 @@ export default function ModelTrainingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ModelTrainingPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading training setup...</div>}>
+      <ModelTrainingPageContent />
+    </Suspense>
   );
 }
