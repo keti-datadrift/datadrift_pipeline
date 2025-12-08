@@ -68,3 +68,13 @@ export namespace UpdateProjectRequest {
  * {@link UpdateProjectRequest}와 동일한 스키마 사용
  * */
 export interface UpdateProjectResponse extends UpdateProjectRequest {}
+
+/**
+ * Upload tasks options for multipart file upload
+ */
+export interface UploadTasksOptions {
+  /** Field name for the files in the form data (defaults to 'files') */
+  fieldName?: string;
+  /** Additional form data to include with the upload */
+  additionalData?: Record<string, string | number | boolean>;
+}

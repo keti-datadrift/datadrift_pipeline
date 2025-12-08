@@ -1,6 +1,8 @@
+import { AuthProvider } from '@/contexts/AuthContext';
 import type { Metadata } from 'next';
 import './globals.css';
 import { JetBrains_Mono } from 'next/font/google';
+import React from 'react';
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -21,7 +23,9 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${jetbrainsMono.variable}`}>
       <body className={'antialiased bg-sidebar-background'}>
-        <main className="flex-1">{children}</main>
+        <AuthProvider>
+          <main className="flex-1">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

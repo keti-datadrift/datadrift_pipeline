@@ -2,28 +2,15 @@
 
 import { StatCard } from '@/components/stat-card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Model } from '@/entities/ml-model';
 import { useModels } from '@/hooks/network/models';
 import { ColumnFiltersState, OnChangeFn } from '@tanstack/react-table';
-import {
-  AlertCircle,
-  PanelsLeftBottom,
-  Search,
-  Signature,
-  Table2,
-  X,
-} from 'lucide-react';
+import { AlertCircle, PanelsLeftBottom, Search, Signature, Table2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 

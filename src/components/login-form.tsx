@@ -2,19 +2,36 @@ import { cn } from '@/lib/utils/tailwind.util';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { getAuthPrerequisits } from '@/lib/api/endpoints/labelstudio/direct';
 import { cn } from '@/lib/utils/tailwind.util';
 import React, { useCallback, useEffect, useState } from 'react';
-
-import { getTokensByCredentials } from '@/lib/api/endpoints/jwt';
-import {
-  directLogin,
-  getAuthPrerequisits,
-} from '@/lib/api/endpoints/labelstudio/direct';
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<'form'>) {
+}: React.ComponentProps<'div'>) {
+  const { loginAction } = useAuthContext();
+
+  const [csrfMiddlewareToken, setToken] = useState<string>('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement> | undefined) => {
+      await loginAction(email, password, csrfMiddlewareToken, e);
+    },
+    [loginAction, csrfMiddlewareToken, email, password],
+  );
+
+  useEffect(() => {
+    async function fetchMiddlewareToken(): Promise<void> {
+      const token = await getAuthPrerequisits();
+      setToken(token);
+    }
+    fetchMiddlewareToken().then((_) => {});
+  }, []);
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="border-sidebar-border">
@@ -23,7 +40,7 @@ export function LoginForm({
           <CardDescription>Login with your email and password</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleSubmit}>
             <div className="grid gap-8">
               <div className="flex flex-col gap-3">
                 <div className="grid gap-3">
@@ -31,8 +48,8 @@ export function LoginForm({
                   <Input
                     id="email"
                     type="email"
-                    placeholder="m@example.com"
-                    required
+                    placeholder="qocr@example.com"
+                    required={true}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -44,7 +61,8 @@ export function LoginForm({
                   <Input
                     id="password"
                     type="password"
-                    required
+                    placeholder="⋅⋅⋅⋅⋅⋅⋅⋅"
+                    required={true}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />

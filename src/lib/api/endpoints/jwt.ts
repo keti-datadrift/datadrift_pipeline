@@ -3,7 +3,7 @@ import { APIError } from '../types';
 
 export const getAccessTokenByRefresh = async (refresh: string): Promise<string> => {
   try {
-    const response = await APIClient.labelstudio.post<{ access: string }>(
+    const response = await APIClient.external.post<{ access: string }>(
       '/token/refresh/',
       { data: { refresh } },
     );
@@ -23,11 +23,10 @@ export const getTokensByCredentials = async (
 ): Promise<void> => {
   try {
     const basicAuth = btoa(`${email}:${password}`);
-    await APIClient.labelstudio.post('/token/obtain/', {
-      data: { email, password },
+    
+    await APIClient.external.post('/token/obtain/', {
       headers: {
         Authorization: `Basic ${basicAuth}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
   } catch (error) {

@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { MLModelResponse, GetMLModelsResponse } from './models/ml-models';
+import { getCookie } from '@/utils/cookie.util';
+import { useCallback, useState } from 'react';
 
 /** HTTP method types */
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -48,10 +48,205 @@ type RequestOptions = {
  * HTTP API client with automatic query string building, CSRF protection, and error handling
  */
 export class ApiClient {
-  private baseURL: string;
+  baseURL: string;
 
   constructor(baseURL: string) {
     this.baseURL = baseURL.replace(/\/$/, ''); // Remove trailing slash
+  }
+
+  /**
+   * Internal request method with automatic error handling and response parsing
+   */
+  private async request<T = any>(
+    endpoint: string,
+    options: RequestOptions = {},
+  ): Promise<T> {
+    const { url: requestURL, config } = this.buildRequestURL(options, endpoint);
+
+    try {
+      const response = await fetch(requestURL, config);
+
+      if (!response.ok) {
+        await this.handleErrorResponse(response);
+      }
+
+      // Handle empty responses
+      if (
+        response.status === 204 ||
+        response.headers.get('content-length') === '0'
+      ) {
+        return {} as T;
+      }
+
+      // Parse response based on content type
+      const contentType = response.headers.get('content-type');
+      if (contentType?.includes('application/json')) {
+        return await response.json();
+      }
+      return (await response.text()) as unknown as T;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      // Handle network errors, timeouts, etc.
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      throw new ApiError(0, 'Network error or request failed', errorMessage);
+    }
+  }
+
+  private buildRequestURL(
+    options: RequestOptions,
+    endpoint: string,
+  ): { url: string; config: RequestInit } {
+    const { method = 'GET', headers = {}, body, signal, query } = options;
+
+    // Build request headers with automatic content-type detection
+    const requestHeaders: Record<string, string> = {
+      // Only set default Content-Type if body is not FormData
+      ...(body instanceof FormData
+        ? {}
+        : { 'Content-Type': 'application/json' }),
+      ...headers,
+    };
+
+    // Add CSRF token for state-changing requests
+    if (method !== 'GET') {
+      const csrfToken = getCookie('csrftoken');
+      if (csrfToken) {
+        requestHeaders['X-CSRFToken'] = csrfToken;
+      }
+    }
+
+    // Build final URL with query parameters
+    const queryString = this.buildQueryString(query);
+    const normalizedEndpoint = endpoint.startsWith('/')
+      ? endpoint
+      : `/${endpoint}`;
+    const requestUrl = `${this.baseURL}${normalizedEndpoint}${queryString}`;
+
+    const config: RequestInit = {
+      method,
+      headers: requestHeaders,
+      signal,
+      credentials: 'include', // Include cookies for authentication
+    };
+
+    // Add body for non-GET requests
+    if (body && method !== 'GET') {
+      config.body = body instanceof FormData ? body : JSON.stringify(body);
+    }
+    return {
+      url: requestUrl,
+      config: config,
+    };
+  }
+
+  /**
+   * GET request
+   * @param endpoint - API endpoint path
+   * @param config - Request configuration
+   */
+  async get<T = any>(
+    endpoint: string,
+    config: BaseRequestConfig = {},
+  ): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'GET',
+    });
+  }
+
+  /**
+   * GET request with Server-Sent Events streaming
+   * @param endpoint - API endpoint path
+   * @param config - SSE configuration
+   */
+  getStream<T = any>(
+    endpoint: string,
+    config: SSEConfig = {},
+  ): AsyncGenerator<SSEEvent<T>, void, unknown> {
+    return this.streamSSE<T>(endpoint, config);
+  }
+
+  /**
+   * POST request with data and optional query parameters
+   * @param endpoint - API endpoint path
+   * @param config - Request configuration with data
+   */
+  async post<T = any>(
+    endpoint: string,
+    config: RequestWithBodyConfig = {},
+  ): Promise<T> {
+    const { data, ...restConfig } = config;
+    return this.request<T>(endpoint, {
+      ...restConfig,
+      method: 'POST',
+      body: data,
+    });
+  }
+
+  /**
+   * POST request with Server-Sent Events streaming
+   * @param endpoint - API endpoint path
+   * @param config - SSE configuration with optional data
+   */
+  postStream<T = any>(
+    endpoint: string,
+    config: SSEConfig & { data?: any } = {},
+  ): AsyncGenerator<SSEEvent<T>, void, unknown> {
+    // Note: POST SSE is uncommon but supported
+    return this.streamSSE<T>(endpoint, config, 'POST');
+  }
+
+  /**
+   * PUT request with data and optional query parameters
+   * @param endpoint - API endpoint path
+   * @param config - Request configuration with data
+   */
+  async put<T = any>(
+    endpoint: string,
+    config: RequestWithBodyConfig = {},
+  ): Promise<T> {
+    const { data, ...restConfig } = config;
+    return this.request<T>(endpoint, {
+      ...restConfig,
+      method: 'PUT',
+      body: data,
+    });
+  }
+
+  /**
+   * PATCH request with data and optional query parameters
+   * @param endpoint - API endpoint path
+   * @param config - Request configuration with data
+   */
+  async patch<T = any>(
+    endpoint: string,
+    config: RequestWithBodyConfig = {},
+  ): Promise<T> {
+    const { data, ...restConfig } = config;
+    return this.request<T>(endpoint, {
+      ...restConfig,
+      method: 'PATCH',
+      body: data,
+    });
+  }
+
+  /**
+   * DELETE request with optional query parameters
+   * @param endpoint - API endpoint path
+   * @param config - Request configuration
+   */
+  async delete<T = any>(
+    endpoint: string,
+    config: BaseRequestConfig = {},
+  ): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'DELETE',
+    });
   }
 
   /**
@@ -62,123 +257,241 @@ export class ApiClient {
     config: SSEConfig & { data?: any },
     method: 'GET' | 'POST' = 'GET',
   ): AsyncGenerator<SSEEvent<T>, void, unknown> {
-    const {
-      headers = {},
-      signal,
-      query,
-      parseJson = true,
-      requireEventStream = true,
-      data,
-    } = config;
+    const { parseJson = true, requireEventStream = true } = config;
+    const { requestUrl, controller, cleanup } = this.setupSSERequest(
+      endpoint,
+      config,
+    );
 
+    try {
+      const requestOptions = this.buildSSERequestOptions(
+        config,
+        method,
+        controller,
+      );
+
+      const response = await this.executeSSERequest(
+        requestUrl,
+        requestOptions,
+        method,
+      );
+
+      this.validateSSEResponse(response, requireEventStream);
+      yield* this.parseSSEStream<T>(response.body!, parseJson);
+    } catch (error) {
+      this.handleSSEError(error);
+    } finally {
+      cleanup();
+    }
+  }
+
+  /**
+   * Setup SSE request configuration
+   */
+  private setupSSERequest(
+    endpoint: string,
+    config: SSEConfig & { data?: any },
+  ) {
+    const { signal, query } = config;
+
+    const requestUrl = this.buildSSEUrl(endpoint, query);
+    const controller = new AbortController();
+    const cleanup = this.createSSECleanup(signal, controller);
+
+    this.setupAbortHandling(signal, controller, cleanup);
+
+    return { requestUrl, controller, cleanup };
+  }
+
+  /**
+   * Build SSE request URL
+   */
+  private buildSSEUrl(endpoint: string, query?: Record<string, any>): string {
     const queryString = this.buildQueryString(query);
     const normalizedEndpoint = endpoint.startsWith('/')
       ? endpoint
       : `/${endpoint}`;
-    const requestUrl = `${this.baseURL}${normalizedEndpoint}${queryString}`;
+    return `${this.baseURL}${normalizedEndpoint}${queryString}`;
+  }
 
-    const controller = new AbortController();
-    const cleanup = () => {
-      if (signal) signal.removeEventListener('abort', handleAbort);
+  /**
+   * Create cleanup function for SSE
+   */
+  private createSSECleanup(signal?: AbortSignal, controller?: AbortController) {
+    return () => {
+      if (signal && controller) {
+        signal.removeEventListener('abort', () => controller.abort());
+      }
     };
+  }
+
+  /**
+   * Setup abort signal handling
+   */
+  private setupAbortHandling(
+    signal?: AbortSignal,
+    controller?: AbortController,
+    cleanup?: () => void,
+  ): void {
+    if (!signal || !controller || !cleanup) return;
+
     const handleAbort = () => {
       controller.abort();
       cleanup();
     };
 
-    if (signal?.aborted) {
+    if (signal.aborted) {
       controller.abort();
-    } else if (signal) {
+    } else {
       signal.addEventListener('abort', handleAbort, { once: true });
     }
+  }
 
-    try {
-      const requestOptions: RequestInit = {
-        method,
-        headers: {
-          'Cache-Control': 'no-cache',
-          ...headers,
-        },
-        signal: controller.signal,
-        credentials: 'include',
-      };
+  /**
+   * Build SSE request options
+   */
+  private buildSSERequestOptions(
+    config: SSEConfig & { data?: any },
+    method: 'GET' | 'POST',
+    controller: AbortController,
+  ): RequestInit {
+    const { headers = {}, data } = config;
 
-      if (method === 'POST' && data !== undefined) {
-        if (data instanceof FormData) {
-          requestOptions.body = data;
-          // Don't set Content-Type, let browser set it for FormData with boundary
-        } else {
-          requestOptions.body = JSON.stringify(data);
-          requestOptions.headers = {
-            ...requestOptions.headers,
-            'Content-Type': 'application/json',
-          };
-        }
+    const requestOptions: RequestInit = {
+      method,
+      headers: { 'Cache-Control': 'no-cache', ...headers },
+      signal: controller.signal,
+      credentials: 'include',
+    };
 
-        // Add CSRF token for POST requests
-        const csrfToken = getCookie('csrftoken');
-        if (csrfToken) {
-          requestOptions.headers = {
-            ...requestOptions.headers,
-            'X-CSRFToken': csrfToken,
-          };
-        }
-      }
-
-      console.log('🌐 SSE Request:', {
-        url: requestUrl,
-        method,
-        headers: requestOptions.headers,
-        hasBody: !!requestOptions.body,
-      });
-
-      const response = await fetch(requestUrl, requestOptions);
-
-      // Create a safe headers log: mocks may not implement headers.entries()
-      let headersLog: Record<string, string> | undefined;
-      try {
-        const entries = (response.headers as any)?.entries?.();
-        if (entries && typeof entries[Symbol.iterator] === 'function') {
-          headersLog = Object.fromEntries(
-            entries as Iterable<[string, string]>,
-          );
-        }
-      } catch {
-        // Ignore logging headers if not iterable
-      }
-
-      console.log('📥 SSE Response:', {
-        status: response.status,
-        statusText: response.statusText,
-        contentType: response.headers.get('content-type'),
-        headers: headersLog,
-      });
-
-      if (!response.ok) {
-        await this.handleErrorResponse(response);
-      }
-
-      const contentType = response.headers.get('content-type') || '';
-      if (requireEventStream && !contentType.includes('text/event-stream')) {
-        throw new ApiError(
-          0,
-          'Invalid SSE response',
-          `Expected text/event-stream, got ${contentType || 'unknown'}`,
-        );
-      }
-
-      if (!response.body) {
-        throw new ApiError(0, 'Stream error', 'Missing response body for SSE');
-      }
-
-      yield* this.parseSSEStream<T>(response.body, parseJson);
-    } catch (error) {
-      if (error instanceof ApiError) throw error;
-      const message = error instanceof Error ? error.message : String(error);
-      throw new ApiError(0, 'SSE connection failed', message);
-    } finally {
-      cleanup();
+    if (method === 'POST' && data !== undefined) {
+      this.addPostDataToRequest(requestOptions, data);
     }
+
+    return requestOptions;
+  }
+
+  /**
+   * Add POST data to request options
+   */
+  private addPostDataToRequest(requestOptions: RequestInit, data: any): void {
+    if (data instanceof FormData) {
+      requestOptions.body = data;
+    } else {
+      requestOptions.body = JSON.stringify(data);
+      requestOptions.headers = {
+        ...requestOptions.headers,
+        'Content-Type': 'application/json',
+      };
+    }
+
+    const csrfToken = getCookie('csrftoken');
+    if (csrfToken) {
+      requestOptions.headers = {
+        ...requestOptions.headers,
+        'X-CSRFToken': csrfToken,
+      };
+    }
+  }
+
+  /**
+   * Execute SSE request and log details
+   */
+  private async executeSSERequest(
+    requestUrl: string,
+    requestOptions: RequestInit,
+    method: string,
+  ): Promise<Response> {
+    this.logSSERequest(requestUrl, method, requestOptions);
+
+    const response = await fetch(requestUrl, requestOptions);
+
+    this.logSSEResponse(response);
+
+    if (!response.ok) {
+      await this.handleErrorResponse(response);
+    }
+
+    return response;
+  }
+
+  /**
+   * Log SSE request details
+   */
+  private logSSERequest(
+    url: string,
+    method: string,
+    options: RequestInit,
+  ): void {
+    console.log('🌐 SSE Request:', {
+      url,
+      method,
+      headers: options.headers,
+      hasBody: !!options.body,
+    });
+  }
+
+  /**
+   * Log SSE response details
+   */
+  private logSSEResponse(response: Response): void {
+    const headersLog = this.getResponseHeadersLog(response);
+
+    console.log('📥 SSE Response:', {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get('content-type'),
+      headers: headersLog,
+    });
+  }
+
+  /**
+   * Safely extract response headers for logging
+   */
+  private getResponseHeadersLog(
+    response: Response,
+  ): Record<string, string> | undefined {
+    try {
+      const entries = (response.headers as any)?.entries?.();
+      if (entries && typeof entries[Symbol.iterator] === 'function') {
+        return Object.fromEntries(entries as Iterable<[string, string]>);
+      }
+    } catch {
+      // Ignore logging headers if not iterable
+    }
+    return undefined;
+  }
+
+  /**
+   * Validate SSE response
+   */
+  private validateSSEResponse(
+    response: Response,
+    requireEventStream: boolean,
+  ): void {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (requireEventStream && !contentType.includes('text/event-stream')) {
+      throw new ApiError(
+        0,
+        'Invalid SSE response',
+        `Expected text/event-stream, got ${contentType || 'unknown'}`,
+      );
+    }
+
+    if (!response.body) {
+      throw new ApiError(0, 'Stream error', 'Missing response body for SSE');
+    }
+  }
+
+  /**
+   * Handle SSE-specific errors
+   */
+  private handleSSEError(error: unknown): never {
+    if (error instanceof ApiError) throw error;
+
+    const message = error instanceof Error ? error.message : String(error);
+    throw new ApiError(0, 'SSE connection failed', message);
   }
 
   /**
@@ -290,51 +603,107 @@ export class ApiClient {
    * Handle error responses consistently
    */
   private async handleErrorResponse(response: Response): Promise<never> {
-    let message = `HTTP ${response.status}`;
-    let details: string | undefined;
+    const errorData = await this.extractErrorData(response);
+
+    throw new ApiError(response.status, errorData.message, errorData.details);
+  }
+
+  /**
+   * Extract error data from response
+   */
+  private async extractErrorData(response: Response): Promise<{
+    message: string;
+    details?: string;
+    parsedContent: any;
+  }> {
+    const defaultMessage = `HTTP ${response.status}`;
+    const isJson = this.isJsonResponse(response);
+
+    const parsedContent = isJson
+      ? await this.safeJsonParse(response)
+      : await this.safeTextParse(response);
+
+    return {
+      message: this.getErrorMessage(parsedContent) || defaultMessage,
+      details: this.getErrorDetails(parsedContent),
+      parsedContent,
+    };
+  }
+
+  /**
+   * Check if response is JSON
+   */
+  private isJsonResponse(response: Response): boolean {
     const contentType = response.headers.get('content-type') || '';
+    return contentType.includes('application/json');
+  }
 
+  /**
+   * Safely parse JSON response
+   */
+  private async safeJsonParse(response: Response): Promise<any> {
     try {
-      if (contentType.includes('application/json')) {
-        const parsed: unknown = await response.json();
-        if (this.isErrorObject(parsed)) {
-          message = parsed.error || message;
-          details = parsed.message || parsed.details;
-
-          // Handle special authentication error that requires redirect
-          if (
-            parsed.error === 'AUTHENTICATION_REQUIRED' &&
-            typeof window !== 'undefined'
-          ) {
-            const redirectTo = (parsed as any).redirectTo || '/login';
-            console.log(
-              '[API] Authentication required, redirecting to:',
-              redirectTo,
-            );
-            window.location.href = redirectTo;
-            // Still throw the error after initiating redirect
-          }
-        }
-      } else {
-        const text = await response.text();
-        if (text) message = text;
-      }
+      return await response.json();
     } catch {
-      // Use defaults if parsing fails
+      return null;
     }
+  }
 
-    throw new ApiError(response.status, message, details);
+  /**
+   * Safely parse text response
+   */
+  private async safeTextParse(response: Response): Promise<string | null> {
+    try {
+      return await response.text();
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Get error message from parsed content
+   */
+  private getErrorMessage(parsedContent: any): string | undefined {
+    if (!this.isErrorObject(parsedContent)) return parsedContent;
+    return parsedContent.error;
+  }
+
+  /**
+   * Get error details from parsed content
+   */
+  private getErrorDetails(parsedContent: any): string | undefined {
+    if (!this.isErrorObject(parsedContent)) return undefined;
+    return parsedContent.message || parsedContent.details;
+  }
+
+  /**
+   * Redirect on authentication error
+   */
+  private redirectOnAuthError(status: number, parsedContent: any): void {
+    if (status !== 401) return;
+
+    const redirectTo = this.extractRedirectUrl(parsedContent) || '/login';
+    console.log('[API] Authentication required, redirecting to:', redirectTo);
+    window.location.href = redirectTo;
+  }
+
+  /**
+   * Extract redirect URL from parsed content
+   */
+  private extractRedirectUrl(parsedContent: any): string | null {
+    if (!parsedContent || typeof parsedContent !== 'object') return null;
+    return parsedContent.redirectTo || null;
   }
 
   /**
    * Type guard for error objects
    */
-  private isErrorObject(obj: unknown): obj is Record<string, unknown> & {
+  private isErrorObject(obj: any): obj is Record<string, any> & {
     error?: string;
     message?: string;
     details?: string;
   } {
-    return typeof obj === 'object' && obj !== null;
+    return obj && typeof obj === 'object';
   }
 
   /**
@@ -361,189 +730,6 @@ export class ApiClient {
 
     const queryString = params.toString();
     return queryString ? `?${queryString}` : '';
-  }
-
-  /**
-   * Internal request method with automatic error handling and response parsing
-   */
-  private async request<T = any>(
-    endpoint: string,
-    options: RequestOptions = {},
-  ): Promise<T> {
-    const { method = 'GET', headers = {}, body, signal, query } = options;
-
-    // Build request headers with automatic content-type detection
-    const requestHeaders: Record<string, string> = {
-      ...(body instanceof FormData
-        ? {} // let browser set Content-Type for FormData
-        : { 'Content-Type': 'application/json' }),
-      ...headers,
-    };
-
-    // Add CSRF token for state-changing requests
-    if (method !== 'GET') {
-      const csrfToken = getCookie('csrftoken');
-      if (csrfToken) {
-        requestHeaders['X-CSRFToken'] = csrfToken;
-      }
-    }
-
-    // Build final URL with query parameters
-    const queryString = this.buildQueryString(query);
-    const normalizedEndpoint = endpoint.startsWith('/')
-      ? endpoint
-      : `/${endpoint}`;
-    const requestUrl = `${this.baseURL}${normalizedEndpoint}${queryString}`;
-
-    const config: RequestInit = {
-      method,
-      headers: requestHeaders,
-      signal,
-      credentials: 'include', // Include cookies for authentication
-    };
-
-    // Add body for non-GET requests
-    if (body && method !== 'GET') {
-      config.body = body instanceof FormData ? body : JSON.stringify(body);
-    }
-
-    try {
-      const response = await fetch(requestUrl, config);
-
-      if (!response.ok) {
-        await this.handleErrorResponse(response);
-      }
-
-      // Handle empty responses
-      if (
-        response.status === 204 ||
-        response.headers.get('content-length') === '0'
-      ) {
-        return {} as T;
-      }
-
-      // Parse response based on content type
-      const contentType = response.headers.get('content-type');
-      if (contentType?.includes('application/json')) {
-        return await response.json();
-      }
-      return (await response.text()) as unknown as T;
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
-      }
-
-      // Handle network errors, timeouts, etc.
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      throw new ApiError(0, 'Network error or request failed', errorMessage);
-    }
-  }
-
-  /**
-   * GET request
-   * @param endpoint - API endpoint path
-   * @param config - Request configuration
-   */
-  async get<T = any>(
-    endpoint: string,
-    config: BaseRequestConfig = {},
-  ): Promise<T> {
-    return this.request<T>(endpoint, {
-      ...config,
-      method: 'GET',
-    });
-  }
-
-  /**
-   * GET request with Server-Sent Events streaming
-   * @param endpoint - API endpoint path
-   * @param config - SSE configuration
-   */
-  getStream<T = any>(
-    endpoint: string,
-    config: SSEConfig = {},
-  ): AsyncGenerator<SSEEvent<T>, void, unknown> {
-    return this.streamSSE<T>(endpoint, config);
-  }
-
-  /**
-   * POST request with data and optional query parameters
-   * @param endpoint - API endpoint path
-   * @param config - Request configuration with data
-   */
-  async post<T = any>(
-    endpoint: string,
-    config: RequestWithBodyConfig = {},
-  ): Promise<T> {
-    const { data, ...restConfig } = config;
-    return this.request<T>(endpoint, {
-      ...restConfig,
-      method: 'POST',
-      body: data,
-    });
-  }
-
-  /**
-   * POST request with Server-Sent Events streaming
-   * @param endpoint - API endpoint path
-   * @param config - SSE configuration with optional data
-   */
-  postStream<T = any>(
-    endpoint: string,
-    config: SSEConfig & { data?: any } = {},
-  ): AsyncGenerator<SSEEvent<T>, void, unknown> {
-    // Note: POST SSE is uncommon but supported
-    return this.streamSSE<T>(endpoint, config, 'POST');
-  }
-
-  /**
-   * PUT request with data and optional query parameters
-   * @param endpoint - API endpoint path
-   * @param config - Request configuration with data
-   */
-  async put<T = any>(
-    endpoint: string,
-    config: RequestWithBodyConfig = {},
-  ): Promise<T> {
-    const { data, ...restConfig } = config;
-    return this.request<T>(endpoint, {
-      ...restConfig,
-      method: 'PUT',
-      body: data,
-    });
-  }
-
-  /**
-   * PATCH request with data and optional query parameters
-   * @param endpoint - API endpoint path
-   * @param config - Request configuration with data
-   */
-  async patch<T = any>(
-    endpoint: string,
-    config: RequestWithBodyConfig = {},
-  ): Promise<T> {
-    const { data, ...restConfig } = config;
-    return this.request<T>(endpoint, {
-      ...restConfig,
-      method: 'PATCH',
-      body: data,
-    });
-  }
-
-  /**
-   * DELETE request with optional query parameters
-   * @param endpoint - API endpoint path
-   * @param config - Request configuration
-   */
-  async delete<T = any>(
-    endpoint: string,
-    config: BaseRequestConfig = {},
-  ): Promise<T> {
-    return this.request<T>(endpoint, {
-      ...config,
-      method: 'DELETE',
-    });
   }
 }
 
@@ -586,27 +772,15 @@ export class ApiError extends Error {
 }
 
 /**
- * Creates API base URL based on environment and execution context
- * @param path - API path to append
- * @returns Complete base URL for API requests
+ * Make base URL for API endpoints
+ *   - direct, external: http://localhost:9999/labelstudio(/api)/{path}
+ *   - internal: http://localhost:9999/next-api/internal/{path}
+ *
+ * @param path - API endpoint path
+ * @param internal - Whether the request is internal to the Next.js app
  */
-const CREATE_API_BASE_URL = (path: string): string => {
-  const defaultUrl = 'http://121.126.210.2/labelstudio';
-  const envUrl = process.env.NEXT_PUBLIC_LABELSTUDIO_URL;
-
-  if (typeof window !== 'undefined') {
-    // Client-side: use proxy in development, direct URL in production
-    const isDev = process.env.NODE_ENV === 'development';
-
-    if (isDev) {
-      return `/next-api/external${path}`;
-    }
-
-    return `${envUrl || defaultUrl}${path}`;
-  }
-
-  // Server-side: always use direct URL
-  return `${envUrl || defaultUrl}${path}`;
+const makeBaseURL = (path: string): string => {
+  return `/next-api/external${path}`;
 };
 
 /**
@@ -614,9 +788,9 @@ const CREATE_API_BASE_URL = (path: string): string => {
  */
 export const APIClient = {
   /** Direct API client for root endpoints */
-  direct: new ApiClient(CREATE_API_BASE_URL('/')),
+  direct: new ApiClient(makeBaseURL('/')),
   /** Label Studio API client */
-  labelstudio: new ApiClient(CREATE_API_BASE_URL('/api')),
+  external: new ApiClient(makeBaseURL('/api')),
 } as const;
 
 /**

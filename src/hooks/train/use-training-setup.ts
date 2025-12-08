@@ -2,7 +2,7 @@ import { Project } from '@/entities/labelstudio';
 import { Model, ModelType, ModelVersion } from '@/entities/ml-model';
 import { useModels, useModelVersions } from '@/hooks/network/models';
 import { useProjects } from '@/hooks/network/projects';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 interface TrainingSetupProps {
   selectedType: ModelType | undefined;

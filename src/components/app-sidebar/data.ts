@@ -12,16 +12,7 @@ export const data = {
       url: '/dashboard/projects',
       icon: Database,
       isActive: true,
-      items: [
-        {
-          title: 'Import',
-          url: '/dashboard/projects/import',
-        },
-        {
-          title: 'Export',
-          url: '/dashboard/projects/export',
-        },
-      ],
+      items: [],
     },
     {
       title: 'Models',

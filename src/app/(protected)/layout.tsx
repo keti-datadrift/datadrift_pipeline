@@ -3,32 +3,16 @@
 import { AppSidebar } from '@/components/app-sidebar/app-sidebar';
 import { SiteHeader } from '@/components/app-sidebar/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { BackgroundTaskProvider } from '@/contexts/BackgroundTaskContext';
+import React from 'react';
 
 export default function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') return;
-
-    const checkAuth = async () => {
-      try {
-        await getCurrentUser();
-      } catch (error) {
-        console.error(
-          'Authentication check failed, redirecting to login:',
-          error,
-        );
-        router.replace('/login');
-      }
-    };
-
-    checkAuth();
-  }, [router]);
+  const { logoutAction } = useAuthContext();
 
   return (
     <BackgroundTaskProvider>
@@ -36,7 +20,7 @@ export default function ProtectedLayout({
         <SidebarProvider className="flex flex-col">
           <SiteHeader />
           <div className="flex flex-1">
-            <AppSidebar animateOnHover={false} />
+            <AppSidebar animateOnHover={false} onLogOut={logoutAction} />
             <SidebarInset>
               <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
             </SidebarInset>

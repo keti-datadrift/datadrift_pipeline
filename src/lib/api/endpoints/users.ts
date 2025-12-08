@@ -1,5 +1,5 @@
-import { APIClient } from '../client';
-import { APIError } from '../types';
+import {APIClient} from '../client';
+import {APIError} from '../types';
 
 // TODO: User 타입 정의 필요
 interface User {
@@ -15,7 +15,7 @@ interface User {
  */
 export const getCurrentUser = async (): Promise<User> => {
   try {
-    const user = await APIClient.labelstudio.get<User>('/current-user/whoami/');
+    const user = await APIClient.external.get<User>('/current-user/whoami');
     return user;
   } catch (error) {
     if (error instanceof APIError) {
@@ -33,10 +33,16 @@ export const getCurrentUser = async (): Promise<User> => {
  *
  * @returns 로그아웃 후 리다이렉트 URL
  */
-export const logout = async (): Promise<string> => {
+export const logout = async (): Promise<{ redirectTo: string }> => {
   try {
-    const redirectUri = await APIClient.direct.get<string>('/logout');
-    return redirectUri;
+    // Request JSON response to avoid browser following redirects to HTML
+    await APIClient.direct.post<void>('/logout', {
+      headers: {
+        Accept: 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    });
+    return { redirectTo: '/login' };
   } catch (error) {
     if (error instanceof APIError) {
       // APIClient에서 발생시킨 에러는 그대로 전달

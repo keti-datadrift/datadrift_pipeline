@@ -1,7 +1,7 @@
 import { Project } from '@/entities/labelstudio';
 import { getProjects, updateProject } from '@/lib/api/endpoints';
 import { useCallback } from 'react';
-import { useApiData, useApiMutation } from './shared/useApiData';
+import { useApiData, useApiMutation } from './shared/network.hook';
 import {
   UpdateProjectRequest,
   UpdateProjectResponse,
