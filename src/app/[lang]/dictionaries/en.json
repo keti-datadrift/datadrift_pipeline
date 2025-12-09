@@ -1,0 +1,196 @@
+{
+  "app": {
+    "title": "Q-OCR Dashboard",
+    "description": "The Q-OCR Dashboard is a powerful tool for converting images to text."
+  },
+  "nav": {
+    "data": "Data",
+    "models": "Models",
+    "training": "Training",
+    "monitoring": "Monitoring",
+    "defaultModels": "Default Models",
+    "trainingStatus": "Training Status",
+    "logs": "Logs",
+    "playground": "Playground"
+  },
+  "modelType": {
+    "layout": "Layout Detection",
+    "ocrcls": "OCR Classification",
+    "ocrrec": "OCR Recognition",
+    "ocrdet": "OCR Detection",
+    "tabrec": "Table Recognition"
+  },
+  "auth": {
+    "login": "Login",
+    "loginDescription": "Login with your email and password",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "qocr@example.com",
+    "loginButton": "Log in"
+  },
+  "labeling": {
+    "title": "Labeling Projects",
+    "description": "Annotate images or documents for training OCR models",
+    "upload": "Upload",
+    "uploadDialogTitle": "Upload Project Files",
+    "uploadDialogDescription": "Select files to upload to your project",
+    "selectProject": "Select Project",
+    "chooseProjectPlaceholder": "Choose a project to upload to..."
+  },
+  "models": {
+    "title": "Models",
+    "description": "Manage and monitor your AI models",
+    "stats": {
+      "layoutDetection": {
+        "title": "Layout Detection",
+        "description": "Number of Layout Detection models"
+      },
+      "ocr": {
+        "title": "OCR",
+        "description": "Number of OCR models"
+      },
+      "tableRecognition": {
+        "title": "Table Recognition",
+        "description": "Number of Table Recognition models"
+      }
+    },
+    "overview": "Model Overview",
+    "overviewDescription": "List of all models",
+    "searchPlaceholder": "Search model name...",
+    "clearSearch": "Clear search",
+    "errorTryAgain": "Try again",
+    "columns": {
+      "id": "ID",
+      "modelName": "Model Name",
+      "type": "Type",
+      "version": "Version",
+      "lastUpdate": "Last Update"
+    },
+    "filters": {
+      "type": "Type",
+      "filterByType": "Filter by Type",
+      "clear": "Clear"
+    },
+    "actions": {
+      "openMenu": "Open menu",
+      "viewDetails": "View Details",
+      "trainThisModel": "Train this Model",
+      "deleteModel": "Delete Model"
+    }
+  },
+  "modelDetail": {
+    "error": "Error",
+    "modelNotFound": "Model not found.",
+    "modelVersions": "Model Versions",
+    "totalVersions": "Total {count} versions",
+    "columns": {
+      "epochs": "Epochs",
+      "trainingTime": "Training Time",
+      "precision": "Precision",
+      "recall": "Recall"
+    }
+  },
+  "monitoring": {
+    "train": {
+      "title": "Training Monitoring",
+      "description": "Monitor and track all model training activities",
+      "stats": {
+        "running": { "title": "Running", "description": "Currently training" },
+        "completed": { "title": "Completed", "description": "Successfully completed" },
+        "failed": { "title": "Failed", "description": "Failed training jobs" },
+        "pending": { "title": "Pending", "description": "Waiting to start" }
+      },
+      "currentTraining": {
+        "title": "Current Training",
+        "description": "Real-time status of active training job",
+        "progress": "Progress",
+        "stage": "Stage",
+        "noActive": "No active training sessions"
+      },
+      "history": {
+        "title": "Training History",
+        "description": "Complete history of all training jobs",
+        "empty": "No training history",
+        "table": {
+          "status": "Status",
+          "task": "Task",
+          "duration": "Duration",
+          "progress": "Progress",
+          "started": "Started"
+        }
+      }
+    },
+    "default": {
+      "title": "Default Models",
+      "description": "Models selected by default for API calls."
+    },
+    "logs": {
+      "title": "Container Logs Monitoring",
+      "description": "Real-time container log streaming and monitoring"
+    }
+  },
+  "trainingPage": {
+    "title": "Model Training",
+    "description": "Configure your training setup by selecting data and model",
+    "selectionsTitle": "Selections",
+    "selectionsSub": "Select dataset and model for training",
+    "taskTitle": "Task",
+    "taskDescription": "Choose the machine learning task",
+    "taskType": "Task Type",
+    "selectTaskTypePlaceholder": "Select a task type",
+    "dataTitle": "Data",
+    "dataDescription": "Choose a labeling project",
+    "labelingProjectLabel": "Labeling Project",
+    "selectLabelingProjectPlaceholder": "Select a labeling project",
+    "selectTaskFirstPlaceholder": "Select a task first",
+    "modelTitle": "Model",
+    "modelDescription": "Choose model architecture and version",
+    "modelArchitectureLabel": "Model Architecture",
+    "selectModelPlaceholder": "Select a model",
+    "modelVersionLabel": "Model Version",
+    "selectVersionPlaceholder": "Select a version",
+    "samples": "samples"
+  },
+  "training": {
+    "button": {
+      "start": "Start Training",
+      "training": "Training"
+    },
+    "status": {
+      "title": "Training Status",
+      "currentEpoch": "Current Epoch:",
+      "trainingLoss": "Training Loss:",
+      "na": "N/A",
+      "progressWillBeDisplayed": "Training progress will be displayed here.",
+      "clickStart": "You can start training by clicking the \"Start Training\" button.",
+      "stopTraining": "Stop Training"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "toggle": "Toggle"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "download": "Download",
+    "edit": "Edit",
+    "delete": "Delete",
+    "logOut": "Log out",
+    "selectVersionButton": "Select version button",
+    "selectVersionHeader": "Select version header",
+    "noModelsFound": "No model found.",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "uploadUI": {
+    "removeFile": "Remove file",
+    "dropHere": "Drop your files here",
+    "maxFilesUpTo": "Max {count} files ∙ Up to {size}MB",
+    "selectImages": "Select images",
+    "api": "API",
+    "withSimulatedProgress": "With simulated progress track"
+  }
+}

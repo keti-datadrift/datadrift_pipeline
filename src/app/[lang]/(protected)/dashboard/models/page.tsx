@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import React, { useCallback, useMemo, useState } from 'react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
+import { useI18n } from '@/contexts/I18nContext';
 
 /**
  * Custom hook for managing column filters
@@ -106,11 +107,12 @@ function ModelsPageError({
   error: string;
   onRetry: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="container mx-auto">
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">Models</h1>
-        <p className="text-sm text-gray-600">Models</p>
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">{t('models.title')}</h1>
+        <p className="text-sm text-gray-600">{t('models.description')}</p>
       </div>
 
       <Alert variant="destructive">
@@ -121,7 +123,7 @@ function ModelsPageError({
             onClick={onRetry}
             className="ml-4 underline hover:no-underline"
           >
-            Try again
+            {t('models.errorTryAgain')}
           </button>
         </AlertDescription>
       </Alert>
@@ -131,6 +133,7 @@ function ModelsPageError({
 
 export default function ModelsPage() {
   const router = useRouter();
+  const { t } = useI18n();
 
   const { data, loading, error, refetch } = useModels();
   const {
@@ -191,29 +194,27 @@ export default function ModelsPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">Models</h1>
-        <p className="text-sm text-gray-600">
-          Manage and monitor your AI models
-        </p>
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">{t('models.title')}</h1>
+        <p className="text-sm text-gray-600">{t('models.description')}</p>
       </div>
 
       {/* Stats */}
       <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
-          title="Layout Detection"
-          description="Number of Layout Detection models"
+          title={t('models.stats.layoutDetection.title')}
+          description={t('models.stats.layoutDetection.description')}
           value={stats.layout}
           icon={PanelsLeftBottom}
         />
         <StatCard
-          title="OCR"
-          description="Number of OCR models"
+          title={t('models.stats.ocr.title')}
+          description={t('models.stats.ocr.description')}
           value={stats.ocr}
           icon={Signature}
         />
         <StatCard
-          title="Table Recognition"
-          description="Number of Table Recognition models"
+          title={t('models.stats.tableRecognition.title')}
+          description={t('models.stats.tableRecognition.description')}
           value={stats.extraction}
           icon={Table2}
         />
@@ -226,25 +227,25 @@ export default function ModelsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-xl font-semibold text-gray-900">
-                  Model Overview
+                  {t('models.overview')}
                 </CardTitle>
-                <CardDescription>List of all models</CardDescription>
+                <CardDescription>{t('models.overviewDescription')}</CardDescription>
               </div>
               <div className="flex items-center">
                 <div className="relative flex items-center">
                   <Search className="absolute left-3 size-4 text-gray-400" />
                   <Input
-                    placeholder="Search model name..."
+                    placeholder={t('models.searchPlaceholder')}
                     value={searchValue}
                     onChange={handleSearchChange}
                     className="pl-10 pr-10 w-64 focus:w-80 transition-all duration-200"
-                    aria-label="Search models by name"
+                    aria-label={t('models.searchPlaceholder')}
                   />
                   {searchValue && (
                     <button
                       onClick={clearSearchFilter}
                       className="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
-                      aria-label="Clear search"
+                      aria-label={t('models.clearSearch')}
                     >
                       <X className="size-4" />
                     </button>

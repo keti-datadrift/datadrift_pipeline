@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { useState } from 'react';
 import FileUpload from './file-upload';
+import { useI18n } from '@/contexts/I18nContext';
 
 type FileItem = {
   file: File | { type: string; name: string; size: number };
@@ -43,8 +44,8 @@ interface FileUploadDialogProps {
 export function FileUploadDialog({
   open,
   onOpenChange,
-  title = 'Upload Files',
-  description = 'Select files to upload to your project',
+  title,
+  description,
   projects = [],
   selectedProjectId,
   onProjectChange,
@@ -52,6 +53,7 @@ export function FileUploadDialog({
 }: FileUploadDialogProps) {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const { t } = useI18n();
 
   const handleUpload = async () => {
     if (!onUpload || files.length === 0) return;
@@ -71,19 +73,21 @@ export function FileUploadDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle>{title ?? t('labeling.uploadDialogTitle')}</DialogTitle>
+          <DialogDescription>
+            {description ?? t('labeling.uploadDialogDescription')}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="py-4 space-y-4">
           {projects.length > 0 && (
             <div>
               <label className="text-sm font-medium mb-2 block">
-                Select Project
+                {t('labeling.selectProject')}
               </label>
               <Select value={selectedProjectId} onValueChange={onProjectChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose a project to upload to..." />
+                  <SelectValue placeholder={t('labeling.chooseProjectPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {projects.map((project) => (
@@ -101,7 +105,7 @@ export function FileUploadDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleUpload}
@@ -111,7 +115,7 @@ export function FileUploadDialog({
               (!selectedProjectId && projects.length > 0)
             }
           >
-            {isUploading ? 'Uploading...' : 'Upload Files'}
+            {isUploading ? t('common.uploading') : t('labeling.uploadDialogTitle')}
           </Button>
         </DialogFooter>
       </DialogContent>

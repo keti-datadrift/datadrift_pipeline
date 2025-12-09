@@ -4,6 +4,7 @@ import { cn } from '@/utils/tailwind.util';
 import { ColumnDef, Row } from '@tanstack/react-table';
 import { Check } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
+import { useI18n } from '@/contexts/I18nContext';
 
 const SelectCell = memo(
   ({
@@ -63,7 +64,7 @@ const SelectCell = memo(
           onClick={handleSelect}
           onPointerEnter={handlePointerEnter}
           onPointerLeave={handlePointerLeave}
-          aria-label="Select version button"
+          aria-label={useI18n().t('common.selectVersionButton')}
         >
           {isSelected ? (
             <Check className="size-5 text-teal-600 font-bold animate-in zoom-in-75 duration-400" />
@@ -77,14 +78,14 @@ const SelectCell = memo(
 );
 SelectCell.displayName = 'SelectCell';
 
-const SelectHeader = memo(() => (
-  <div
-    className="flex items-center justify-center"
-    aria-label="Select version header"
-  >
-    <Check className="w-4 h-4" />
-  </div>
-));
+const SelectHeader = memo(() => {
+  const { t } = useI18n();
+  return (
+    <div className="flex items-center justify-center" aria-label={t('common.selectVersionHeader')}>
+      <Check className="w-4 h-4" />
+    </div>
+  );
+});
 SelectHeader.displayName = 'SelectHeader';
 
 const VersionCell = memo(({ row }: { row: Row<ModelVersion> }) => {
@@ -137,14 +138,22 @@ export const columns = (
     maxSize: 60,
   },
   {
-    header: 'Version',
+    id: 'version',
+    header: () => {
+      const { t } = useI18n();
+      return t('models.columns.version');
+    },
     cell: ({ row }) => <VersionCell row={row} />,
     size: 100,
     minSize: 100,
     maxSize: 100,
   },
   {
-    header: 'Epochs',
+    id: 'epochs',
+    header: () => {
+      const { t } = useI18n();
+      return t('modelDetail.columns.epochs');
+    },
     cell: ({ row }) => (
       <MetricsCell metric={row.original.trainingMetrics.epochs} />
     ),
@@ -153,7 +162,11 @@ export const columns = (
     maxSize: 80,
   },
   {
-    header: 'Training Time',
+    id: 'trainingTime',
+    header: () => {
+      const { t } = useI18n();
+      return t('modelDetail.columns.trainingTime');
+    },
     cell: ({ row }) => (
       <MetricsCell metric={row.original.trainingMetrics.trainingTime} />
     ),
@@ -162,7 +175,11 @@ export const columns = (
     maxSize: 120,
   },
   {
-    header: 'Precision',
+    id: 'precision',
+    header: () => {
+      const { t } = useI18n();
+      return t('modelDetail.columns.precision');
+    },
     cell: ({ row }) => (
       <MetricsCell metric={row.original.trainingMetrics.precision} />
     ),
@@ -171,7 +188,11 @@ export const columns = (
     maxSize: 90,
   },
   {
-    header: 'Recall',
+    id: 'recall',
+    header: () => {
+      const { t } = useI18n();
+      return t('modelDetail.columns.recall');
+    },
     cell: ({ row }) => (
       <MetricsCell metric={row.original.trainingMetrics.recall} />
     ),
@@ -199,7 +220,10 @@ export const columns = (
   },
   {
     accessorKey: 'trainedAt',
-    header: 'Trained At',
+    header: () => {
+      const { t } = useI18n();
+      return t('models.columns.lastUpdate');
+    },
     cell: ({ row }) => <TrainedAtCell row={row} />,
     size: 150,
     minSize: 150,

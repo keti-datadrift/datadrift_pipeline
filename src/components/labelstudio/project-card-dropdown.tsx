@@ -5,11 +5,20 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { CopyPlus, Edit, Ellipsis, Trash2 } from 'lucide-react';
+import { DownloadIcon, Edit3Icon, Ellipsis, Trash2Icon } from 'lucide-react';
+import { useI18n } from '@/contexts/I18nContext';
 
-export function ProjectCardDropdown({ onEdit }: { onEdit?: () => void }) {
+export function ProjectCardDropdown({
+  onEditAction,
+  onExportAction,
+}: {
+  onEditAction?: () => void;
+  onExportAction?: () => void;
+}) {
+  const { t } = useI18n();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,30 +35,40 @@ export function ProjectCardDropdown({ onEdit }: { onEdit?: () => void }) {
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation();
-            onEdit?.();
+            onEditAction?.();
           }}
         >
-          <Edit className="mr-2 h-4 w-4" />
-          Edit
+          <Edit3Icon className="mr-2 h-4 w-4" />
+          {t('common.edit')}
         </DropdownMenuItem>
+        {/*<DropdownMenuItem*/}
+        {/*  onClick={(e) => {*/}
+        {/*    e.stopPropagation();*/}
+        {/*    console.log('Duplicate');*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  <CopyPlusIcon className="mr-2 h-4 w-4" />*/}
+        {/*  Duplicate*/}
+        {/*</DropdownMenuItem>*/}
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation();
-            console.log('Duplicate');
+            onExportAction?.();
           }}
         >
-          <CopyPlus className="mr-2 h-4 w-4" />
-          Duplicate
+          <DownloadIcon className="mr-2 h-4 w-4" />
+          {t('common.download')}
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
-          variant="destructive"
           onClick={(e) => {
             e.stopPropagation();
             console.log('Delete');
           }}
+          variant="destructive"
         >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete
+          <Trash2Icon className="mr-2 h-4 w-4" />
+          {t('common.delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

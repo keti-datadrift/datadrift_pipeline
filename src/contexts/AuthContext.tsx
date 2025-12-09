@@ -46,15 +46,19 @@ function useAuthRedirect(isAuthenticated: boolean | undefined) {
     if (isAuthenticated === undefined) return;
 
     const currentPath = window.location.pathname;
-    const isPublicRoute = ['/', '/login'].some((path) => {
-      return currentPath === path;
-    });
+    // Extract locale prefix: /{lang}[/*]
+    const segments = currentPath.split('/');
+    const lang = segments[1] || 'ko';
+    const rootOfLang = `/${lang}`;
+    const loginOfLang = `/${lang}/login`;
+
+    const isPublicRoute = [rootOfLang, loginOfLang].includes(currentPath);
 
     if (isAuthenticated && isPublicRoute) {
-      router.replace('/dashboard');
+      router.replace(`/${lang}/dashboard`);
     } else if (!isAuthenticated) {
-      if (!isPublicRoute || currentPath === '/') {
-        router.replace('/login');
+      if (!isPublicRoute || currentPath === rootOfLang) {
+        router.replace(loginOfLang);
       }
     }
   }, [isAuthenticated, router]);

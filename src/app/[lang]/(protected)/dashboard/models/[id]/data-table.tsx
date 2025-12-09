@@ -19,6 +19,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { memo, useCallback, useMemo, useState } from 'react';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -34,6 +35,7 @@ export const DataTable = memo(
     columnFilters = [],
     onColumnFiltersChange,
   }: DataTableProps<TData, TValue>) => {
+    const { t } = useI18n();
     const [sorting, setSorting] = useState<SortingState>([]);
 
     const memoizedSorting = useMemo(() => sorting, [sorting]);
@@ -73,7 +75,7 @@ export const DataTable = memo(
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className={`py-3 ${header.column.columnDef.header === 'Version' ? 'text-left' : 'text-center'} text-gray-500`}
+                      className={`py-3 ${header.column.id === 'version' ? 'text-left' : 'text-center'} text-gray-500`}
                       style={{
                         width: header.column.columnDef.size,
                         minWidth: header.column.columnDef.minSize,
@@ -102,7 +104,7 @@ export const DataTable = memo(
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className={`py-2 ${cell.column.columnDef.header === 'Version' ? 'text-left' : 'text-center'}`}
+                        className={`py-2 ${cell.column.id === 'version' ? 'text-left' : 'text-center'}`}
                         style={{
                           width: cell.column.columnDef.size,
                           minWidth: cell.column.columnDef.minSize,
@@ -123,7 +125,7 @@ export const DataTable = memo(
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No model found.
+                    {t('common.noModelsFound')}
                   </TableCell>
                 </TableRow>
               )}

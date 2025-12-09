@@ -10,10 +10,12 @@ export function ProjectCard({
   project,
   onClick,
   onEditSubmit,
+  onExport,
 }: {
   project: Project;
   onClick?: (project: Project) => void;
   onEditSubmit?: (project: Project) => Promise<Project | null>;
+  onExport?: (project: Project) => void;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +37,10 @@ export function ProjectCard({
                 <ModelTypeBadge type={project.type} />
               </div>
             </div>
-            <ProjectCardDropdown onEdit={() => setIsDialogOpen(true)} />
+            <ProjectCardDropdown 
+              onEditAction={() => setIsDialogOpen(true)}
+              onExportAction={() => onExport?.(project)}
+            />
           </div>
         </CardHeader>
         <CardContent>
@@ -81,6 +86,7 @@ export function ProjectCard({
             }
           }
         }}
+        onExport={onExport}
       />
     </>
   );

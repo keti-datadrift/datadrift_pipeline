@@ -12,9 +12,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/components/ui/sidebar';
 import { SidebarIcon } from 'lucide-react';
+import { useI18n } from '@/contexts/I18nContext';
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
+  const { t } = useI18n();
 
   return (
     <header className="bg-background sticky top-0 z-50 flex w-full items-center border-b border-sidebar-border">
@@ -35,7 +37,7 @@ export function SiteHeader() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                <BreadcrumbPage>{t('sidebar.dashboard')}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>

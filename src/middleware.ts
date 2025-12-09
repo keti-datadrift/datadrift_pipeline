@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Locales used in route prefixes must match the app route segment: src/app/[lang]
+// Our app uses short codes ('ko', 'en'), not region codes ('ko-KR', 'en-US').
+let locales = ['ko', 'en'];
+
+let protectedRoutes = ['/dashboard', '/services'];
+
+let requiredCookies = [
+  'csrftoken',
+  'sessionid',
+  'ls_access_token',
+  'ls_refresh_token',
+];
+
 const NON_TOKEN_REFRESH_PATHS = [
   '/user/login',
   '/user/logout',
@@ -10,10 +23,9 @@ const NON_TOKEN_REFRESH_PATHS = [
 export const config = {
   matcher: [
     // HTTP Requests
-    '/next-api/external/:function*',
-    // Page Routes
-    '/dashboard/:path*',
-    '/services/:path*',
+    '/next-api/external/:path*',
+    // Page Routes - exclude static files and API routes
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };
 
@@ -21,13 +33,43 @@ export async function middleware(request: NextRequest): Promise<Response> {
   const { pathname } = request.nextUrl;
   console.info('Middleware called for path:', pathname);
 
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
+  );
+
+  if (pathnameHasLocale) {
+    // Already localized: only handle auth for protected routes
+    return handlePageRoutes(request);
+  }
+
   // LabelStudio API routes (include API endpoints + direct requests)
   if (pathname.startsWith('/next-api/external')) {
     return await handleHTTPRequests(request);
   }
 
-  // Web page routes
-  return handlePageRoutes(request);
+  // Web page routes - redirect to localized version
+  const locale = getLocale(request);
+  const url = request.nextUrl.clone();
+  url.pathname = `/${locale}${pathname}`;
+  console.info('Redirecting to localized path:', url.pathname);
+  return NextResponse.redirect(url);
+}
+
+/**
+ * Get the locale from the request headers.
+ *
+ * @param request - This request's pathname starts with '/dashboard' or '/services''
+ */
+function getLocale(request: NextRequest): string {
+  const acceptLanguage = request.headers.get('accept-language');
+
+  if (acceptLanguage) {
+    if (acceptLanguage.includes('ko')) {
+      return 'ko';
+    }
+  }
+
+  return 'en';
 }
 
 /**
@@ -54,11 +96,93 @@ async function handleHTTPRequests(request: NextRequest): Promise<Response> {
 
   // Step Final. Make fetch get the response and handle cookies
   // NextResponse.rewrite() doesn't work for SSE responses, so we need to use fetch directly
-  const fetchResponse = await fetch(handlingRequest, {
+
+  // Prepare the body based on the request method
+  let body = undefined;
+  if (handlingRequest.method !== 'GET' && handlingRequest.method !== 'HEAD') {
+    // Clone the request to preserve the body stream
+    const clonedRequest = handlingRequest.clone();
+
+    // Check if the content-type is form data
+    const contentType = handlingRequest.headers.get('content-type') || '';
+
+    console.debug('📝 Request Content-Type:', contentType);
+    console.debug('📝 Request Method:', handlingRequest.method);
+    console.debug('📝 Request URL:', handlingRequest.url);
+
+    if (contentType.includes('application/x-www-form-urlencoded')) {
+      // For URL-encoded form data, read as text
+      body = await clonedRequest.text();
+      console.debug('📝 Body as URL-encoded:', body.substring(0, 200));
+    } else if (contentType.includes('multipart/form-data')) {
+      // For multipart form data, read as blob
+      body = await clonedRequest.blob();
+      console.debug('📝 Body as multipart form-data');
+    } else if (contentType.includes('application/json')) {
+      // For JSON, read as text
+      body = await clonedRequest.text();
+      console.debug('📝 Body as JSON:', body.substring(0, 200));
+    } else {
+      // For other content types, read as array buffer
+      body = await clonedRequest.arrayBuffer();
+      console.debug('📝 Body as ArrayBuffer, size:', body.byteLength);
+    }
+  }
+
+  console.debug(
+    '🚀 Fetching with headers:',
+    Object.fromEntries(headers.entries()),
+  );
+
+  const fetchResponse = await fetch(handlingRequest.url, {
     method: handlingRequest.method,
     headers,
-    body: handlingRequest.body,
+    body,
+    redirect: 'manual', // Handle redirects manually
   });
+
+  console.debug('📥 Response status:', fetchResponse.status);
+  console.debug('📥 Response headers:', Object.fromEntries(fetchResponse.headers.entries()));
+
+  // Handle redirects
+  if (fetchResponse.status >= 300 && fetchResponse.status < 400) {
+    const location = fetchResponse.headers.get('location');
+    console.debug('🔄 Redirect detected to:', location);
+    
+    if (location) {
+      // If it's a relative path, construct the full URL
+      let redirectUrl: URL;
+      try {
+        // Try parsing as absolute URL first
+        redirectUrl = new URL(location);
+      } catch {
+        // If it fails, treat it as a relative path
+        redirectUrl = new URL(location, handlingRequest.url);
+      }
+      
+      console.debug('🔄 Full redirect URL:', redirectUrl.toString());
+      
+      // For login redirects, we should follow them
+      if (handlingRequest.nextUrl.pathname.includes('/user/login')) {
+        // Follow the redirect
+        const cleanHeaders = Object.fromEntries(headers.entries());
+        // Remove content-type for GET request
+        delete cleanHeaders['content-type'];
+        
+        const redirectResponse = await fetch(redirectUrl.toString(), {
+          method: 'GET',
+          headers: cleanHeaders,
+          credentials: 'include',
+        });
+        
+        return new NextResponse(redirectResponse.body, {
+          status: redirectResponse.status,
+          statusText: redirectResponse.statusText,
+          headers: redirectResponse.headers,
+        });
+      }
+    }
+  }
 
   // For SSE responses, stream directly without buffering
   const contentType = fetchResponse.headers.get('content-type');
@@ -85,35 +209,31 @@ async function handleHTTPRequests(request: NextRequest): Promise<Response> {
 
 /**
  * Handles authentication for protected Next.js routes.
+ * This function gets the request with the locale prefix and checks if the user is trying to access protected routes.
  */
 function handlePageRoutes(request: NextRequest): NextResponse {
   console.info('Handling page routes: ' + request.nextUrl.pathname);
   const { pathname } = request.nextUrl;
-  const csrfToken = request.cookies.get('csrftoken')?.value;
-  const sessionID = request.cookies.get('sessionid')?.value;
 
-  // Check if user is trying to access protected routes
-  const isProtectedRoute =
-    pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/services') ||
-    pathname === '/';
+  // Check if user is trying to access protected routes (accounting for locale prefix)
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.includes(route),
+  );
 
   if (isProtectedRoute) {
-    // If any of csrfToken or sessionID is missing, redirect to login
-    if (!(csrfToken && sessionID)) {
-      const loginUrl = new URL('/login', request.url);
+    // If any of required cookies is missing, redirect to login
+    if (requiredCookies.some((cookieKey) => !request.cookies.get(cookieKey))) {
+      const currentLocale =
+        locales.find(
+          (locale) =>
+            pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
+        ) || 'ko';
+      const loginUrl = new URL(`/${currentLocale}/login`, request.url);
       return NextResponse.redirect(loginUrl);
-    }
-
-    // Now there's both csrfToken and sessionID.
-    // If user is on the root path, redirect to dashboard
-    if (pathname === '/') {
-      const dashboardUrl = new URL('/dashboard', request.url);
-      return NextResponse.redirect(dashboardUrl);
     }
   }
 
-  // Allow the request to continue
+  // User is not trying to access protected routes, so continue with the request
   return NextResponse.next();
 }
 

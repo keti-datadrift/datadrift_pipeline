@@ -1,6 +1,9 @@
+"use client";
+
 import { ModelType } from '@/entities/ml-model';
 import { Badge } from './ui/badge';
 import { ModelTypeColors } from './colors/model-type';
+import { useI18n } from '@/contexts/I18nContext';
 
 type HoverStyle = 'plain' | 'highlight';
 
@@ -11,6 +14,7 @@ export default function ModelTypeBadge({
   type: ModelType;
   hover?: HoverStyle;
 }) {
+  const { t } = useI18n();
   const style = ModelTypeColors[type] ?? {
     background: 'bg-gray-500/90',
     text: 'text-white',
@@ -20,7 +24,7 @@ export default function ModelTypeBadge({
     <Badge
       className={`text-xs font-medium ${style.background} ${style.text} ${hover === 'highlight' ? style.bgHover : ''}`}
     >
-      {ModelType.presentationName(type)}
+      {t(`modelType.${type}`)}
     </Badge>
   );
 }

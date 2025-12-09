@@ -12,6 +12,8 @@ interface BaseRequestConfig {
   headers?: Record<string, string>;
   /** AbortController signal for request cancellation */
   signal?: AbortSignal;
+  /** Response type - affects how response is parsed */
+  responseType?: 'json' | 'text' | 'blob' | 'arrayBuffer';
 }
 
 /** SSE-specific configuration */
@@ -42,6 +44,7 @@ type RequestOptions = {
   body?: any;
   signal?: AbortSignal;
   query?: Record<string, any>;
+  responseType?: 'json' | 'text' | 'blob' | 'arrayBuffer';
 };
 
 /**
@@ -78,9 +81,21 @@ export class ApiClient {
         return {} as T;
       }
 
-      // Parse response based on content type
+      // Parse response based on responseType or content type
+      const { responseType } = options;
+      if (responseType === 'blob') {
+        return (await response.blob()) as unknown as T;
+      }
+      if (responseType === 'arrayBuffer') {
+        return (await response.arrayBuffer()) as unknown as T;
+      }
+      if (responseType === 'text') {
+        return (await response.text()) as unknown as T;
+      }
+      
+      // Auto-detect based on content type if no responseType specified
       const contentType = response.headers.get('content-type');
-      if (contentType?.includes('application/json')) {
+      if (contentType?.includes('application/json') || responseType === 'json') {
         return await response.json();
       }
       return (await response.text()) as unknown as T;
@@ -135,7 +150,18 @@ export class ApiClient {
 
     // Add body for non-GET requests
     if (body && method !== 'GET') {
-      config.body = body instanceof FormData ? body : JSON.stringify(body);
+      if (body instanceof FormData) {
+        config.body = body;
+        // Remove Content-Type header to let browser set it with boundary for multipart/form-data
+        delete requestHeaders['Content-Type'];
+        config.headers = requestHeaders; // Update config.headers after deletion
+      } else if (typeof body === 'string') {
+        // If body is already a string (like URL-encoded form data), use it as is
+        config.body = body;
+      } else {
+        // Otherwise, stringify as JSON
+        config.body = JSON.stringify(body);
+      }
     }
     return {
       url: requestUrl,

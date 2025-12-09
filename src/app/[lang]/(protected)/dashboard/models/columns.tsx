@@ -20,9 +20,11 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useI18n } from '@/contexts/I18nContext';
 
 // Component to handle type filtering
 const TypeFilterCell = ({ column }: { column: any }) => {
+  const { t } = useI18n();
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
   const handleTypeToggle = (type: string) => {
@@ -49,7 +51,7 @@ const TypeFilterCell = ({ column }: { column: any }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="flex items-center gap-2">
-          Type
+          {t('models.filters.type')}
           {selectedTypes.length > 0 ? (
             <Filter className="size-4 text-blue-600" />
           ) : (
@@ -60,7 +62,7 @@ const TypeFilterCell = ({ column }: { column: any }) => {
       <DropdownMenuContent align="start" className="w-56">
         <div className="p-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">Filter by Type</span>
+            <span className="text-sm font-medium">{t('models.filters.filterByType')}</span>
             {selectedTypes.length > 0 && (
               <Button
                 variant="ghost"
@@ -68,7 +70,7 @@ const TypeFilterCell = ({ column }: { column: any }) => {
                 onClick={clearFilters}
                 className="h-6 px-2 text-xs"
               >
-                Clear
+                {t('models.filters.clear')}
               </Button>
             )}
           </div>
@@ -95,6 +97,7 @@ const TypeFilterCell = ({ column }: { column: any }) => {
 // Component to handle actions, including router usage
 const ModelActionsCell = ({ model }: { model: Model }) => {
   const router = useRouter();
+  const { t } = useI18n();
 
   const handleDetailClick = () => {
     router.push(`/dashboard/models/${model.id}`);
@@ -108,7 +111,7 @@ const ModelActionsCell = ({ model }: { model: Model }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="size-8 p-0">
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">{t('models.actions.openMenu')}</span>
           <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -119,7 +122,15 @@ const ModelActionsCell = ({ model }: { model: Model }) => {
           onClick={handleDetailClick}
         >
           <Info className="size-4" />
-          View Details
+          {t('models.actions.viewDetails')}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          variant="default"
+          className="flex items-center gap-2"
+          onClick={handleTrainClick}
+        >
+          <Play className="size-4" />
+          {t('models.actions.trainThisModel')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -128,7 +139,7 @@ const ModelActionsCell = ({ model }: { model: Model }) => {
           onClick={handleDeleteClick}
         >
           <Trash2 className="size-4" />
-          Delete Model
+          {t('models.actions.deleteModel')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -139,12 +150,13 @@ export const columns: ColumnDef<Model>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => {
+      const { t } = useI18n();
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          ID
+          {t('models.columns.id')}
           <ArrowUpDown className="ml-2 size-4" />
         </Button>
       );
@@ -159,7 +171,10 @@ export const columns: ColumnDef<Model>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'Model Name',
+    header: () => {
+      const { t } = useI18n();
+      return t('models.columns.modelName');
+    },
     cell: ({ row }) => (
       <div className="font-medium truncate" title={row.original.name}>
         {row.original.name}
@@ -183,7 +198,10 @@ export const columns: ColumnDef<Model>[] = [
   },
   {
     accessorKey: 'version',
-    header: 'Version',
+    header: () => {
+      const { t } = useI18n();
+      return t('models.columns.version');
+    },
     cell: ({ row }) => (
       <div
         className="font-mono text-sm truncate"
@@ -198,7 +216,10 @@ export const columns: ColumnDef<Model>[] = [
   },
   {
     accessorKey: 'updatedAt',
-    header: 'Last Update',
+    header: () => {
+      const { t } = useI18n();
+      return t('models.columns.lastUpdate');
+    },
     cell: ({ row }) => (
       <div className="truncate" title={row.getValue('updatedAt')}>
         {row.getValue('updatedAt')}

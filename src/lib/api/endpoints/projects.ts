@@ -1,5 +1,7 @@
 import { APIClient } from '../client';
 import {
+  CreateExportSnapshotRequest,
+  ExportSnapshotResponse,
   UpdateProjectRequest,
   UpdateProjectResponse,
   UploadTasksOptions,
@@ -90,5 +92,74 @@ export const uploadTasks = async (
     console.error('Failed to uploadTasks:', error);
     if (error instanceof APIError) throw error;
     throw new APIError(0, 'Failed to upload tasks');
+  }
+};
+
+/**
+ * Create export snapshot for a project
+ * @param id - Project ID
+ * @param request - Export snapshot creation request
+ */
+export const createExportSnapshot = async (
+  id: string,
+  request: CreateExportSnapshotRequest,
+): Promise<ExportSnapshotResponse> => {
+  try {
+    const response = await APIClient.external.post<ExportSnapshotResponse>(
+      `/projects/${id}/exports/`,
+      {
+        data: request,
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error('Failed to createExportSnapshot:', error);
+    if (error instanceof APIError) throw error;
+    throw new APIError(0, 'Failed to create export snapshot');
+  }
+};
+
+/**
+ * Download export snapshot as a zip file
+ * @param projectId - Project ID
+ * @param exportId - Export snapshot ID
+ */
+export const downloadExportSnapshot = async (
+  projectId: string,
+  exportId: number,
+): Promise<Blob> => {
+  try {
+    const response = await APIClient.external.get<Blob>(
+      `/projects/${projectId}/exports/${exportId}/download`,
+      {
+        query: { exportFile: 'true' },
+        responseType: 'blob',
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error('Failed to downloadExportSnapshot:', error);
+    if (error instanceof APIError) throw error;
+    throw new APIError(0, 'Failed to download export snapshot');
+  }
+};
+
+/**
+ * Delete export snapshot
+ * @param projectId - Project ID
+ * @param exportId - Export snapshot ID
+ */
+export const deleteExportSnapshot = async (
+  projectId: string,
+  exportId: number,
+): Promise<void> => {
+  try {
+    await APIClient.external.delete<void>(
+      `/projects/${projectId}/exports/${exportId}`,
+    );
+  } catch (error) {
+    console.error('Failed to deleteExportSnapshot:', error);
+    if (error instanceof APIError) throw error;
+    throw new APIError(0, 'Failed to delete export snapshot');
   }
 };

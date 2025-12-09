@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils/tailwind.util';
 import { Loader2, Play } from 'lucide-react';
 import { useMemo } from 'react';
 import { Button } from '../ui/button';
+import { useI18n } from '@/contexts/I18nContext';
 
 export function TrainButton({
   onClick,
@@ -13,10 +14,11 @@ export function TrainButton({
   disabled?: boolean;
 }) {
   const isTraining = !!progress;
+  const { t } = useI18n();
 
   const buttonTitle = useMemo(() => {
-    return isTraining ? 'Training' : 'Start Training';
-  }, [isTraining]);
+    return isTraining ? t('training.button.training') : t('training.button.start');
+  }, [isTraining, t]);
 
   const icon = useMemo(() => {
     return isTraining ? (

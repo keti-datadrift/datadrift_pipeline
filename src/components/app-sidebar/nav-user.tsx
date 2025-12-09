@@ -15,6 +15,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useI18n } from '@/contexts/I18nContext';
 
 export function NavUser({
   user,
@@ -28,6 +29,7 @@ export function NavUser({
   logoutAction: () => Promise<void>;
 }) {
   const { isMobile } = useSidebar();
+  const { t } = useI18n();
 
   return (
     <SidebarMenu>
@@ -57,7 +59,7 @@ export function NavUser({
           >
             <DropdownMenuItem variant="destructive" onClick={logoutAction}>
               <LogOut />
-              Log out
+              {t('common.logOut')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

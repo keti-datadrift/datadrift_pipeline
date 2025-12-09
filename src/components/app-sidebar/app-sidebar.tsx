@@ -16,9 +16,17 @@ import { logout } from '@/lib/api/endpoints';
 import { Command } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
-import { data } from './data';
+import { getSidebarData } from './data';
+import { useI18n } from '@/contexts/I18nContext';
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  onLogOut,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  onLogOut: () => Promise<void>;
+}) {
+  const { t } = useI18n();
+  const data = React.useMemo(() => getSidebarData(t), [t]);
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"

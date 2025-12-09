@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select';
 import { ModelType } from '@/entities/ml-model';
 import { BrainCircuit, Database, Settings2 } from 'lucide-react';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface TrainingSelectionPanelProps {
   tasks: Array<{ id: string; name: string }>;
@@ -48,22 +49,23 @@ export function TrainingSelectionPanel({
   setSelectedVersion,
   isTraining,
 }: TrainingSelectionPanelProps) {
+  const { t } = useI18n();
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold mb-4">Selections</h2>
-      <div>Select dataset and model for training</div>
+      <h2 className="text-xl font-semibold mb-4">{t('trainingPage.selectionsTitle')}</h2>
+      <div>{t('trainingPage.selectionsSub')}</div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings2 className="h-5 w-5" />
-            Task
+            {t('trainingPage.taskTitle')}
           </CardTitle>
-          <CardDescription>Choose the machine learning task</CardDescription>
+          <CardDescription>{t('trainingPage.taskDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="task">Task Type</Label>
+            <Label htmlFor="task">{t('trainingPage.taskType')}</Label>
             <Select
               key={selectedType || undefined}
               value={selectedType || undefined}
@@ -74,12 +76,12 @@ export function TrainingSelectionPanel({
               disabled={isTraining}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a task type" />
+                <SelectValue placeholder={t('trainingPage.selectTaskTypePlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {tasks.map((task) => (
                   <SelectItem key={task.id} value={task.name}>
-                    {ModelType.presentationName(task.id as ModelType)}
+                    {t(`modelType.${task.id}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -92,13 +94,13 @@ export function TrainingSelectionPanel({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5" />
-            Data
+            {t('trainingPage.dataTitle')}
           </CardTitle>
-          <CardDescription>Choose a labeling project</CardDescription>
+          <CardDescription>{t('trainingPage.dataDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="project">Labeling Project</Label>
+            <Label htmlFor="project">{t('trainingPage.labelingProjectLabel')}</Label>
             <Select
               key={selectedProject?.id}
               value={selectedProject?.id}
@@ -109,8 +111,8 @@ export function TrainingSelectionPanel({
                 <SelectValue
                   placeholder={
                     selectedType
-                      ? 'Select a labeling project'
-                      : 'Select a task first'
+                      ? t('trainingPage.selectLabelingProjectPlaceholder')
+                      : t('trainingPage.selectTaskFirstPlaceholder')
                   }
                 />
               </SelectTrigger>
@@ -121,7 +123,7 @@ export function TrainingSelectionPanel({
                       <span key={project.id}>{project.title}</span>
                       <div className="flex items-center gap-2 ml-4">
                         <Badge variant="secondary">
-                          {project.finishedTasksCount.toLocaleString()} samples
+                          {project.finishedTasksCount.toLocaleString()} {t('trainingPage.samples')}
                         </Badge>
                       </div>
                     </div>
@@ -137,16 +139,14 @@ export function TrainingSelectionPanel({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BrainCircuit className="h-5 w-5" />
-            Model
+            {t('trainingPage.modelTitle')}
           </CardTitle>
-          <CardDescription>
-            Choose model architecture and version
-          </CardDescription>
+          <CardDescription>{t('trainingPage.modelDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="model">Model Architecture</Label>
+              <Label htmlFor="model">{t('trainingPage.modelArchitectureLabel')}</Label>
               <Select
                 key={selectedModel?.id}
                 value={selectedModel?.id}
@@ -156,7 +156,7 @@ export function TrainingSelectionPanel({
                 <SelectTrigger>
                   <SelectValue
                     placeholder={
-                      selectedType ? 'Select a model' : 'Select a task first'
+                      selectedType ? t('trainingPage.selectModelPlaceholder') : t('trainingPage.selectTaskFirstPlaceholder')
                     }
                   />
                 </SelectTrigger>
@@ -177,7 +177,7 @@ export function TrainingSelectionPanel({
 
             {selectedModel && (
               <div className="space-y-2">
-                <Label htmlFor="version">Model Version</Label>
+                <Label htmlFor="version">{t('trainingPage.modelVersionLabel')}</Label>
                 <Select
                   key={selectedVersion?.version}
                   value={selectedVersion?.version}
@@ -185,7 +185,7 @@ export function TrainingSelectionPanel({
                   disabled={isTraining}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a version" />
+                    <SelectValue placeholder={t('trainingPage.selectVersionPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {availableVersions.map((version) => (

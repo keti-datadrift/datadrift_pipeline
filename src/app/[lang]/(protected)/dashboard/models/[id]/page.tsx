@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { memo, use, useCallback, useEffect, useMemo, useState } from 'react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
+import { useI18n } from '@/contexts/I18nContext';
 
 const MemoizedDataTable = memo(
   ({ versions, columns }: { versions: ModelVersion[]; columns: any[] }) => {
@@ -90,6 +91,7 @@ export default function ModelVersionPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { t } = useI18n();
   const { id } = use(params);
   const modelId = Number(id);
   const router = useRouter();
@@ -144,8 +146,8 @@ export default function ModelVersionPage({
   if (!model) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-red-600">Error</h1>
-        <p className="text-gray-500">Model not found.</p>
+        <h1 className="text-3xl font-bold text-red-600">{t('modelDetail.error')}</h1>
+        <p className="text-gray-500">{t('modelDetail.modelNotFound')}</p>
       </div>
     );
   }
@@ -165,9 +167,9 @@ export default function ModelVersionPage({
         <Card>
           <CardHeader>
             <div>
-              <CardTitle>Model Versions</CardTitle>
+              <CardTitle>{t('modelDetail.modelVersions')}</CardTitle>
               <p className="text-sm text-gray-500">
-                Total {memoizedVersions.length} versions
+                {t('modelDetail.totalVersions', { count: memoizedVersions.length })}
               </p>
             </div>
           </CardHeader>

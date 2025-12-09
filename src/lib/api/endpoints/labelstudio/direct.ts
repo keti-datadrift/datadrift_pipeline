@@ -29,15 +29,15 @@ export const directLogin = async (
   password: string,
 ): Promise<string> => {
   try {
-    // Create form data for Django form submission
-    const formData = new FormData();
-    formData.append('csrfmiddlewaretoken', csrfMiddlewareToken);
-    formData.append('email', email);
-    formData.append('password', password);
-    formData.append('persist_session', 'on');
+    // Create URL-encoded form data for Django form submission
+    const params = new URLSearchParams();
+    params.append('csrfmiddlewaretoken', csrfMiddlewareToken);
+    params.append('email', email);
+    params.append('password', password);
+    params.append('persist_session', 'on');
 
     await APIClient.direct.post<void>('/user/login/', {
-      data: formData,
+      data: params.toString(),
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },

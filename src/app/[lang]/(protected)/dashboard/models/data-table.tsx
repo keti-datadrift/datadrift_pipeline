@@ -22,6 +22,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -38,6 +39,7 @@ export function DataTable<TData, TValue>({
   onColumnFiltersChange,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
+  const { t } = useI18n();
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
@@ -116,7 +118,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="py-2">
-                  No model found.
+                  {t('common.noModelsFound')}
                 </TableCell>
               </TableRow>
             )}
@@ -130,7 +132,7 @@ export function DataTable<TData, TValue>({
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          Previous
+          {t('common.previous')}
         </Button>
         <Button
           variant="outline"
@@ -138,7 +140,7 @@ export function DataTable<TData, TValue>({
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
-          Next
+          {t('common.next')}
         </Button>
       </div>
     </div>

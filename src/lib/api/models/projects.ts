@@ -78,3 +78,38 @@ export interface UploadTasksOptions {
   /** Additional form data to include with the upload */
   additionalData?: Record<string, string | number | boolean>;
 }
+
+/**
+ * Export snapshot creation request
+ */
+export interface CreateExportSnapshotRequest {
+  task_filter_options: {
+    annotated: 'only' | 'include' | 'exclude';
+  };
+}
+
+/**
+ * Export snapshot response
+ */
+export interface ExportSnapshotResponse {
+  title: string;
+  id: number;
+  created_by: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    avatar: string | null;
+  };
+  created_at: string;
+  finished_at: string | null;
+  status: 'created' | 'in_progress' | 'completed' | 'failed';
+  md5: string | null;
+  counters: {
+    task_number: number;
+  };
+  converted_formats: string[];
+  task_filter_options: any | null;
+  annotation_filter_options: any | null;
+  serialization_options: any | null;
+}

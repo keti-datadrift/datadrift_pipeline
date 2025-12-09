@@ -4,8 +4,10 @@ import { LogStreamConfiguration, LogViewer } from '@/components/docker';
 import { useContainerLogs } from '@/hooks/network/docker';
 import { LogStreamOptions } from '@/lib/api/endpoints';
 import { useCallback, useState } from 'react';
+import { useI18n } from '@/contexts/I18nContext';
 
 export default function LogsMonitoringPage() {
+  const { t } = useI18n();
   const [selectedContainer, setSelectedContainer] = useState<string>('');
   const [tailLines, setTailLines] = useState<string>('all');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -64,12 +66,8 @@ export default function LogsMonitoringPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">
-          Container Logs Monitoring
-        </h1>
-        <p className="text-sm text-gray-600">
-          Real-time container log streaming and monitoring
-        </p>
+        <h1 className="mb-2 text-3xl font-bold text-gray-900">{t('monitoring.logs.title')}</h1>
+        <p className="text-sm text-gray-600">{t('monitoring.logs.description')}</p>
       </div>
 
       <LogStreamConfiguration

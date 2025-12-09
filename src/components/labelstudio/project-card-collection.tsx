@@ -6,10 +6,12 @@ export function ProjectCardCollection({
   projects,
   onProjectClick,
   onProjectEdit,
+  onProjectExport,
 }: {
   projects: Project[];
   onProjectClick?: (project: Project) => void;
   onProjectEdit?: (project: Project) => Promise<Project | null>;
+  onProjectExport?: (project: Project) => void;
 }) {
   return (
     <CardCollection
@@ -20,6 +22,7 @@ export function ProjectCardCollection({
           project={project}
           onClick={onProjectClick}
           onEditSubmit={onProjectEdit}
+          onExport={onProjectExport}
         />
       )}
       columns={{ default: 1, md: 2, lg: 3 }}

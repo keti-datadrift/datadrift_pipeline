@@ -6,12 +6,14 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { getAuthPrerequisits } from '@/lib/api/endpoints/labelstudio/direct';
 import { cn } from '@/lib/utils/tailwind.util';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useI18n } from '@/contexts/I18nContext';
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
   const { loginAction } = useAuthContext();
+  const { t } = useI18n();
 
   const [csrfMiddlewareToken, setToken] = useState<string>('');
   const [email, setEmail] = useState('');
@@ -36,19 +38,19 @@ export function LoginForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="border-sidebar-border">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Login</CardTitle>
-          <CardDescription>Login with your email and password</CardDescription>
+          <CardTitle className="text-xl">{t('auth.login')}</CardTitle>
+          <CardDescription>{t('auth.loginDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-8">
               <div className="flex flex-col gap-3">
                 <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('auth.email')}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="qocr@example.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     required={true}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -56,7 +58,7 @@ export function LoginForm({
                 </div>
                 <div className="grid gap-3">
                   <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t('auth.password')}</Label>
                   </div>
                   <Input
                     id="password"
@@ -73,7 +75,7 @@ export function LoginForm({
                   type="submit"
                   className="w-full h-10 font-extrabold rounded-4xl cursor-pointer"
                 >
-                  Log in
+                  {t('auth.loginButton')}
                 </Button>
               </div>
             </div>

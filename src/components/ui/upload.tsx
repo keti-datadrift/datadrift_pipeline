@@ -22,6 +22,7 @@ import {
 } from '@/hooks/use-file-upload';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { useI18n } from '@/contexts/I18nContext';
 
 // Create some dummy initial files
 const initialFiles = [
@@ -192,6 +193,7 @@ const simulateUpload = (
 };
 
 export default function Component() {
+  const { t } = useI18n();
   const maxSizeMB = 5;
   const maxSize = maxSizeMB * 1024 * 1024; // 5MB default
   const maxFiles = 6;
@@ -364,7 +366,7 @@ export default function Component() {
                           handleFileRemoved(file.id);
                           removeFile(file.id);
                         }}
-                        aria-label="Remove file"
+                        aria-label={t('uploadUI.removeFile')}
                       >
                         <XIcon className="size-4" aria-hidden="true" />
                       </Button>
@@ -405,13 +407,11 @@ export default function Component() {
             >
               <ImageIcon className="size-4 opacity-60" />
             </div>
-            <p className="mb-1.5 text-sm font-medium">Drop your files here</p>
-            <p className="text-muted-foreground text-xs">
-              Max {maxFiles} files ∙ Up to {maxSizeMB}MB
-            </p>
+            <p className="mb-1.5 text-sm font-medium">{t('uploadUI.dropHere')}</p>
+            <p className="text-muted-foreground text-xs">{t('uploadUI.maxFilesUpTo', { count: maxFiles, size: maxSizeMB })}</p>
             <Button variant="outline" className="mt-4" onClick={openFileDialog}>
               <UploadIcon className="-ms-1 opacity-60" aria-hidden="true" />
-              Select images
+              {t('uploadUI.selectImages')}
             </Button>
           </div>
         )}
@@ -432,13 +432,13 @@ export default function Component() {
         role="region"
         className="text-muted-foreground mt-2 text-center text-xs"
       >
-        With simulated progress track ∙{' '}
+        {t('uploadUI.withSimulatedProgress')} ∙{' '}
         <a
           href="https://github.com/origin-space/originui/tree/main/docs/use-file-upload.md"
           className="hover:text-foreground underline"
           target="_blank"
         >
-          API
+          {t('uploadUI.api')}
         </a>
       </p>
     </div>
