@@ -69,7 +69,7 @@ interface FileUploadProps {
 }
 
 export default function FileUpload({
-  onUpload,
+  onUpload: _onUpload,
   onFilesChange,
 }: FileUploadProps = {}) {
   const maxSize = 100 * 1024 * 1024; // 10MB default

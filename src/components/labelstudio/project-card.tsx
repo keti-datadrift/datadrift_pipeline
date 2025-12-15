@@ -25,6 +25,7 @@ export function ProjectCard({
       <Card
         className="hover:shadow-md transition-shadow cursor-pointer"
         onClick={() => onClick?.(project)}
+        data-testid={`project-card-${project.id}`}
       >
         <CardHeader>
           <div className="flex justify-between w-full">
@@ -37,7 +38,8 @@ export function ProjectCard({
                 <ModelTypeBadge type={project.type} />
               </div>
             </div>
-            <ProjectCardDropdown 
+            <ProjectCardDropdown
+              projectId={project.id}
               onEditAction={() => setIsDialogOpen(true)}
               onExportAction={() => onExport?.(project)}
             />

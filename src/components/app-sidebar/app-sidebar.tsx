@@ -27,6 +27,7 @@ export function AppSidebar({
 }) {
   const { t } = useI18n();
   const data = React.useMemo(() => getSidebarData(t), [t]);
+
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
@@ -41,7 +42,7 @@ export function AppSidebar({
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Q-OCR</span>
+                  <span className="truncate font-medium">{t('app.name')}</span>
                   <span className="truncate text-xs">v0.0.1 🌈</span>
                 </div>
               </Link>

@@ -1,0 +1,38 @@
+[
+  {
+    "id": 301,
+    "type": "ocrrec",
+    "name": "OCR Recognizer",
+    "version": "3.0.0",
+    "weight": "ocr-recognizer-v3.pt",
+    "trained_at": "2024-08-20T09:00:00Z",
+    "training_args": {
+      "imgsz": 512
+    },
+    "metrics": {
+      "metrics/precision(B)": 0.88,
+      "metrics/recall(B)": 0.79,
+      "metrics/mAP50(B)": 0.83,
+      "metrics/mAP50-95(B)": 0.68
+    },
+    "isActive": true
+  },
+  {
+    "id": 302,
+    "type": "ocrrec",
+    "name": "OCR Recognizer",
+    "version": "3.1.0",
+    "weight": "ocr-recognizer-v3-1.pt",
+    "trained_at": "2024-09-12T09:00:00Z",
+    "training_args": {
+      "imgsz": 512
+    },
+    "metrics": {
+      "metrics/precision(B)": 0.9,
+      "metrics/recall(B)": 0.82,
+      "metrics/mAP50(B)": 0.86,
+      "metrics/mAP50-95(B)": 0.71
+    },
+    "isActive": false
+  }
+]

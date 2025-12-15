@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Play, Square, Trash2 } from 'lucide-react';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface LogStreamControlsProps {
   selectedContainer: string;
@@ -35,10 +36,12 @@ export function LogStreamControls({
   disabled = false,
   loading = false,
 }: LogStreamControlsProps) {
+  const { t } = useI18n();
+  const tailLineOptions = [50, 100, 200, 500, 1000];
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="tail">Tail Lines</Label>
+        <Label htmlFor="tail">{t('monitoring.logs.tailLines.label')}</Label>
         <Select
           value={tailLines}
           onValueChange={onTailLinesChange}
@@ -48,18 +51,18 @@ export function LogStreamControls({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="50">50 lines</SelectItem>
-            <SelectItem value="100">100 lines</SelectItem>
-            <SelectItem value="200">200 lines</SelectItem>
-            <SelectItem value="500">500 lines</SelectItem>
-            <SelectItem value="1000">1000 lines</SelectItem>
-            <SelectItem value="all">All lines</SelectItem>
+            {tailLineOptions.map((n) => (
+              <SelectItem key={n} value={String(n)}>
+                {t('monitoring.logs.tailLines.count', { count: n })}
+              </SelectItem>
+            ))}
+            <SelectItem value="all">{t('monitoring.logs.tailLines.all')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
-        <Label>Controls</Label>
+        <Label>{t('monitoring.logs.controls.label')}</Label>
         <div className="flex gap-2">
           {!isStreaming ? (
             <Button
@@ -69,7 +72,7 @@ export function LogStreamControls({
               className="hover:cursor-pointer"
             >
               <Play className="h-4 w-4 mr-1" />
-              Start
+              {t('monitoring.logs.controls.start')}
             </Button>
           ) : (
             <Button
@@ -80,7 +83,7 @@ export function LogStreamControls({
               className="hover:cursor-pointer"
             >
               <Square className="h-4 w-4 mr-1" />
-              Stop
+              {t('monitoring.logs.controls.stop')}
             </Button>
           )}
           <Button
@@ -90,7 +93,7 @@ export function LogStreamControls({
             disabled={disabled}
           >
             <Trash2 className="h-4 w-4 mr-1" />
-            Clear
+            {t('monitoring.logs.controls.clear')}
           </Button>
         </div>
       </div>

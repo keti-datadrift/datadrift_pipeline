@@ -17,6 +17,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface LogViewerProps {
   logs: LogMessage[];
@@ -36,6 +37,7 @@ export function LogViewer({
   onDownloadLogs,
 }: LogViewerProps) {
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     if (autoScroll && logContainerRef.current && logs.length > 0) {
@@ -50,7 +52,7 @@ export function LogViewer({
           <div className="flex items-center gap-2">
             <ScrollText className="h-5 w-5" />
             <CardTitle>
-              Live Log Stream
+              {t('monitoring.logs.viewer.title')}
               {selectedContainer && (
                 <span className="text-sm font-normal text-muted-foreground ml-2">
                   ({selectedContainer})
@@ -63,9 +65,13 @@ export function LogViewer({
               <Activity
                 className={`h-4 w-4 ${isStreaming ? 'text-green-500' : 'text-gray-400'}`}
               />
-              {isStreaming ? 'Streaming' : 'Stopped'}
+              {isStreaming
+                ? t('monitoring.logs.viewer.status.streaming')
+                : t('monitoring.logs.viewer.status.stopped')}
               {logs.length > 0 && (
-                <span className="ml-2">{logs.length} messages</span>
+                <span className="ml-2">
+                  {t('monitoring.logs.viewer.messages', { count: logs.length })}
+                </span>
               )}
             </div>
             <div className="flex gap-1">
@@ -92,10 +98,10 @@ export function LogViewer({
         </div>
         <CardDescription>
           {!isStreaming && !selectedContainer
-            ? 'Enter a container/service name and click Start to begin streaming logs'
+            ? t('monitoring.logs.viewer.hint.enterContainer')
             : isStreaming
-              ? 'Real-time log stream is active'
-              : 'Log stream is stopped'}
+              ? t('monitoring.logs.viewer.hint.active')
+              : t('monitoring.logs.viewer.hint.stopped')}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col min-h-0">
@@ -109,12 +115,12 @@ export function LogViewer({
               {isStreaming ? (
                 <div className="text-center">
                   <Activity className="h-8 w-8 mx-auto mb-2 animate-pulse" />
-                  <p>Waiting for log messages...</p>
+                  <p>{t('monitoring.logs.viewer.empty.waiting')}</p>
                 </div>
               ) : (
                 <div className="text-center">
                   <Terminal className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>No log messages</p>
+                  <p>{t('monitoring.logs.viewer.empty.none')}</p>
                 </div>
               )}
             </div>

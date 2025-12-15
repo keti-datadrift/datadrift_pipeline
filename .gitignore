@@ -12,6 +12,10 @@
 
 # testing
 /coverage
+cypress/screenshots
+cypress/videos
+cypress/downloads
+cypress/cypress.env.json
 
 # next.js
 /.next/
@@ -39,3 +43,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# LLM
+CODE_REVIEW.md

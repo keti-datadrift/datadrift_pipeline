@@ -1,0 +1,52 @@
+{
+  "1": {
+    "items": [
+      {
+        "id": 101,
+        "ml_model": 1,
+        "trained_at": "2024-09-01T10:00:00Z",
+        "weight": "ocr-master-v3.0.0.pt",
+        "version": "3.0.0",
+        "training_args": {
+          "imgsz": 640,
+          "optimizer": "adamw",
+          "epochs": 100,
+          "batch_size": 32
+        },
+        "metrics": {
+          "epoch": 100,
+          "metrics/precision(B)": 0.92,
+          "metrics/recall(B)": 0.89,
+          "metrics/mAP50(B)": 0.91,
+          "metrics/mAP50-95(B)": 0.78
+        }
+      },
+      {
+        "id": 102,
+        "ml_model": 1,
+        "trained_at": "2024-09-10T12:00:00Z",
+        "weight": "ocr-master-v3.1.0.pt",
+        "version": "3.1.0",
+        "training_args": {
+          "imgsz": 640,
+          "optimizer": "adamw",
+          "epochs": 120,
+          "batch_size": 32
+        },
+        "metrics": {
+          "epoch": 120,
+          "metrics/precision(B)": 0.94,
+          "metrics/recall(B)": 0.91,
+          "metrics/mAP50(B)": 0.93,
+          "metrics/mAP50-95(B)": 0.81
+        }
+      }
+    ],
+    "total": 2,
+    "page": 1,
+    "page_size": 20,
+    "total_pages": 1,
+    "has_next": false,
+    "has_previous": false
+  }
+}

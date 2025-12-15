@@ -1,4 +1,5 @@
-import 'server-only';
+'server-only';
+
 import type { SupportedLocales } from './i18n';
 
 const dictionaries = {

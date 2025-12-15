@@ -59,6 +59,8 @@ export type Model = {
   description?: string;
 };
 
+export type DefaultModel = Pick<Model, 'type' | 'name' | 'version'>;
+
 export interface TrainingMetrics {
   epochs: number | null;
   trainingTime: number | null;

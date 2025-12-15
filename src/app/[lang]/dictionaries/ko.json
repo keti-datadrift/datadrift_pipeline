@@ -1,15 +1,17 @@
 {
   "app": {
-    "title": "Q-OCR Dashboard",
-    "description": "Q-OCR 대시보드는 이미지를 텍스트로 변환하는 강력한 도구입니다."
+    "name": "데이터 드리프트",
+    "title": "데이터 드리프트",
+    "description": "데이터 드리프트 시연 페이지"
   },
   "nav": {
     "data": "데이터",
+    "workspaces": "워크스페이스",
     "models": "모델",
     "training": "학습",
     "monitoring": "모니터링",
     "defaultModels": "기본 모델 관리",
-    "trainingStatus": "학습 상태",
+    "trainingStatus": "학습 모니터링",
     "logs": "로그",
     "playground": "데모"
   },
@@ -25,12 +27,12 @@
     "loginDescription": "이메일과 비밀번호로 로그인하세요",
     "email": "이메일",
     "password": "비밀번호",
-    "emailPlaceholder": "qocr@example.com",
+    "emailPlaceholder": "diquest@example.com",
     "loginButton": "로그인"
   },
   "labeling": {
     "title": "레이블링 워크스페이스",
-    "description": "OCR 모델 학습을 위한 이미지/문서를 주석 처리합니다",
+    "description": "OCR 모델 학습을 위한 이미지/문서를 레이블링 할 수 있습니다.",
     "upload": "업로드",
     "uploadDialogTitle": "프로젝트 파일 업로드",
     "uploadDialogDescription": "프로젝트에 업로드할 파일을 선택하세요",
@@ -43,18 +45,18 @@
     "stats": {
       "layoutDetection": {
         "title": "레이아웃 감지",
-        "description": "레이아웃 감지 모델 수"
+        "description": "레이아웃 감지 모델 개수"
       },
       "ocr": {
         "title": "OCR",
-        "description": "OCR 모델 수"
+        "description": "OCR 모델 개수"
       },
       "tableRecognition": {
         "title": "테이블 인식",
-        "description": "테이블 인식 모델 수"
+        "description": "테이블 인식 모델 개수"
       }
     },
-    "overview": "모델 개요",
+    "overview": "모델",
     "overviewDescription": "모든 모델 목록",
     "searchPlaceholder": "모델 이름 검색...",
     "clearSearch": "검색 지우기",
@@ -75,19 +77,23 @@
       "openMenu": "메뉴 열기",
       "viewDetails": "상세 보기",
       "trainThisModel": "이 모델 학습",
-      "deleteModel": "모델 삭제"
-    }
-  },
-  "modelDetail": {
-    "error": "오류",
-    "modelNotFound": "모델을 찾을 수 없습니다.",
-    "modelVersions": "모델 버전",
-    "totalVersions": "총 {count}개 버전",
-    "columns": {
-      "epochs": "Epochs",
-      "trainingTime": "Training Time",
-      "precision": "Precision",
-      "recall": "Recall"
+      "deleteModel": "제거"
+    },
+    "details": {
+      "error": "오류",
+      "modelNotFound": "모델을 찾을 수 없습니다.",
+      "modelVersions": "모델 버전",
+      "totalVersions": "총 {count}개 버전",
+      "columns": {
+        "epochs": "Epochs",
+        "trainingTime": "Training Time",
+        "precision": "Precision",
+        "recall": "Recall"
+      }
+    },
+    "default": {
+      "title": "기본 모델",
+      "description": "API 호출에 기본으로 선택된 모델입니다."
     }
   },
   "monitoring": {
@@ -120,13 +126,45 @@
         }
       }
     },
-    "default": {
-      "title": "기본 모델",
-      "description": "API 호출에 기본으로 선택된 모델입니다."
-    },
     "logs": {
-      "title": "컨테이너 로그 모니터링",
-      "description": "실시간 컨테이너 로그 스트리밍 및 모니터링"
+      "title": "로그 모니터링",
+      "description": "실시간 컨테이너 로그 스트리밍 및 모니터링",
+      "config": {
+        "title": "로그 설정",
+        "description": "로그를 확인할 컨테이너를 선택하고, 로그 옵션을 설정하세요"
+      },
+      "container": {
+        "placeholder": "컨테이너 선택",
+        "label": "컨테이너/서비스"
+      },
+      "tailLines": {
+        "label": "Tail 라인",
+        "count": "{count}줄",
+        "all": "전체"
+      },
+      "controls": {
+        "label": "컨트롤",
+        "start": "시작",
+        "stop": "중지",
+        "clear": "지우기"
+      },
+      "viewer": {
+        "title": "라이브 로그",
+        "status": {
+          "streaming": "스트리밍 중",
+          "stopped": "중지됨"
+        },
+        "messages": "총 {count}개 메시지",
+        "hint": {
+          "enterContainer": "컨테이너/서비스 이름을 입력하고 시작을 클릭하여 로그 스트리밍을 시작하세요",
+          "active": "실시간 로그 스트림이 활성화되었습니다",
+          "stopped": "로그 스트림이 중지되었습니다"
+        },
+        "empty": {
+          "waiting": "로그 메시지를 기다리는 중...",
+          "none": "로그 메시지가 없습니다"
+        }
+      }
     }
   },
   "trainingPage": {
@@ -171,6 +209,7 @@
     "toggle": "Toggle"
   },
   "common": {
+    "error": "오류",
     "cancel": "취소",
     "save": "저장",
     "upload": "업로드",

@@ -1,0 +1,25 @@
+{
+  "count": 2,
+  "results": [
+    {
+      "id": 101,
+      "title": "OCR 레이블 프로젝트",
+      "color": "#3b82f6",
+      "ml_model_type": "ocrrec",
+      "finished_task_number": 150,
+      "task_number": 200,
+      "total_annotations_number": 180,
+      "total_predictions_number": 50
+    },
+    {
+      "id": 102,
+      "title": "레이아웃 감지 프로젝트",
+      "color": "#10b981",
+      "ml_model_type": "layout",
+      "finished_task_number": 80,
+      "task_number": 100,
+      "total_annotations_number": 95,
+      "total_predictions_number": 25
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "count": 1,
+  "results": [
+    {
+      "id": 101,
+      "title": "샘플 프로젝트",
+      "color": "#123456",
+      "ml_model_type": "layout",
+      "finished_task_number": 3,
+      "task_number": 10,
+      "total_annotations_number": 5,
+      "total_predictions_number": 2
+    }
+  ]
+}

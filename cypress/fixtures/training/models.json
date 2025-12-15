@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "OCR Master",
+      "type": "ocrrec",
+      "version": "3.0.0",
+      "created_at": "2024-08-01T10:00:00Z",
+      "updated_at": "2024-09-15T10:00:00Z",
+      "description": "Advanced OCR recognition model"
+    },
+    {
+      "id": 2,
+      "name": "Layout Detector Pro",
+      "type": "layout",
+      "version": "2.1.0",
+      "created_at": "2024-07-15T08:00:00Z",
+      "updated_at": "2024-09-10T08:00:00Z",
+      "description": "Professional layout detection model"
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "page_size": 20,
+  "total_pages": 1,
+  "has_next": false,
+  "has_previous": false
+}

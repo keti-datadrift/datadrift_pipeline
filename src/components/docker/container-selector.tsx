@@ -1,6 +1,7 @@
 'use client';
 
 import { Label } from '@/components/ui/label';
+import { useI18n } from '@/contexts/I18nContext';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Containers } from '@/entities/docker';
 
@@ -17,9 +18,10 @@ export function ContainerSelector({
   disabled = false,
   placeholder = ""
 }: ContainerSelectorProps) {
+  const { t } = useI18n();
   return (
     <div className="space-y-2">
-      <Label htmlFor="container">Container/Service</Label>
+      <Label htmlFor="container">{t('monitoring.logs.container.label')}</Label>
       <Select
         value={value}
         onValueChange={onValueChange}

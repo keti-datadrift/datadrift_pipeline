@@ -1,0 +1,50 @@
+{
+  "items": [
+    {
+      "id": 11,
+      "ml_model": 1,
+      "trained_at": "2024-09-05T09:00:00Z",
+      "weight": "layout-master-v1.pt",
+      "version": "1.0.0",
+      "training_args": {
+        "imgsz": 640,
+        "optimizer": "adam",
+        "nbs": 64,
+        "iou": 0.5
+      },
+      "metrics": {
+        "epoch": 50,
+        "metrics/precision(B)": 0.87,
+        "metrics/recall(B)": 0.75,
+        "metrics/mAP50(B)": 0.82,
+        "metrics/mAP50-95(B)": 0.65
+      }
+    },
+    {
+      "id": 12,
+      "ml_model": 1,
+      "trained_at": "2024-09-08T09:00:00Z",
+      "weight": "layout-master-v1-1.pt",
+      "version": "1.1.0",
+      "training_args": {
+        "imgsz": 640,
+        "optimizer": "adam",
+        "nbs": 64,
+        "iou": 0.55
+      },
+      "metrics": {
+        "epoch": 60,
+        "metrics/precision(B)": 0.9,
+        "metrics/recall(B)": 0.8,
+        "metrics/mAP50(B)": 0.85,
+        "metrics/mAP50-95(B)": 0.7
+      }
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "page_size": 20,
+  "total_pages": 1,
+  "has_next": false,
+  "has_previous": false
+}

@@ -1,0 +1,35 @@
+{
+  "count": 3,
+  "results": [
+    {
+      "id": 101,
+      "title": "레이블 프로젝트 A",
+      "color": "#123456",
+      "ml_model_type": "layout",
+      "finished_task_number": 3,
+      "task_number": 10,
+      "total_annotations_number": 5,
+      "total_predictions_number": 2
+    },
+    {
+      "id": 202,
+      "title": "레이블 프로젝트 B",
+      "color": "#654321",
+      "ml_model_type": "ocrrec",
+      "finished_task_number": 7,
+      "task_number": 12,
+      "total_annotations_number": 8,
+      "total_predictions_number": 4
+    },
+    {
+      "id": 303,
+      "title": "레이블 프로젝트 C",
+      "color": "#abcdef",
+      "ml_model_type": "tabrec",
+      "finished_task_number": 0,
+      "task_number": 5,
+      "total_annotations_number": 0,
+      "total_predictions_number": 0
+    }
+  ]
+}

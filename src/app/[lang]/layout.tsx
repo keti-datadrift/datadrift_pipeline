@@ -12,17 +12,22 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
 });
 
+// Note: Next.js will type-check layout props via its build-time plugin.
+// We keep local props simple and align `params.lang` to `string` for compatibility.
+
 export async function generateStaticParams() {
-  return [{ lang: 'en-US' }, { lang: 'de' }];
+  // Keep in sync with SupportedLocales
+  return [{ lang: 'en' }, { lang: 'ko' }];
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ lang: SupportedLocales }>;
+  params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang } = await params;
-  const dict = await getDictionary(lang);
+  const locale: SupportedLocales = lang === 'ko' ? 'ko' : 'en';
+  const dict = await getDictionary(locale);
   return {
     title: dict.app.title,
     description: dict.app.description,
@@ -34,13 +39,14 @@ export default function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ lang: SupportedLocales }>;
+  params: Promise<{ lang: string }>;
 }>) {
   const { lang } = React.use(params);
+  const locale: SupportedLocales = lang === 'ko' ? 'ko' : 'en';
   return (
-    <html lang={lang} className={`${jetbrainsMono.variable}`}>
+    <html lang={locale} className={`${jetbrainsMono.variable}`}>
       <body className={'antialiased bg-sidebar-background'}>
-        <I18nProvider locale={lang}>
+        <I18nProvider locale={locale}>
           <AuthProvider>
             <main className="flex-1">{children}</main>
           </AuthProvider>

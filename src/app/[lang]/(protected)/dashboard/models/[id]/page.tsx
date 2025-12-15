@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ModelVersion } from '@/entities/ml-model';
@@ -11,6 +10,7 @@ import { memo, use, useCallback, useEffect, useMemo, useState } from 'react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 import { useI18n } from '@/contexts/I18nContext';
+import PageHeader from '@/components/models/page-header';
 
 const MemoizedDataTable = memo(
   ({ versions, columns }: { versions: ModelVersion[]; columns: any[] }) => {
@@ -146,40 +146,39 @@ export default function ModelVersionPage({
   if (!model) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-red-600">{t('modelDetail.error')}</h1>
-        <p className="text-gray-500">{t('modelDetail.modelNotFound')}</p>
+        <h1 className="text-3xl font-bold text-red-600">
+          {t('models.detail.error')}
+        </h1>
+        <p className="text-gray-500">{t('models.detail.modelNotFound')}</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex flex-row justify-items-start items-baseline gap-2 mb-8">
-        <h1 className="text-3xl font-bold">{model.name}</h1>
-        <Badge variant="secondary" className="font-mono text-xs">
-          v{selectedVersion}
-        </Badge>
-      </div>
-
-      {/* Model Versions Table */}
-      <div className="mb-8">
-        <Card>
-          <CardHeader>
-            <div>
-              <CardTitle>{t('modelDetail.modelVersions')}</CardTitle>
-              <p className="text-sm text-gray-500">
-                {t('modelDetail.totalVersions', { count: memoizedVersions.length })}
-              </p>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <MemoizedDataTable
-              versions={memoizedVersions}
-              columns={memoizedColumns}
-            />
-          </CardContent>
-        </Card>
+    <div>
+      <PageHeader title={model.name} />
+      <div className="container mx-auto px-4 py-8">
+        {/* Model Versions Table */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <div>
+                <CardTitle>{t('models.details.modelVersions')}</CardTitle>
+                <p className="text-sm text-gray-500">
+                  {t('models.details.totalVersions', {
+                    count: memoizedVersions.length,
+                  })}
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <MemoizedDataTable
+                versions={memoizedVersions}
+                columns={memoizedColumns}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

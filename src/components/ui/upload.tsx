@@ -24,8 +24,8 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { useI18n } from '@/contexts/I18nContext';
 
-// Create some dummy initial files
-const initialFiles = [
+// Create some dummy initial files (dev only)
+const initialFiles = process.env.NODE_ENV !== 'production' ? [
   {
     name: 'intro.zip',
     size: 252873,
@@ -47,7 +47,7 @@ const initialFiles = [
     url: 'https://example.com/audio.mp3',
     id: 'audio-123456789',
   },
-];
+] : [];
 
 const getFileIcon = (file: { file: File | { type: string; name: string } }) => {
   const fileType = file.file instanceof File ? file.file.type : file.file.type;
@@ -101,7 +101,7 @@ const getFileIcon = (file: { file: File | { type: string; name: string } }) => {
   return <FileIcon className="size-5 opacity-60" />;
 };
 
-const getFilePreview = (file: {
+const _getFilePreview = (file: {
   file: File | { type: string; name: string; url?: string };
 }) => {
   const fileType = file.file instanceof File ? file.file.type : file.file.type;

@@ -140,8 +140,11 @@ export const columns = (
   {
     id: 'version',
     header: () => {
-      const { t } = useI18n();
-      return t('models.columns.version');
+      const VersionHeader = () => {
+        const { t } = useI18n();
+        return <>{t('models.columns.version')}</>;
+      };
+      return <VersionHeader />;
     },
     cell: ({ row }) => <VersionCell row={row} />,
     size: 100,
@@ -151,8 +154,11 @@ export const columns = (
   {
     id: 'epochs',
     header: () => {
-      const { t } = useI18n();
-      return t('modelDetail.columns.epochs');
+      const EpochsHeader = () => {
+        const { t } = useI18n();
+        return <>{t('models.details.columns.epochs')}</>;
+      };
+      return <EpochsHeader />;
     },
     cell: ({ row }) => (
       <MetricsCell metric={row.original.trainingMetrics.epochs} />
@@ -164,8 +170,11 @@ export const columns = (
   {
     id: 'trainingTime',
     header: () => {
-      const { t } = useI18n();
-      return t('modelDetail.columns.trainingTime');
+      const TrainingTimeHeader = () => {
+        const { t } = useI18n();
+        return <>{t('models.details.columns.trainingTime')}</>;
+      };
+      return <TrainingTimeHeader />;
     },
     cell: ({ row }) => (
       <MetricsCell metric={row.original.trainingMetrics.trainingTime} />
@@ -177,8 +186,11 @@ export const columns = (
   {
     id: 'precision',
     header: () => {
-      const { t } = useI18n();
-      return t('modelDetail.columns.precision');
+      const PrecisionHeader = () => {
+        const { t } = useI18n();
+        return <>{t('models.details.columns.precision')}</>;
+      };
+      return <PrecisionHeader />;
     },
     cell: ({ row }) => (
       <MetricsCell metric={row.original.trainingMetrics.precision} />
@@ -190,8 +202,11 @@ export const columns = (
   {
     id: 'recall',
     header: () => {
-      const { t } = useI18n();
-      return t('modelDetail.columns.recall');
+      const RecallHeader = () => {
+        const { t } = useI18n();
+        return <>{t('models.details.columns.recall')}</>;
+      };
+      return <RecallHeader />;
     },
     cell: ({ row }) => (
       <MetricsCell metric={row.original.trainingMetrics.recall} />
@@ -221,8 +236,11 @@ export const columns = (
   {
     accessorKey: 'trainedAt',
     header: () => {
-      const { t } = useI18n();
-      return t('models.columns.lastUpdate');
+      const LastUpdateHeader = () => {
+        const { t } = useI18n();
+        return <>{t('models.columns.lastUpdate')}</>;
+      };
+      return <LastUpdateHeader />;
     },
     cell: ({ row }) => <TrainedAtCell row={row} />,
     size: 150,

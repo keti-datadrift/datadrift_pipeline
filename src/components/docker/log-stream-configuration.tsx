@@ -10,6 +10,7 @@ import {
 import { Terminal } from 'lucide-react';
 import { ContainerSelector } from './container-selector';
 import { LogStreamControls } from './log-stream-controls';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface LogStreamConfigurationProps {
   selectedContainer: string;
@@ -36,15 +37,16 @@ export function LogStreamConfiguration({
   loading = false,
   error,
 }: LogStreamConfigurationProps) {
+  const { t } = useI18n();
   return (
     <Card className="mb-6">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Terminal className="h-5 w-5" />
-          Log Stream Configuration
+          {t('monitoring.logs.config.title')}
         </CardTitle>
         <CardDescription>
-          Configure container selection and streaming options
+          {t('monitoring.logs.config.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -53,7 +55,7 @@ export function LogStreamConfiguration({
             value={selectedContainer}
             onValueChange={onSelectedContainerChange}
             disabled={isStreaming}
-            placeholder="Select container"
+            placeholder={t('monitoring.logs.container.placeholder')}
           />
 
           <LogStreamControls
@@ -71,7 +73,7 @@ export function LogStreamConfiguration({
 
         {error && (
           <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
-            Error: {error}
+            {t('common.error')}: {error}
           </div>
         )}
       </CardContent>

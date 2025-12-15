@@ -150,16 +150,19 @@ export const columns: ColumnDef<Model>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => {
-      const { t } = useI18n();
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          {t('models.columns.id')}
-          <ArrowUpDown className="ml-2 size-4" />
-        </Button>
-      );
+      const IdHeader = ({ column }: { column: any }) => {
+        const { t } = useI18n();
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {t('models.columns.id')}
+            <ArrowUpDown className="ml-2 size-4" />
+          </Button>
+        );
+      };
+      return <IdHeader column={column} />;
     },
     cell: ({ row }) => {
       const id = row.getValue('id') as Model['id'];
@@ -172,8 +175,11 @@ export const columns: ColumnDef<Model>[] = [
   {
     accessorKey: 'name',
     header: () => {
-      const { t } = useI18n();
-      return t('models.columns.modelName');
+      const NameHeader = () => {
+        const { t } = useI18n();
+        return <>{t('models.columns.modelName')}</>;
+      };
+      return <NameHeader />;
     },
     cell: ({ row }) => (
       <div className="font-medium truncate" title={row.original.name}>
@@ -199,8 +205,11 @@ export const columns: ColumnDef<Model>[] = [
   {
     accessorKey: 'version',
     header: () => {
-      const { t } = useI18n();
-      return t('models.columns.version');
+      const VersionHeader = () => {
+        const { t } = useI18n();
+        return <>{t('models.columns.version')}</>;
+      };
+      return <VersionHeader />;
     },
     cell: ({ row }) => (
       <div
@@ -217,8 +226,11 @@ export const columns: ColumnDef<Model>[] = [
   {
     accessorKey: 'updatedAt',
     header: () => {
-      const { t } = useI18n();
-      return t('models.columns.lastUpdate');
+      const LastUpdateHeader = () => {
+        const { t } = useI18n();
+        return <>{t('models.columns.lastUpdate')}</>;
+      };
+      return <LastUpdateHeader />;
     },
     cell: ({ row }) => (
       <div className="truncate" title={row.getValue('updatedAt')}>

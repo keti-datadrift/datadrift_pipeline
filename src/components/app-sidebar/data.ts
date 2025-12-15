@@ -1,4 +1,4 @@
-import { BookOpen, BrainCircuit, Database, SquareTerminal } from 'lucide-react';
+import { BookOpen, BrainCircuit, Database } from 'lucide-react';
 
 export function getSidebarData(t: (key: string) => string) {
   return {
@@ -13,7 +13,15 @@ export function getSidebarData(t: (key: string) => string) {
         url: '/dashboard/projects',
         icon: Database,
         isActive: true,
-        items: [],
+        items: [
+          {
+            title: t('nav.workspaces'),
+            url: '/dashboard/projects',
+            icon: Database,
+            isActive: true,
+            items: [],
+          },
+        ],
       },
       {
         title: t('nav.models'),
@@ -22,20 +30,28 @@ export function getSidebarData(t: (key: string) => string) {
         isActive: true,
         items: [
           {
+            title: t('nav.models'),
+            url: '/dashboard/models',
+          },
+          {
             title: t('nav.training'),
             url: '/dashboard/models/train',
+          },
+          {
+            title: t('nav.defaultModels'),
+            url: '/dashboard/models/default',
           },
         ],
       },
       {
         title: t('nav.monitoring'),
-        url: '/dashboard/monitoring',
+        url: '/dashboard/monitoring/',
         icon: BookOpen,
         isActive: true,
         items: [
           {
-            title: t('nav.defaultModels'),
-            url: '/dashboard/monitoring/default',
+            title: t('nav.playground'),
+            url: '/services/gradio',
           },
           {
             title: t('nav.trainingStatus'),
@@ -46,13 +62,6 @@ export function getSidebarData(t: (key: string) => string) {
             url: '/dashboard/monitoring/logs',
           },
         ],
-      },
-      {
-        title: t('nav.playground'),
-        url: '/services/gradio',
-        icon: SquareTerminal,
-        isActive: true,
-        items: [],
       },
     ],
     navSecondary: [],

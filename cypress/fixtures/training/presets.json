@@ -1,0 +1,20 @@
+{
+  "layout": {
+    "epochs": 50,
+    "batch_size": 16,
+    "learning_rate": 0.001,
+    "optimizer": "adam"
+  },
+  "ocrrec": {
+    "epochs": 100,
+    "batch_size": 32,
+    "learning_rate": 0.0001,
+    "optimizer": "adamw"
+  },
+  "tabrec": {
+    "epochs": 75,
+    "batch_size": 8,
+    "learning_rate": 0.0005,
+    "optimizer": "sgd"
+  }
+}

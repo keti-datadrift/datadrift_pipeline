@@ -12,9 +12,11 @@ import { DownloadIcon, Edit3Icon, Ellipsis, Trash2Icon } from 'lucide-react';
 import { useI18n } from '@/contexts/I18nContext';
 
 export function ProjectCardDropdown({
+  projectId,
   onEditAction,
   onExportAction,
 }: {
+  projectId: string;
   onEditAction?: () => void;
   onExportAction?: () => void;
 }) {
@@ -24,6 +26,7 @@ export function ProjectCardDropdown({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
+          data-testid={`project-card-menu-${projectId}`}
           onClick={(e) => {
             e.stopPropagation();
           }}

@@ -41,7 +41,7 @@ export default function ProjectEditDialog({
   open,
   setIsOpen,
   onSubmit,
-  onExport,
+  onExport: _onExport,
   loading = false,
 }: {
   project: Project;

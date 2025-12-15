@@ -1,0 +1,234 @@
+{
+  "app": {
+    "title": "Q-OCR Dashboard",
+    "description": "Q-OCR은 이미지를 텍스트로 변환하는 강력한 OCR 도구입니다."
+  },
+  "nav": {
+    "data": "데이터",
+    "workspaces": "워크스페이스",
+    "models": "모델",
+    "training": "학습",
+    "monitoring": "모니터링",
+    "defaultModels": "기본 모델 관리",
+    "trainingStatus": "학습 모니터링",
+    "logs": "로그",
+    "playground": "데모"
+  },
+  "modelType": {
+    "layout": "Layout Detection",
+    "ocrcls": "OCR Classification",
+    "ocrrec": "OCR Recognition",
+    "ocrdet": "OCR Detection",
+    "tabrec": "Table Recognition"
+  },
+  "auth": {
+    "login": "로그인",
+    "loginDescription": "이메일과 비밀번호로 로그인하세요",
+    "email": "이메일",
+    "password": "비밀번호",
+    "emailPlaceholder": "qocr@example.com",
+    "loginButton": "로그인"
+  },
+  "labeling": {
+    "title": "레이블링 워크스페이스",
+    "description": "OCR 모델 학습을 위한 이미지/문서를 레이블링 할 수 있습니다.",
+    "upload": "업로드",
+    "uploadDialogTitle": "프로젝트 파일 업로드",
+    "uploadDialogDescription": "프로젝트에 업로드할 파일을 선택하세요",
+    "selectProject": "프로젝트 선택",
+    "chooseProjectPlaceholder": "업로드할 프로젝트를 선택하세요..."
+  },
+  "models": {
+    "title": "모델",
+    "description": "AI 모델을 관리하고 모니터링합니다",
+    "stats": {
+      "layoutDetection": {
+        "title": "레이아웃 감지",
+        "description": "레이아웃 감지 모델 개수"
+      },
+      "ocr": {
+        "title": "OCR",
+        "description": "OCR 모델 개수"
+      },
+      "tableRecognition": {
+        "title": "테이블 인식",
+        "description": "테이블 인식 모델 개수"
+      }
+    },
+    "overview": "모델",
+    "overviewDescription": "모든 모델 목록",
+    "searchPlaceholder": "모델 이름 검색...",
+    "clearSearch": "검색 지우기",
+    "errorTryAgain": "다시 시도",
+    "columns": {
+      "id": "ID",
+      "modelName": "모델 이름",
+      "type": "유형",
+      "version": "버전",
+      "lastUpdate": "마지막 업데이트"
+    },
+    "filters": {
+      "type": "유형",
+      "filterByType": "유형으로 필터",
+      "clear": "초기화"
+    },
+    "actions": {
+      "openMenu": "메뉴 열기",
+      "viewDetails": "상세 보기",
+      "trainThisModel": "이 모델 학습",
+      "deleteModel": "제거"
+    },
+    "details": {
+      "error": "오류",
+      "modelNotFound": "모델을 찾을 수 없습니다.",
+      "modelVersions": "모델 버전",
+      "totalVersions": "총 {count}개 버전",
+      "columns": {
+        "epochs": "Epochs",
+        "trainingTime": "Training Time",
+        "precision": "Precision",
+        "recall": "Recall"
+      }
+    },
+    "default": {
+      "title": "기본 모델",
+      "description": "API 호출에 기본으로 선택된 모델입니다."
+    }
+  },
+  "monitoring": {
+    "train": {
+      "title": "학습 모니터링",
+      "description": "모델 학습 활동을 모니터링하고 추적합니다",
+      "stats": {
+        "running": { "title": "학습 중", "description": "현재 학습 중" },
+        "completed": { "title": "완료", "description": "성공적으로 완료됨" },
+        "failed": { "title": "실패", "description": "실패한 학습 작업" },
+        "pending": { "title": "대기", "description": "시작 대기 중" }
+      },
+      "currentTraining": {
+        "title": "현재 학습",
+        "description": "활성 학습 작업의 실시간 상태",
+        "progress": "진행률",
+        "stage": "단계",
+        "noActive": "활성 학습 세션이 없습니다"
+      },
+      "history": {
+        "title": "학습 기록",
+        "description": "모든 학습 작업의 전체 기록",
+        "empty": "학습 기록이 없습니다",
+        "table": {
+          "status": "상태",
+          "task": "작업",
+          "duration": "기간",
+          "progress": "진행",
+          "started": "시작 시간"
+        }
+      }
+    },
+    "logs": {
+      "title": "로그 모니터링",
+      "description": "실시간 컨테이너 로그 스트리밍 및 모니터링",
+      "config": {
+        "title": "로그 설정",
+        "description": "로그를 확인할 컨테이너를 선택하고, 로그 옵션을 설정하세요"
+      },
+      "container": {
+        "placeholder": "컨테이너 선택",
+        "label": "컨테이너/서비스"
+      },
+      "tailLines": {
+        "label": "Tail 라인",
+        "count": "{count}줄",
+        "all": "전체"
+      },
+      "controls": {
+        "label": "컨트롤",
+        "start": "시작",
+        "stop": "중지",
+        "clear": "지우기"
+      },
+      "viewer": {
+        "title": "라이브 로그",
+        "status": {
+          "streaming": "스트리밍 중",
+          "stopped": "중지됨"
+        },
+        "messages": "총 {count}개 메시지",
+        "hint": {
+          "enterContainer": "컨테이너/서비스 이름을 입력하고 시작을 클릭하여 로그 스트리밍을 시작하세요",
+          "active": "실시간 로그 스트림이 활성화되었습니다",
+          "stopped": "로그 스트림이 중지되었습니다"
+        },
+        "empty": {
+          "waiting": "로그 메시지를 기다리는 중...",
+          "none": "로그 메시지가 없습니다"
+        }
+      }
+    }
+  },
+  "trainingPage": {
+    "title": "모델 학습",
+    "description": "데이터와 모델을 선택하여 학습 구성을 설정하세요",
+    "selectionsTitle": "선택 항목",
+    "selectionsSub": "학습에 사용할 레이블링 워크스페이스와 모델을 선택하세요",
+    "taskTitle": "작업",
+    "taskDescription": "작업 유형을 선택하세요",
+    "taskType": "작업 유형",
+    "selectTaskTypePlaceholder": "작업 유형을 선택하세요",
+    "dataTitle": "데이터",
+    "dataDescription": "레이블링 프로젝트를 선택하세요",
+    "labelingProjectLabel": "Labeling Project",
+    "selectLabelingProjectPlaceholder": "레이블링 프로젝트를 선택하세요",
+    "selectTaskFirstPlaceholder": "먼저 작업 유형을 선택하세요",
+    "modelTitle": "모델",
+    "modelDescription": "모델 architecture와 버전을 선택하세요",
+    "modelArchitectureLabel": "Model Architecture",
+    "selectModelPlaceholder": "모델을 선택하세요",
+    "modelVersionLabel": "Model Version",
+    "selectVersionPlaceholder": "버전을 선택하세요",
+    "samples": "samples"
+  },
+  "training": {
+    "button": {
+      "start": "학습 시작",
+      "training": "학습 중"
+    },
+    "status": {
+      "title": "학습 상태",
+      "currentEpoch": "Current Epoch:",
+      "trainingLoss": "Training Loss:",
+      "na": "N/A",
+      "progressWillBeDisplayed": "여기에 학습 진행 상황이 표시됩니다.",
+      "clickStart": "\"학습 시작\" 버튼을 클릭하여 학습을 시작할 수 있습니다.",
+      "stopTraining": "학습 중지"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "toggle": "Toggle"
+  },
+  "common": {
+    "error": "오류",
+    "cancel": "취소",
+    "save": "저장",
+    "upload": "업로드",
+    "uploading": "업로드 중...",
+    "download": "다운로드",
+    "edit": "편집",
+    "delete": "삭제",
+    "logOut": "로그아웃",
+    "selectVersionButton": "버전 선택 버튼",
+    "selectVersionHeader": "버전 선택 헤더",
+    "noModelsFound": "모델이 없습니다.",
+    "previous": "이전",
+    "next": "다음"
+  },
+  "uploadUI": {
+    "removeFile": "파일 제거",
+    "dropHere": "여기에 파일을 놓으세요",
+    "maxFilesUpTo": "최대 {count}개 파일 ∙ 파일당 {size}MB",
+    "selectImages": "이미지 선택",
+    "api": "API",
+    "withSimulatedProgress": "시뮬레이션된 진행률 추적과 함께"
+  }
+}

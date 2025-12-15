@@ -5,6 +5,7 @@
   },
   "nav": {
     "data": "Data",
+    "workspaces": "workspaces",
     "models": "Models",
     "training": "Training",
     "monitoring": "Monitoring",
@@ -126,7 +127,43 @@
     },
     "logs": {
       "title": "Container Logs Monitoring",
-      "description": "Real-time container log streaming and monitoring"
+      "description": "Real-time container log streaming and monitoring",
+      "config": {
+        "title": "Log Stream Configuration",
+        "description": "Configure container selection and streaming options"
+      },
+      "container": {
+        "placeholder": "Select container",
+        "label": "Container/Service"
+      },
+      "tailLines": {
+        "label": "Tail Lines",
+        "count": "{count} lines",
+        "all": "All lines"
+      },
+      "controls": {
+        "label": "Controls",
+        "start": "Start",
+        "stop": "Stop",
+        "clear": "Clear"
+      },
+      "viewer": {
+        "title": "Live Log Stream",
+        "status": {
+          "streaming": "Streaming",
+          "stopped": "Stopped"
+        },
+        "messages": "{count} messages",
+        "hint": {
+          "enterContainer": "Enter a container/service name and click Start to begin streaming logs",
+          "active": "Real-time log stream is active",
+          "stopped": "Log stream is stopped"
+        },
+        "empty": {
+          "waiting": "Waiting for log messages...",
+          "none": "No log messages"
+        }
+      }
     }
   },
   "trainingPage": {
@@ -171,6 +208,7 @@
     "toggle": "Toggle"
   },
   "common": {
+    "error": "Error",
     "cancel": "Cancel",
     "save": "Save",
     "upload": "Upload",

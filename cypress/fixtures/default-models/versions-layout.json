@@ -1,0 +1,38 @@
+[
+  {
+    "id": 201,
+    "type": "layout",
+    "name": "Layout Master",
+    "version": "1.0.0",
+    "weight": "layout-master-v1.pt",
+    "trained_at": "2024-09-05T09:00:00Z",
+    "training_args": {
+      "imgsz": 640
+    },
+    "metrics": {
+      "metrics/precision(B)": 0.86,
+      "metrics/recall(B)": 0.74,
+      "metrics/mAP50(B)": 0.81,
+      "metrics/mAP50-95(B)": 0.63
+    },
+    "isActive": true
+  },
+  {
+    "id": 202,
+    "type": "layout",
+    "name": "Layout Master",
+    "version": "1.1.0",
+    "weight": "layout-master-v1-1.pt",
+    "trained_at": "2024-09-15T09:00:00Z",
+    "training_args": {
+      "imgsz": 640
+    },
+    "metrics": {
+      "metrics/precision(B)": 0.9,
+      "metrics/recall(B)": 0.8,
+      "metrics/mAP50(B)": 0.85,
+      "metrics/mAP50-95(B)": 0.7
+    },
+    "isActive": false
+  }
+]
