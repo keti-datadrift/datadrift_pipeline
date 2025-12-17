@@ -1,11 +1,12 @@
 {
   "app": {
+    "name": "Q-OCR",
     "title": "Q-OCR Dashboard",
     "description": "The Q-OCR Dashboard is a powerful tool for converting images to text."
   },
   "nav": {
     "data": "Data",
-    "workspaces": "workspaces",
+    "workspaces": "Workspaces",
     "models": "Models",
     "training": "Training",
     "monitoring": "Monitoring",
@@ -76,7 +77,27 @@
       "openMenu": "Open menu",
       "viewDetails": "View Details",
       "trainThisModel": "Train this Model",
-      "deleteModel": "Delete Model"
+      "deleteModel": "Delete Model",
+      "forkVersion": "Fork Version",
+      "deleteVersion": "Delete Version"
+    },
+    "fork": {
+      "dialogTitle": "Fork Model Version",
+      "dialogDescription": "Create a new model by copying this version. The filesystem directory containing weights will be duplicated.",
+      "modelNameLabel": "New Model Name",
+      "modelNamePlaceholder": "Enter model name...",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Add notes about this forked model...",
+      "submitButton": "Fork Version",
+      "submitting": "Forking...",
+      "nameRequired": "Model name is required",
+      "successMessage": "Model version forked successfully",
+      "errorMessage": "Failed to fork model version"
+    },
+    "delete": {
+      "confirmMessage": "Are you sure you want to delete this model version? This action cannot be undone and will delete all associated files.",
+      "successMessage": "Model version deleted successfully",
+      "errorMessage": "Failed to delete model version"
     }
   },
   "modelDetail": {
@@ -88,7 +109,9 @@
       "epochs": "Epochs",
       "trainingTime": "Training Time",
       "precision": "Precision",
-      "recall": "Recall"
+      "recall": "Recall",
+      "map50": "mAP50",
+      "map5095": "mAP50-95"
     }
   },
   "monitoring": {
@@ -97,7 +120,10 @@
       "description": "Monitor and track all model training activities",
       "stats": {
         "running": { "title": "Running", "description": "Currently training" },
-        "completed": { "title": "Completed", "description": "Successfully completed" },
+        "completed": {
+          "title": "Completed",
+          "description": "Successfully completed"
+        },
         "failed": { "title": "Failed", "description": "Failed training jobs" },
         "pending": { "title": "Pending", "description": "Waiting to start" }
       },

@@ -1,5 +1,8 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+
 import PageHeader from '@/components/models/page-header';
 import { TrainButton } from '@/components/training/TrainingButton';
 import { TrainingSelectionPanel } from '@/components/training/TrainingSelectionPanel';
@@ -8,14 +11,18 @@ import { useI18n } from '@/contexts/I18nContext';
 import { ModelType } from '@/entities/ml-model';
 import { useBackgroundTraining } from '@/hooks/train/use-background-training';
 import { useTrainingSetup } from '@/hooks/train/use-training-setup';
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useMemo } from 'react';
+import { getAnnotatedTasks, getMLBackends } from '@/lib/api/endpoints';
 
 function ModelTrainingPageContent() {
   const searchParams = useSearchParams();
   const type = searchParams.get('type');
   const modelId = searchParams.get('modelId');
   const versionId = searchParams.get('versionId');
+
+  const [taskIds, setTaskIds] = useState<number[]>([]);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(false);
+
+  const [mlBackend, setMLBackend] = useState<number | undefined>(undefined);
 
   const tasks = useMemo(() => {
     return ModelType.allCases().map((type) => {
@@ -28,28 +35,100 @@ function ModelTrainingPageContent() {
 
   const trainingSetup = useTrainingSetup();
 
+  useEffect(() => {
+    let isMounted = true;
+    const projectId = trainingSetup.selectedProject?.id;
+
+    if (!projectId) {
+      setTaskIds([]);
+      setIsLoadingTasks(false);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    setTaskIds([]);
+
+    const fetchTasks = async () => {
+      setIsLoadingTasks(true);
+      try {
+        const response = await getAnnotatedTasks(projectId);
+        const tasks = response.tasks || [];
+        if (isMounted) {
+          setTaskIds(tasks.map((task) => task.id));
+        }
+      } catch (error) {
+        console.error('Failed to load annotated tasks:', error);
+        if (isMounted) {
+          setTaskIds([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingTasks(false);
+        }
+      }
+    };
+
+    void fetchTasks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [trainingSetup.selectedProject?.id]);
+
+  useEffect(() => {
+    if (!trainingSetup.selectedProject) return;
+
+    getMLBackends(trainingSetup.selectedProject.id)
+      .then((backends) => {
+        if (backends.length === 0) {
+          setMLBackend(undefined);
+        } else if (backends.length === 1) {
+          const mlBackendID = backends[0]?.id;
+          if (!mlBackendID) return;
+          setMLBackend(mlBackendID);
+        } else {
+          console.warn(
+            'Multiple number of ML Backends are fetched. There should be only one.',
+          );
+          setMLBackend(undefined);
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to load ML backends:', error);
+      });
+  }, [trainingSetup.selectedProject]);
+
+  const selectedModelId = useMemo(() => {
+    const id = trainingSetup.selectedModel?.id;
+    return id ? Number(id) : undefined;
+  }, [trainingSetup.selectedModel]);
+
+  const selectedVersionId = useMemo(() => {
+    return trainingSetup.selectedVersion?.id;
+  }, [trainingSetup.selectedVersion]);
+
   const isAllSelected = useMemo(() => {
     return Boolean(
       trainingSetup.selectedType &&
         trainingSetup.selectedProject &&
         trainingSetup.selectedModel &&
-        trainingSetup.selectedVersion,
+        trainingSetup.selectedVersion &&
+        taskIds.length > 0,
     );
   }, [
     trainingSetup.selectedType,
     trainingSetup.selectedProject,
     trainingSetup.selectedModel,
     trainingSetup.selectedVersion,
+    taskIds.length,
   ]);
 
   const trainingState = useBackgroundTraining({
-    modelId: trainingSetup.selectedModel?.id
-      ? parseInt(trainingSetup.selectedModel.id)
-      : 0,
-    taskIds: [1, 2, 3, 4, 5], // TODO: Use actual task IDs
-    modelVersionID: trainingSetup.selectedVersion?.id
-      ? trainingSetup.selectedVersion.id
-      : 0,
+    modelId: selectedModelId,
+    mlBackendID: mlBackend,
+    taskIds,
+    modelVersionID: selectedVersionId,
     modelType: trainingSetup.selectedType,
     projectName: trainingSetup.selectedProject?.title,
     isAllSelected,
@@ -77,8 +156,12 @@ function ModelTrainingPageContent() {
 
           <TrainButton
             onClick={trainingState.startTraining}
-            progress={trainingState.isStarting || trainingState.isTraining}
-            disabled={!trainingState.canStartTraining}
+            progress={
+              trainingState.isStarting ||
+              trainingState.isTraining ||
+              isLoadingTasks
+            }
+            disabled={!trainingState.canStartTraining || isLoadingTasks}
           />
         </div>
 

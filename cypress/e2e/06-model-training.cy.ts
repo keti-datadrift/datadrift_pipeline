@@ -36,6 +36,12 @@ describe('모델 학습 페이지', () => {
       }
     });
 
+    // Add missing intercepts for login flow
+    cy.intercept('POST', '/next-api/external/user/login/').as('loginRequest');
+    cy.intercept('POST', '/next-api/external/api/token/obtain/').as(
+      'tokenRequest',
+    );
+
     cy.intercept('GET', backgroundTasksPath, {
       statusCode: 200,
       body: trainingBackgroundTasks.empty,

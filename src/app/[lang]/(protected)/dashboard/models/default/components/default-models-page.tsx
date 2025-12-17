@@ -1,6 +1,6 @@
 'use client';
 
-import { ActivityIcon } from 'lucide-react';
+import { Activity } from 'lucide-react';
 
 import PageHeader from '@/components/models/page-header';
 import { useI18n } from '@/contexts/I18nContext';
@@ -50,63 +50,59 @@ export function DefaultModelsPage() {
   };
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-background">
+    <div className="min-h-screen bg-background">
       <PageHeader
-        title={t('defaultModels.title')}
-        subtitle={t('defaultModels.subtitle')}
-        icon={ActivityIcon}
+        title={t('defaultModelsPage.title')}
+        subtitle={t('defaultModelsPage.subtitle')}
+        icon={Activity}
       />
-      <main className="flex flex-1 min-h-0 flex-col">
-        <div className="container mx-auto flex h-full w-full flex-1 min-h-0 flex-col gap-6 px-6 py-6">
-          {defaultsStatus === 'error' && !hasDefaults ? (
-            <DefaultsErrorAlert
-              message={defaultsError}
-              onRetryAction={() => {
-                void loadDefaultModels();
-              }}
+      <div className="container mx-auto px-6 py-8 space-y-8">
+        {defaultsStatus === 'error' && !hasDefaults ? (
+          <DefaultsErrorAlert
+            message={defaultsError}
+            onRetryAction={() => {
+              void loadDefaultModels();
+            }}
+          />
+        ) : null}
+
+        {defaultsStatus === 'loading' && !hasDefaults ? (
+          <TypeCardSkeletons />
+        ) : (
+          <TypeCardGrid
+            defaultModels={defaultModels}
+            selectedType={selectedType}
+            onSelectTypeAction={handleSelectType}
+            status={defaultsStatus}
+            hasDefaults={hasDefaults}
+          />
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <VersionDetails
+              selectedVersion={selectedVersion}
+              versionMetrics={versionMetrics}
+              isSelectedVersionDefault={isSelectedVersionDefault}
+              updateStatus={updateStatus}
+              updateMessage={updateMessage}
+              onUpdateDefault={updateDefault}
             />
-          ) : null}
-
-          <section className="grid min-h-0 grid-rows-[auto,1fr] gap-6">
-            {defaultsStatus === 'loading' && !hasDefaults ? (
-              <TypeCardSkeletons />
-            ) : (
-              <TypeCardGrid
-                defaultModels={defaultModels}
-                selectedType={selectedType}
-                onSelectTypeAction={handleSelectType}
-                status={defaultsStatus}
-                hasDefaults={hasDefaults}
-              />
-            )}
-
-            <div className="flex flex-1 min-h-0 flex-col gap-6 md:flex-row">
-              <div className="flex flex-1 min-h-0 flex-col overflow-hidden">
-                <VersionDetails
-                  selectedVersion={selectedVersion}
-                  versionMetrics={versionMetrics}
-                  isSelectedVersionDefault={isSelectedVersionDefault}
-                  updateStatus={updateStatus}
-                  updateMessage={updateMessage}
-                  onUpdateDefaultAction={updateDefault}
-                />
-              </div>
-              <div className="flex min-h-0 flex-col overflow-hidden md:w-[360px]">
-                <VersionsList
-                  selectedType={selectedType}
-                  selectedTypeDefault={selectedTypeDefault}
-                  versions={versions}
-                  versionsStatus={versionsStatus}
-                  versionsError={versionsError}
-                  selectedVersionID={selectedVersionID}
-                  onSelectVersionAction={handleSelectVersion}
-                  onRetryAction={handleRetryVersions}
-                />
-              </div>
-            </div>
-          </section>
+          </div>
+          <div>
+            <VersionsList
+              selectedType={selectedType}
+              selectedTypeDefault={selectedTypeDefault}
+              versions={versions}
+              versionsStatus={versionsStatus}
+              versionsError={versionsError}
+              selectedVersionID={selectedVersionID}
+              onSelectVersionAction={handleSelectVersion}
+              onRetryAction={handleRetryVersions}
+            />
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

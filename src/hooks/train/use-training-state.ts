@@ -1,3 +1,5 @@
+import { useCallback, useMemo, useState } from 'react';
+
 import { TrainingProgress, TrainingStatus } from '@/entities/train';
 import { useTrain } from '@/hooks/network/models';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -60,11 +62,7 @@ export const useTrainingState = ({
     reset: resetTrainingData,
   } = useTrain(modelId, taskIds, modelVersionID);
 
-  useEffect(() => {
-    if (isTraining) {
-      setIsStarting(false);
-    }
-  }, [isTraining]);
+  const actualIsStarting = isTraining ? false : isStarting;
 
   const trainingProgress = useMemo(() => {
     return trainingData?.metrics?.epoch && trainingData.epochs
@@ -96,8 +94,8 @@ export const useTrainingState = ({
   }, [trainingData, currentEpoch, trainingError]);
 
   const canStartTraining = useMemo(() => {
-    return isAllSelected && !isStarting && !isTraining;
-  }, [isAllSelected, isStarting, isTraining]);
+    return isAllSelected && !actualIsStarting && !isTraining;
+  }, [isAllSelected, actualIsStarting, isTraining]);
 
   const startTraining = useCallback(() => {
     if (!canStartTraining) return;
@@ -118,7 +116,7 @@ export const useTrainingState = ({
     trainingLoss,
     trainingStatus,
     isTraining,
-    isStarting,
+    isStarting: actualIsStarting,
     trainingError,
     canStartTraining,
     trainingData,

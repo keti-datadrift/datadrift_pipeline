@@ -104,6 +104,10 @@ export async function proxyExternalRequest(
     logDebug(`Fetch Response Headers: ${key} - ${value}`);
   }
 
+  const responseHeaders = new Headers(fetchResponse.headers);
+  rewriteSetCookieHeaders(responseHeaders);
+  stripHopByHopHeaders(responseHeaders);
+
   if (fetchResponse.status >= 300 && fetchResponse.status < 400) {
     const location = fetchResponse.headers.get('location');
     logDebug('🔄 Redirect detected to:', location);
@@ -121,6 +125,24 @@ export async function proxyExternalRequest(
       // Let the browser follow redirects (especially for login) so it can store
       // any new session cookies that arrived with the 3xx response.
     }
+
+    responseHeaders.delete('location');
+
+    const redirectResponse = new NextResponse(null, {
+      status: 204,
+      headers: responseHeaders,
+    });
+
+    const isLogout = handlingRequest.nextUrl.pathname.includes('/logout');
+    const validAccessToken = handlingRequest.cookies.get('ls_access_token');
+    if (validAccessToken && !isLogout) {
+      redirectResponse.headers.append(
+        'Set-Cookie',
+        `ls_access_token=${validAccessToken.value}; Path=/; Max-Age=${60 * 60 * 24}; HttpOnly; SameSite=Lax`,
+      );
+    }
+
+    return redirectResponse;
   }
 
   const responseHeaders = new Headers(fetchResponse.headers);
@@ -137,8 +159,9 @@ export async function proxyExternalRequest(
     headers: responseHeaders,
   });
 
+  const isLogout = handlingRequest.nextUrl.pathname.includes('/logout');
   const validAccessToken = handlingRequest.cookies.get('ls_access_token');
-  if (validAccessToken) {
+  if (validAccessToken && !isLogout) {
     response.headers.append(
       'Set-Cookie',
       `ls_access_token=${validAccessToken.value}; Path=/; Max-Age=${60 * 60 * 24}; HttpOnly; SameSite=Lax`,
@@ -155,6 +178,23 @@ function rewriteSetCookieHeaders(headers: Headers): void {
   headers.delete('set-cookie');
   for (const value of setCookieValues) {
     headers.append('Set-Cookie', enforceRootPath(value));
+  }
+}
+
+function stripHopByHopHeaders(headers: Headers): void {
+  const hopByHopHeaders = [
+    'connection',
+    'keep-alive',
+    'proxy-authenticate',
+    'proxy-authorization',
+    'te',
+    'trailer',
+    'transfer-encoding',
+    'upgrade',
+  ];
+
+  for (const header of hopByHopHeaders) {
+    headers.delete(header);
   }
 }
 

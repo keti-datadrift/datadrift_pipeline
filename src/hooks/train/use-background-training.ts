@@ -11,7 +11,8 @@ import {
 import { useCallback, useMemo } from 'react';
 
 interface UseBackgroundTrainingOptions {
-  modelId: number;
+  modelId?: number;
+  mlBackendID?: number;
   taskIds: number[];
   modelVersionID?: number;
   modelType?: string;
@@ -21,6 +22,7 @@ interface UseBackgroundTrainingOptions {
 
 export function useBackgroundTraining({
   modelId,
+  mlBackendID,
   taskIds,
   modelVersionID,
   modelType,
@@ -29,6 +31,10 @@ export function useBackgroundTraining({
 }: UseBackgroundTrainingOptions) {
   const { tasks, startTask, cancelTask, getTasksByType } = useBackgroundTasks();
 
+  /**
+   * Generate unique task ID
+   * @description This is not a task from label studio, but a training task for a model.
+   */
   const taskId = useMemo(() => {
     const taskIdsHash = [...taskIds].sort((a, b) => a - b).join('-');
     return `training-${modelId}-${modelVersionID || 'latest'}-tasks-${taskIdsHash}`;
@@ -83,6 +89,7 @@ export function useBackgroundTraining({
 
   const startTraining = useCallback(async () => {
     if (!canStartTraining) return;
+    if (!modelId || !mlBackendID) return;
 
     const config: BackgroundTaskConfig = {
       id: taskId,
@@ -98,7 +105,7 @@ export function useBackgroundTraining({
     };
 
     const executorConfig: TrainingExecutorConfig = {
-      mlBackendID: modelId,
+      mlBackendID: mlBackendID,
       taskIDs: taskIds,
       modelVersionID,
     };
@@ -115,6 +122,7 @@ export function useBackgroundTraining({
     taskId,
     modelType,
     modelId,
+    mlBackendID,
     projectName,
     modelVersionID,
     taskIds,

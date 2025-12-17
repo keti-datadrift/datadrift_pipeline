@@ -10,12 +10,24 @@ export type { GetMLModelVersionsResponse as MLModelVersionPageResponse } from '.
 export { ProjectResponse } from './models/projects';
 export type { GetProjectsResponse as ProjectPageResponse } from './models/projects';
 
+// Tasks
+export type {
+  GetTasksResponse as TaskPageResponse,
+  TaskResponse,
+} from './models/tasks';
+
+// ML Backends
+export type {
+  MLBackendResponse,
+  MLBackendsResponse,
+} from './models/ml-backend';
+
 // Training
 export { TrainingProgressResponse } from './models/train';
 
 // Pagination models
 export type {
+  PaginatedQueryParams,
   PaginatedResponse,
   PaginationParams,
-  PaginatedQueryParams,
 } from './models/pagination';

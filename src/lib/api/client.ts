@@ -402,7 +402,11 @@ export class ApiClient {
 
     const requestOptions: RequestInit = {
       method,
-      headers: { 'Cache-Control': 'no-cache', ...headers },
+      headers: {
+        'Cache-Control': 'no-cache',
+        Accept: 'application/json, text/event-stream',
+        ...headers,
+      },
       signal: controller.signal,
       credentials: 'include',
     };

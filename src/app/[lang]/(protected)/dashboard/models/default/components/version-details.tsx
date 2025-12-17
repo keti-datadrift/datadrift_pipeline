@@ -23,7 +23,7 @@ type VersionDetailsProps = {
   isSelectedVersionDefault: boolean;
   updateStatus: 'idle' | 'loading' | 'success' | 'error';
   updateMessage: string | null;
-  onUpdateDefaultAction: () => void;
+  onUpdateDefault: () => void;
 };
 
 export function VersionDetails({
@@ -32,13 +32,13 @@ export function VersionDetails({
   isSelectedVersionDefault,
   updateStatus,
   updateMessage,
-  onUpdateDefaultAction,
+  onUpdateDefault,
 }: VersionDetailsProps) {
   const { t } = useI18n();
 
   if (!selectedVersion) {
     return (
-      <Card className="flex h-full min-h-0 w-full flex-col">
+      <Card className="h-full">
         <CardHeader>
           <CardTitle>{t('defaultModels.sections.details.title')}</CardTitle>
           <CardDescription>
@@ -52,8 +52,8 @@ export function VersionDetails({
   const isLoadingUpdate = updateStatus === 'loading';
 
   return (
-    <Card className="flex h-full min-h-0 w-full flex-col">
-      <CardHeader className="shrink-0">
+    <Card className="h-full">
+      <CardHeader>
         <div className="flex items-center justify-between gap-4">
           <div>
             <CardTitle className="flex items-center gap-2">
@@ -71,7 +71,7 @@ export function VersionDetails({
             </CardDescription>
           </div>
           <Button
-            onClick={onUpdateDefaultAction}
+            onClick={onUpdateDefault}
             disabled={isSelectedVersionDefault || isLoadingUpdate}
           >
             {isSelectedVersionDefault
@@ -82,7 +82,7 @@ export function VersionDetails({
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 space-y-6">
+      <CardContent className="space-y-6">
         {updateStatus === 'success' && updateMessage ? (
           <Alert>
             <CheckCircle2 className="h-4 w-4" />
@@ -101,9 +101,38 @@ export function VersionDetails({
             <AlertDescription>{updateMessage}</AlertDescription>
           </Alert>
         ) : null}
+
         <div>
           <h3 className="text-sm font-semibold mb-3">
             {t('defaultModels.sections.details.metricsTitle')}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {versionMetrics.map((metric) => {
+              const metricLabel = t(`defaultModels.metrics.${metric.key}`);
+              const metricValue =
+                typeof metric.value === 'number'
+                  ? metric.formatter
+                    ? metric.formatter(metric.value)
+                    : metric.value.toFixed(3)
+                  : t('defaultModels.text.notAvailable');
+
+              return (
+                <Card key={metric.key} className="bg-muted/40">
+                  <CardContent className="p-4">
+                    <p className="text-xs text-muted-foreground">
+                      {metricLabel}
+                    </p>
+                    <p className="text-lg font-semibold">{metricValue}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-semibold mb-3">
+            {t('defaultModels.sections.details.progressTitle')}
           </h3>
           <div className="space-y-3">
             {versionMetrics.map((metric) => {

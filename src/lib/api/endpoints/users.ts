@@ -1,7 +1,6 @@
-import {APIClient} from '../client';
-import {APIError} from '../types';
+import { APIClient } from '../client';
+import { APIError } from '../types';
 
-// TODO: User 타입 정의 필요
 interface User {
   id: number;
   email: string;
@@ -15,8 +14,7 @@ interface User {
  */
 export const getCurrentUser = async (): Promise<User> => {
   try {
-    const user = await APIClient.external.get<User>('/current-user/whoami');
-    return user;
+    return await APIClient.external.get<User>('/current-user/whoami');
   } catch (error) {
     if (error instanceof APIError) {
       // APIClient에서 발생시킨 에러는 그대로 전달

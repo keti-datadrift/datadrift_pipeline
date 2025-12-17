@@ -1,12 +1,16 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import { memo, use, useCallback, useMemo, useState } from 'react';
+
+import PageHeader from '@/components/models/page-header';
+import VersionForkDialog from '@/components/models/version-fork-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ModelVersion } from '@/entities/ml-model';
 import { useModel, useModelVersions } from '@/hooks/network/models';
-import { selectModelVersion } from '@/lib/api/endpoints';
-import { useRouter } from 'next/navigation';
-import { memo, use, useCallback, useEffect, useMemo, useState } from 'react';
+import { deleteModelVersion, forkModelVersion } from '@/lib/api/endpoints';
+
 import { columns } from './columns';
 import { DataTable } from './data-table';
 import { useI18n } from '@/contexts/I18nContext';
@@ -100,13 +104,11 @@ export default function ModelVersionPage({
   const { data: versions, loading: versionsLoading } =
     useModelVersions(modelId);
 
-  const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (model?.version) {
-      setSelectedVersion(model.version);
-    }
-  }, [model?.version]);
+  const selectedVersion = model?.version ?? null;
+  const [forkDialogOpen, setForkDialogOpen] = useState(false);
+  const [selectedVersionForFork, setSelectedVersionForFork] = useState<
+    number | null
+  >(null);
 
   const memoizedVersions = useMemo(() => {
     if (!versions) return [];
@@ -117,26 +119,50 @@ export default function ModelVersionPage({
     }));
   }, [versions, selectedVersion]);
 
-  const handleVersionSelect = useCallback(
-    async (version: string) => {
-      if (version === selectedVersion) return; // Prevent unnecessary calls
+  const handleVersionDelete = useCallback(
+    async (versionId: number) => {
+      if (!window.confirm(t('models.delete.confirmMessage'))) {
+        return;
+      }
+
       try {
-        await selectModelVersion(modelId, version);
-        setSelectedVersion(version);
-        // Use setTimeout to avoid immediate router refresh
+        await deleteModelVersion(versionId);
         setTimeout(() => {
           router.refresh();
         }, 0);
       } catch (error) {
-        console.error('Failed to select model version:', error);
+        console.error('Failed to delete version:', error);
+        alert(t('models.delete.errorMessage'));
       }
     },
-    [modelId, selectedVersion, router],
+    [t, router],
+  );
+
+  const handleVersionFork = useCallback((versionId: number) => {
+    setSelectedVersionForFork(versionId);
+    setForkDialogOpen(true);
+  }, []);
+
+  const handleForkSubmit = useCallback(
+    async (name: string, notes?: string) => {
+      if (!selectedVersionForFork) return;
+
+      try {
+        await forkModelVersion(selectedVersionForFork, name, notes);
+        setForkDialogOpen(false);
+        setSelectedVersionForFork(null);
+        router.push('/dashboard/models');
+      } catch (error) {
+        console.error('Failed to fork version:', error);
+        throw error;
+      }
+    },
+    [selectedVersionForFork, router],
   );
 
   const memoizedColumns = useMemo(
-    () => columns(selectedVersion, handleVersionSelect),
-    [selectedVersion, handleVersionSelect],
+    () => columns(handleVersionDelete, handleVersionFork),
+    [handleVersionDelete, handleVersionFork],
   );
 
   if (modelLoading || versionsLoading) {
@@ -163,9 +189,9 @@ export default function ModelVersionPage({
           <Card>
             <CardHeader>
               <div>
-                <CardTitle>{t('models.details.modelVersions')}</CardTitle>
+                <CardTitle>{t('modelDetail.modelVersions')}</CardTitle>
                 <p className="text-sm text-gray-500">
-                  {t('models.details.totalVersions', {
+                  {t('modelDetail.totalVersions', {
                     count: memoizedVersions.length,
                   })}
                 </p>
@@ -180,6 +206,12 @@ export default function ModelVersionPage({
           </Card>
         </div>
       </div>
+      <VersionForkDialog
+        open={forkDialogOpen}
+        onOpenChange={setForkDialogOpen}
+        onSubmit={handleForkSubmit}
+        defaultModelName={model?.name ? `${model.name}-copy` : undefined}
+      />
     </div>
   );
 }

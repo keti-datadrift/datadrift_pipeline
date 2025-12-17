@@ -76,7 +76,27 @@
       "openMenu": "메뉴 열기",
       "viewDetails": "상세 보기",
       "trainThisModel": "이 모델 학습",
-      "deleteModel": "제거"
+      "deleteModel": "제거",
+      "forkVersion": "버전 복제",
+      "deleteVersion": "버전 삭제"
+    },
+    "fork": {
+      "dialogTitle": "모델 버전 복제",
+      "dialogDescription": "이 버전을 복사하여 새 모델을 만듭니다. 가중치가 포함된 파일 시스템 디렉토리가 복제됩니다.",
+      "modelNameLabel": "새 모델 이름",
+      "modelNamePlaceholder": "모델 이름 입력...",
+      "notesLabel": "메모 (선택사항)",
+      "notesPlaceholder": "복제된 모델에 대한 메모 추가...",
+      "submitButton": "버전 복제",
+      "submitting": "복제 중...",
+      "nameRequired": "모델 이름은 필수입니다",
+      "successMessage": "모델 버전이 성공적으로 복제되었습니다",
+      "errorMessage": "모델 버전 복제에 실패했습니다"
+    },
+    "delete": {
+      "confirmMessage": "이 모델 버전을 삭제하시겠습니까? 이 작업은 되돌릴 수 없으며 모든 관련 파일이 삭제됩니다.",
+      "successMessage": "모델 버전이 성공적으로 삭제되었습니다",
+      "errorMessage": "모델 버전 삭제에 실패했습니다"
     },
     "details": {
       "error": "오류",

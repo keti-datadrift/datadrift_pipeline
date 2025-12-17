@@ -1,3 +1,6 @@
+import { Check, Loader2 } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Check, Loader2 } from 'lucide-react';
@@ -22,10 +25,10 @@ export function TrainingStatusPanel({
   // Show progress info not only while training, but also after it finished.
   // Only hide progress area before any training ever started.
   const hasHistory =
-    (typeof totalEpochs === 'number' && totalEpochs > 0) ||
-    (typeof currentEpoch === 'number' && currentEpoch > 0) ||
+    totalEpochs > 0 ||
+    currentEpoch > 0 ||
     trainingLoss !== null ||
-    (typeof trainingProgress === 'number' && trainingProgress > 0);
+    trainingProgress > 0;
 
   return (
     <Card>
@@ -69,7 +72,7 @@ export function TrainingStatusPanel({
             </div>
           )}
 
-          {isTraining && <div>{t('training.status.stopTraining')}</div>}
+          {isTraining && <Button>{t('training.status.stopTraining')}</Button>}
         </div>
       </CardContent>
     </Card>

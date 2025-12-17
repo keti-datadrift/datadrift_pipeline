@@ -105,3 +105,45 @@ export const invokeTraining = async function* (
     throw new ApiError(0, 'Failed to invoke training for model');
   }
 };
+
+export const deleteModelVersion = async (versionId: number): Promise<void> => {
+  try {
+    await APIClient.external.delete<void>(`/ml_models/versions/${versionId}`);
+  } catch (error) {
+    console.error(`Failed to delete model version (id: ${versionId}):`, error);
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(
+      0,
+      `Failed to delete model version ${versionId}. Details: ${String(error)}`,
+    );
+  }
+};
+
+export const forkModelVersion = async (
+  versionId: number,
+  name: string,
+  notes?: string,
+): Promise<MLModelResponse> => {
+  try {
+    const response = await APIClient.external.post<MLModelResponse>(
+      `/ml_models/versions/${versionId}/fork`,
+      {
+        data: {
+          name,
+          ...(notes && { notes }),
+        },
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error(
+      `Failed to fork model version (id: ${versionId}, name: ${name}):`,
+      error,
+    );
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(
+      0,
+      `Failed to fork model version ${versionId}. Details: ${String(error)}`,
+    );
+  }
+};

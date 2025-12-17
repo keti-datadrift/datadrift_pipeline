@@ -11,6 +11,20 @@ FROM oven/bun:latest AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+
+# Copy curl from the health-tools stage (used by the HEALTHCHECK)
+COPY --from=health-tools /usr/bin/curl /usr/bin/curl
+COPY --from=health-tools /usr/lib /usr/lib
+
+# Install production dependencies needed to serve the prebuilt Next.js app
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --verbose --production
+
+# Copy the prebuilt artifacts and static assets
+COPY .next ./.next
+COPY public ./public
+COPY next.config.ts ./next.config.ts
+
 EXPOSE 3000
 
 COPY --from=builder /app/.next ./.next

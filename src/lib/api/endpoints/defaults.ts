@@ -46,7 +46,7 @@ export const updateDefaultModelFor = async (
       `/ml_models/defaults/${type}`,
       {
         data: {
-          model_version_id: modelVersionID,
+          ml_model_version_id: modelVersionID,
         },
       },
     );
