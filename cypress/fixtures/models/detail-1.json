@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "name": "Layout Master",
+  "type": "layout",
+  "version": "1.0.0",
+  "created_at": "2024-09-01T10:00:00Z",
+  "updated_at": "2024-09-10T10:00:00Z",
+  "description": "Layout detection model"
+}

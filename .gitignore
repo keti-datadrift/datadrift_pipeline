@@ -46,13 +46,3 @@ next-env.d.ts
 
 # LLM
 CODE_REVIEW.md
-
-# Python/runtime data
-.venv/
-__pycache__/
-*.pyc
-.runtime/
-.pytest_cache/
-
-# Local verification images can contain private source imagery
-docs/verification/*.png

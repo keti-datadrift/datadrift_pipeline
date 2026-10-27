@@ -1,0 +1,63 @@
+{
+  "empty": [],
+  "running": [
+    {
+      "id": "training-1-101-tasks-1-2-3",
+      "type": "training",
+      "title": "Training OCR Recognition #1",
+      "description": "Project: OCR 레이블 프로젝트",
+      "status": "running",
+      "progress": {
+        "type": "numeric",
+        "current": 1,
+        "total": 10,
+        "percentage": 10,
+        "message": "Epoch 1/10",
+        "metadata": {
+          "trainClsLoss": 0.2560,
+          "valClsLoss": 0.3120
+        }
+      },
+      "metadata": {
+        "modelId": 1,
+        "modelVersionID": 101,
+        "modelType": "ocrrec",
+        "projectName": "OCR 레이블 프로젝트"
+      },
+      "createdAt": "2024-09-24T07:00:00Z",
+      "startedAt": "2024-09-24T07:00:05Z",
+      "completedAt": null,
+      "error": null
+    }
+  ],
+  "completed": [
+    {
+      "id": "training-1-101-tasks-1-2-3",
+      "type": "training",
+      "title": "Training OCR Recognition #1",
+      "description": "Project: OCR 레이블 프로젝트",
+      "status": "completed",
+      "progress": {
+        "type": "numeric",
+        "current": 10,
+        "total": 10,
+        "percentage": 100,
+        "message": "Epoch 10/10",
+        "metadata": {
+          "trainClsLoss": 0.0890,
+          "valClsLoss": 0.1250
+        }
+      },
+      "metadata": {
+        "modelId": 1,
+        "modelVersionID": 101,
+        "modelType": "ocrrec",
+        "projectName": "OCR 레이블 프로젝트"
+      },
+      "createdAt": "2024-09-24T06:00:00Z",
+      "startedAt": "2024-09-24T06:00:05Z",
+      "completedAt": "2024-09-24T06:15:30Z",
+      "error": null
+    }
+  ]
+}

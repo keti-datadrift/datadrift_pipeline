@@ -1,0 +1,93 @@
+[
+    {
+      "customer_id": "cust_001",
+      "age": 24,
+      "income": 42.5,
+      "visit_count": 3,
+      "avg_spend": 15.2,
+      "region": "north",
+      "segment": "C"
+    },
+    {
+      "customer_id": "cust_002",
+      "age": 39,
+      "income": 95.0,
+      "visit_count": 15,
+      "avg_spend": 58.0,
+      "region": "east",
+      "segment": "A"
+    },
+    {
+      "customer_id": "cust_003",
+      "age": 31,
+      "income": 65.3,
+      "visit_count": 7,
+      "avg_spend": 24.6,
+      "region": "south",
+      "segment": "B"
+    },
+    {
+      "customer_id": "cust_004",
+      "age": 52,
+      "income": 110.0,
+      "visit_count": 20,
+      "avg_spend": 70.0,
+      "region": "west",
+      "segment": "A"
+    },
+    {
+      "customer_id": "cust_005",
+      "age": 22,
+      "income": 30.0,
+      "visit_count": 2,
+      "avg_spend": 9.8,
+      "region": "north",
+      "segment": "C"
+    },
+    {
+      "customer_id": "cust_006",
+      "age": 45,
+      "income": 85.0,
+      "visit_count": 12,
+      "avg_spend": 45.5,
+      "region": "south",
+      "segment": "B"
+    },
+    {
+      "customer_id": "cust_007",
+      "age": 36,
+      "income": 58.7,
+      "visit_count": 8,
+      "avg_spend": 29.9,
+      "region": "east",
+      "segment": "B"
+    },
+    {
+      "customer_id": "cust_008",
+      "age": 28,
+      "income": 40.2,
+      "visit_count": 4,
+      "avg_spend": 17.0,
+      "region": "west",
+      "segment": "C"
+    },
+    {
+      "customer_id": "cust_009",
+      "age": 50,
+      "income": 120.0,
+      "visit_count": 18,
+      "avg_spend": 66.3,
+      "region": "north",
+      "segment": "A"
+    },
+    {
+      "customer_id": "cust_010",
+      "age": 33,
+      "income": 60.0,
+      "visit_count": 6,
+      "avg_spend": 26.1,
+      "region": "south",
+      "segment": "B"
+    }
+  ]
+  
