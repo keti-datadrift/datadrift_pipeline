@@ -1,0 +1,46 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "Layout Master",
+      "type": "layout",
+      "version": "1.0.0",
+      "created_at": "2024-09-01T10:00:00Z",
+      "updated_at": "2024-09-10T10:00:00Z",
+      "description": "Layout detection model"
+    },
+    {
+      "id": 2,
+      "name": "OCR Detector",
+      "type": "ocrdet",
+      "version": "2.1.0",
+      "created_at": "2024-08-15T08:00:00Z",
+      "updated_at": "2024-09-11T08:00:00Z",
+      "description": "OCR detection"
+    },
+    {
+      "id": 3,
+      "name": "OCR Recognizer",
+      "type": "ocrrec",
+      "version": "3.0.0",
+      "created_at": "2024-07-20T12:00:00Z",
+      "updated_at": "2024-09-09T12:00:00Z",
+      "description": "Recognizes OCR text"
+    },
+    {
+      "id": 4,
+      "name": "Table Extractor",
+      "type": "tabrec",
+      "version": "1.2.3",
+      "created_at": "2024-06-30T09:00:00Z",
+      "updated_at": "2024-09-08T09:00:00Z",
+      "description": "Table recognition"
+    }
+  ],
+  "total": 4,
+  "page": 1,
+  "page_size": 20,
+  "total_pages": 1,
+  "has_next": false,
+  "has_previous": false
+}

@@ -1,0 +1,60 @@
+{% extends 'users/new-ui/user_base.html' %}
+{% load static %}
+
+{% block user_content %}
+  <div class="form-wrapper">
+    <h2>Sign Up</h2>
+    <form id="signup-form"
+        action="{% url 'user-signup' %}?next={{ next }}{% if token %}&token={{ token }}{% endif %}"
+        method="post"
+    >
+    {% csrf_token %}
+      <div class="input-wrapper">
+        <label>Email Address</label>
+        <input type="text" class="lsf-input-ls" name="email" id="email" value="{{ user_form.data.email }}">
+        {% if user_form.errors.email %}
+          <ul class="field_errors">
+            {% for error in user_form.errors.email %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        </div>
+      <div class="input-wrapper">
+        <label>Password</label>
+        <input type="password" class="lsf-input-ls" name="password" id="password">
+        {% if user_form.errors.password %}
+          <ul class="field_errors">
+            {% for error in user_form.errors.password %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+      <div class="input-wrapper" id="elaborateContainer" {% if user_form.data.how_find_us != elaborate %}style="display:none;"{% endif %}> 
+        <label>Please elaborate</label>
+        <input class="lsf-input-ls" name="elaborate" id="elaborate" {% if user_form.data.how_find_us == elaborate %}value="{{ user_form.data.elaborate }}"{% endif %}>
+        </select>
+      </div>
+
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <p class="error">
+            {{ error }}
+          </p>
+        {% endfor %}
+      {% endif %}
+      <p><button type="submit" aria-label="Create Account" class="lsf-button-ls lsf-button-ls_look_primary">Create Account</button></p>
+    </form>
+  </div>
+  <div class="text-wrapper">
+    <p class="">Already have an account?</p>
+    <a href="{% url 'user-login' %}{% querystring %}">Log in</a>
+  </div>
+  <script>
+    document.querySelector("#how_find_us").addEventListener('change', function(e) {
+      const isOther = e.target.value == '{{ elaborate }}';
+      document.querySelector("#elaborateContainer").style.display = isOther ? 'block' : 'none';
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,39 @@
+FROM oven/bun:latest AS builder
+WORKDIR /app
+
+COPY . .
+
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+RUN bun run build
+
+FROM oven/bun:latest AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Copy curl from the health-tools stage (used by the HEALTHCHECK)
+COPY --from=health-tools /usr/bin/curl /usr/bin/curl
+COPY --from=health-tools /usr/lib /usr/lib
+
+# Install production dependencies needed to serve the prebuilt Next.js app
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --verbose --production
+
+# Copy the prebuilt artifacts and static assets
+COPY .next ./.next
+COPY public ./public
+COPY next.config.ts ./next.config.ts
+
+EXPOSE 3000
+
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/bun.lock ./bun.lock
+COPY --from=builder /app/next.config.ts ./next.config.ts
+
+RUN bun install --frozen-lockfile
+
+# Optional healthcheck: adjust locale prefix if needed
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -f http://localhost:3000/ko/next-api/health || exit 1

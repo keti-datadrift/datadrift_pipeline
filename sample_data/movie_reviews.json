@@ -1,0 +1,62 @@
+[
+    {
+      "review_id": "rev_001",
+      "user_id": "u001",
+      "review_text": "배우들의 연기가 정말 인상 깊었고, 스토리 전개도 탄탄했어요.",
+      "sentiment": "positive"
+    },
+    {
+      "review_id": "rev_002",
+      "user_id": "u002",
+      "review_text": "예고편이 전부였습니다. 지루하고 뻔한 전개로 실망했어요.",
+      "sentiment": "negative"
+    },
+    {
+      "review_id": "rev_003",
+      "user_id": "u003",
+      "review_text": "영상미가 뛰어나고 음악도 좋았어요. 여운이 남는 영화네요.",
+      "sentiment": "positive"
+    },
+    {
+      "review_id": "rev_004",
+      "user_id": "u004",
+      "review_text": "스토리가 전혀 흡입력이 없고 캐릭터도 매력이 없었어요.",
+      "sentiment": "negative"
+    },
+    {
+      "review_id": "rev_005",
+      "user_id": "u005",
+      "review_text": "오랜만에 감동적인 영화를 봤어요. 눈물이 날 뻔했네요.",
+      "sentiment": "positive"
+    },
+    {
+      "review_id": "rev_006",
+      "user_id": "u006",
+      "review_text": "시간이 아까웠습니다. 연출도 연기력도 너무 별로였어요.",
+      "sentiment": "negative"
+    },
+    {
+      "review_id": "rev_007",
+      "user_id": "u007",
+      "review_text": "몰입감 최고였어요! 시간 가는 줄 몰랐습니다.",
+      "sentiment": "positive"
+    },
+    {
+      "review_id": "rev_008",
+      "user_id": "u008",
+      "review_text": "줄거리가 산만하고 결말도 허무했어요.",
+      "sentiment": "negative"
+    },
+    {
+      "review_id": "rev_009",
+      "user_id": "u009",
+      "review_text": "잔잔하지만 울림이 있는 작품이었습니다. 추천해요.",
+      "sentiment": "positive"
+    },
+    {
+      "review_id": "rev_010",
+      "user_id": "u010",
+      "review_text": "전형적인 설정에 캐릭터도 진부했어요. 기대 이하.",
+      "sentiment": "negative"
+    }
+  ]  

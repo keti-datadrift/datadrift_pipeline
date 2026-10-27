@@ -1,0 +1,12 @@
+{
+  "layout": {
+    "type": "layout",
+    "name": "Layout Master",
+    "version": "1.0.0"
+  },
+  "ocrrec": {
+    "type": "ocrrec",
+    "name": "OCR Recognizer",
+    "version": "3.0.0"
+  }
+}

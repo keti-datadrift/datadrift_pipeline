@@ -1,0 +1,7 @@
+{
+    "models_dir": {
+        "pipeline": "/data/test-weights",
+        "vlm": ""
+    },
+    "config_version": "1.3.0"
+}

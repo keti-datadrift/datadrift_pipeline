@@ -1,0 +1,171 @@
+{% load static %}
+{% load i18n %}
+{% load rules %}
+{% load filters %}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="author" content="Label Studio"/>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, shrink-to-fit=no">
+
+  <!-- Address string color -->
+  <meta name="theme-color" content="#272727"> <!-- Chrome, Firefox OS and Opera -->
+  <meta name="msapplication-navbutton-color" content="#272727">  <!-- Windows Phone -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="#272727">  <!-- iOS Safari -->
+
+  <!-- Preload fonts -->
+  <link rel="preload" href="{{ settings.HOSTNAME }}/static/fonts/Figtree-Regular.ttf" as="font" type="font/ttf"
+    crossorigin="anonymous">
+  <link rel="preload" href="{{ settings.HOSTNAME }}/static/fonts/Figtree-SemiBold.ttf" as="font" type="font/ttf"
+    crossorigin="anonymous">
+
+
+  <!-- CSS -->
+  {% block app-css %}
+    <link href="{{settings.FRONTEND_HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
+  {% endblock %}
+
+  {% block theme_colors %}
+    {% if feature_flags.fflag_feat_front_optic_1217_theme_toggle_short %}
+    <script>
+      function handleThemeColor() {
+        let themeColor = window.localStorage.getItem("preferred-color-scheme");
+        if (themeColor === "Auto") {
+          themeColor = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "Dark" : "Light"
+        } else if (!themeColor) {
+          themeColor = "Light";
+        }
+        document.documentElement.setAttribute("data-color-scheme", themeColor.toLowerCase());
+      }
+      handleThemeColor();
+    </script>
+    {% endif %}
+  {% endblock %}
+  
+  {% block app-scripts %}
+  {% endblock %}
+
+  <script nonce="{{request.csp_nonce}}">
+    window.exports = () => {};
+  </script>
+
+  {% block page_labeling %}
+    <title>Label Studio</title>
+    <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
+  {% endblock %}
+
+  {% block head %}
+  {% endblock %}
+
+  {% get_current_language as LANGUAGE_CODE %}
+  {% get_available_languages as LANGUAGES %}
+
+</head>
+
+<body>
+
+<div class="app-wrapper"></div>
+
+<template id="main-content">
+  <main class="main">
+
+    <!-- Space & Divider -->
+    {% block divider %}
+      <div class="ui divider divider-wide"></div>
+    {% endblock %}
+
+    <!-- Content -->
+    {% block content %}
+    {% endblock %}
+
+  </main>
+</template>
+
+<template id="context-menu-left">
+  {% block context_menu_left %}{% endblock %}
+</template>
+
+<template id="context-menu-right">
+  {% block context_menu_right %}{% endblock %}
+</template>
+
+<script id="app-settings" nonce="{{request.csp_nonce}}">
+  window.APP_SETTINGS = Object.assign({
+    user: {
+      id: {{ user.pk }},
+      username: "{{user.username}}",
+      firstName: "{{user.first_name}}",
+      lastName: "{{user.last_name}}",
+      initials: "{{user.get_initials}}",
+      email: "{{user.email}}",
+      allow_newsletters: {% if user.allow_newsletters is None %}null{% else %}{{user.allow_newsletters|yesno:"true,false"}}{% endif %},
+      {% if user.avatar %}
+      avatar: "{{user.avatar_url|safe}}",
+      {% endif %}
+    },
+    debug: {{settings.DEBUG|yesno:"true,false"}},
+    hostname: "{{settings.HOSTNAME}}",
+    version: {{ versions|json_dumps_ensure_ascii|safe }},
+    editor_keymap: JSON.parse({{ settings.EDITOR_KEYMAP|safe }}),
+    feature_flags: {{ feature_flags|json_dumps_ensure_ascii|safe }},
+    feature_flags_default_value: {{ settings.FEATURE_FLAGS_DEFAULT_VALUE|json_dumps_ensure_ascii|safe }},
+    server_id: {{ request.server_id|json_dumps_ensure_ascii|safe }},
+    collect_analytics: {{ settings.COLLECT_ANALYTICS|yesno:"true,false" }},
+
+    {% block app_more_settings %}
+      flags: {
+        allow_organization_webhooks: {{settings.ALLOW_ORGANIZATION_WEBHOOKS|yesno:"true,false"}},
+        storage_persistence: {{ settings.STORAGE_PERSISTENCE|yesno:"true,false" }}, 
+      },
+    {% endblock %}
+
+  }, {% block frontend_settings %}{}{% endblock %});
+</script>
+
+{% block app-js %}
+<script src="{{settings.FRONTEND_HOSTNAME}}/react-app/runtime.js?v={{ versions.backend.commit }}"></script>
+{% comment %}
+  NOTE: purposely setting this to not cache using backend commit as we do not intend this to change frequently.
+  If for any reason we need to invalidate the cache, we can do so by changing the version number.
+{% endcomment %}
+<script src="{{settings.FRONTEND_HOSTNAME}}/react-app/vendor.js?v=1"></script>
+<script src="{{settings.FRONTEND_HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
+{% endblock %}
+
+{% block bottomjs %}
+  <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
+  <script nonce="{{request.csp_nonce}}">
+
+    // CSRF
+    (function() {
+      function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+      }
+
+      // Apply CSRF token
+      var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+      $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+        }
+      });
+    })();
+
+  </script>
+{% endblock %}
+
+<div id="dynamic-content">
+
+  {% block billing-checks %}
+  {% endblock %}
+
+</div>
+
+</body>
+</html>

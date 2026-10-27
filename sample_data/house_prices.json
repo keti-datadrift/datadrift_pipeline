@@ -1,0 +1,93 @@
+[
+    {
+      "house_id": "house_001",
+      "area": 85.0,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "year_built": 2010,
+      "location": "seoul",
+      "price": 8500
+    },
+    {
+      "house_id": "house_002",
+      "area": 45.5,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "year_built": 2005,
+      "location": "busan",
+      "price": 4200
+    },
+    {
+      "house_id": "house_003",
+      "area": 120.0,
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "year_built": 2018,
+      "location": "seongnam",
+      "price": 11500
+    },
+    {
+      "house_id": "house_004",
+      "area": 60.0,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "year_built": 2000,
+      "location": "gwangju",
+      "price": 4900
+    },
+    {
+      "house_id": "house_005",
+      "area": 33.0,
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "year_built": 1995,
+      "location": "daegu",
+      "price": 3300
+    },
+    {
+      "house_id": "house_006",
+      "area": 95.0,
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "year_built": 2015,
+      "location": "incheon",
+      "price": 8700
+    },
+    {
+      "house_id": "house_007",
+      "area": 77.0,
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "year_built": 2008,
+      "location": "seoul",
+      "price": 7300
+    },
+    {
+      "house_id": "house_008",
+      "area": 110.0,
+      "bedrooms": 4,
+      "bathrooms": 2,
+      "year_built": 2020,
+      "location": "yongin",
+      "price": 9900
+    },
+    {
+      "house_id": "house_009",
+      "area": 52.0,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "year_built": 2003,
+      "location": "ulsan",
+      "price": 4600
+    },
+    {
+      "house_id": "house_010",
+      "area": 70.0,
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "year_built": 2007,
+      "location": "sejong",
+      "price": 5900
+    }
+  ]
+  

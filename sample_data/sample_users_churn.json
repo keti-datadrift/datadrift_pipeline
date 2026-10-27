@@ -1,0 +1,103 @@
+[
+    {
+      "user_id": "user_001",
+      "age": 25,
+      "subscription_type": "free",
+      "login_count": 3,
+      "avg_session_time": 4.2,
+      "last_login_days_ago": 80,
+      "support_tickets": 0,
+      "churned": true
+    },
+    {
+      "user_id": "user_002",
+      "age": 34,
+      "subscription_type": "premium",
+      "login_count": 120,
+      "avg_session_time": 22.5,
+      "last_login_days_ago": 1,
+      "support_tickets": 1,
+      "churned": false
+    },
+    {
+      "user_id": "user_003",
+      "age": 29,
+      "subscription_type": "basic",
+      "login_count": 40,
+      "avg_session_time": 10.1,
+      "last_login_days_ago": 5,
+      "support_tickets": 0,
+      "churned": false
+    },
+    {
+      "user_id": "user_004",
+      "age": 47,
+      "subscription_type": "free",
+      "login_count": 2,
+      "avg_session_time": 1.8,
+      "last_login_days_ago": 120,
+      "support_tickets": 2,
+      "churned": true
+    },
+    {
+      "user_id": "user_005",
+      "age": 22,
+      "subscription_type": "basic",
+      "login_count": 12,
+      "avg_session_time": 7.0,
+      "last_login_days_ago": 30,
+      "support_tickets": 0,
+      "churned": false
+    },
+    {
+      "user_id": "user_006",
+      "age": 31,
+      "subscription_type": "premium",
+      "login_count": 85,
+      "avg_session_time": 18.3,
+      "last_login_days_ago": 3,
+      "support_tickets": 1,
+      "churned": false
+    },
+    {
+      "user_id": "user_007",
+      "age": 38,
+      "subscription_type": "free",
+      "login_count": 5,
+      "avg_session_time": 3.5,
+      "last_login_days_ago": 60,
+      "support_tickets": 3,
+      "churned": true
+    },
+    {
+      "user_id": "user_008",
+      "age": 45,
+      "subscription_type": "basic",
+      "login_count": 22,
+      "avg_session_time": 9.4,
+      "last_login_days_ago": 12,
+      "support_tickets": 1,
+      "churned": false
+    },
+    {
+      "user_id": "user_009",
+      "age": 28,
+      "subscription_type": "premium",
+      "login_count": 100,
+      "avg_session_time": 25.2,
+      "last_login_days_ago": 0,
+      "support_tickets": 0,
+      "churned": false
+    },
+    {
+      "user_id": "user_010",
+      "age": 50,
+      "subscription_type": "free",
+      "login_count": 1,
+      "avg_session_time": 1.0,
+      "last_login_days_ago": 200,
+      "support_tickets": 5,
+      "churned": true
+    }
+  ]
+  

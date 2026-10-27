@@ -1,0 +1,38 @@
+{
+  "started": {
+    "status": "training_started",
+    "message": "Training started",
+    "epochs": 10,
+    "metrics": null
+  },
+  "progress": {
+    "status": "training_progress",
+    "message": "Training in progress",
+    "epochs": 10,
+    "metrics": {
+      "epoch": 1,
+      "trainClsLoss": 0.2560,
+      "validationClsLoss": 0.3120,
+      "precision": 0.85,
+      "recall": 0.82
+    }
+  },
+  "completed": {
+    "status": "training_completed",
+    "message": "Training completed successfully",
+    "epochs": 10,
+    "metrics": {
+      "epoch": 10,
+      "trainClsLoss": 0.0890,
+      "validationClsLoss": 0.1250,
+      "precision": 0.94,
+      "recall": 0.91
+    }
+  },
+  "failed": {
+    "status": "training_failed",
+    "message": "Training failed due to insufficient memory",
+    "epochs": 10,
+    "metrics": null
+  }
+}
