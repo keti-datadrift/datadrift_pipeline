@@ -53,3 +53,6 @@ __pycache__/
 *.pyc
 .runtime/
 .pytest_cache/
+
+# Local verification images can contain private source imagery
+docs/verification/*.png

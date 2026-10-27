@@ -1,0 +1,16 @@
+[Unit]
+Description=DataDrift Pipeline serialized GPU worker
+After=network.target
+[Service]
+WorkingDirectory=/home/hslim/Code/datadrift/datadrift_pipeline
+Environment=DATADRIFT_STATE=/home/hslim/Code/datadrift/datadrift_pipeline/.runtime
+Environment=DATADRIFT_TRAIN_PYTHON=/data/hslim/venvs/gemma4-12b-transformers-dev/bin/python
+Environment=DATADRIFT_GPU=0
+ExecStart=/home/hslim/Code/datadrift/datadrift_pipeline/.venv/bin/python -m backend.worker
+Restart=always
+RestartSec=3
+KillMode=control-group
+TimeoutStopSec=30
+UMask=0077
+[Install]
+WantedBy=default.target

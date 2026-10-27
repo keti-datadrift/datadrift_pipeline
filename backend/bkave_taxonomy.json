@@ -1,0 +1,2170 @@
+{
+  "id": "bkave-106baf22f720",
+  "name": "비케이브 Taxonomy",
+  "source_filename": "비케이브_Taxonomy_공유.xlsx",
+  "source_sha256": "106baf22f72046e5d89261bac389695c3ed6d2af9d36c2f81c9206ffaf52e7f5",
+  "groups": {
+    "아우터": {
+      "핏": [
+        "슬림핏",
+        "레귤러핏",
+        "루즈핏",
+        "오버핏"
+      ],
+      "기장": [
+        "숏",
+        "기본",
+        "하프",
+        "롱",
+        "맥시"
+      ],
+      "넥라인": [
+        "라운드넥",
+        "V넥",
+        "U넥",
+        "스퀘어넥",
+        "카라넥",
+        "헨리넥",
+        "하이넥",
+        "하프넥",
+        "후드"
+      ],
+      "무늬": [
+        "무지",
+        "스트라이프",
+        "체크",
+        "도트",
+        "플라워",
+        "카모플라쥬",
+        "애니멀패턴",
+        "로고/그래픽",
+        "레터링",
+        "캐릭터",
+        "페이즐리",
+        "타이다이"
+      ],
+      "디자인 디테일": [
+        "자수",
+        "패치",
+        "패치워크",
+        "배색",
+        "퀼팅",
+        "포켓",
+        "턱",
+        "플리츠",
+        "셔링",
+        "프릴",
+        "슬릿",
+        "언발란스",
+        "레이어드",
+        "디스트로이드",
+        "스티치",
+        "스트링",
+        "벨트"
+      ]
+    },
+    "상의": {
+      "핏": [
+        "슬림핏",
+        "레귤러핏",
+        "루즈핏",
+        "오버핏"
+      ],
+      "기장": [
+        "크롭",
+        "기본",
+        "롱"
+      ],
+      "소매 길이": [
+        "민소매",
+        "반소매",
+        "5부",
+        "7부",
+        "9부",
+        "긴소매"
+      ],
+      "넥라인": [
+        "라운드넥",
+        "V넥",
+        "U넥",
+        "스퀘어넥",
+        "보트넥",
+        "카라넥",
+        "헨리넥",
+        "터틀넥",
+        "하프넥",
+        "후드",
+        "오프숄더",
+        "일자탑"
+      ],
+      "무늬": [
+        "무지",
+        "스트라이프",
+        "체크",
+        "도트",
+        "플라워",
+        "카모플라쥬",
+        "애니멀패턴",
+        "로고/그래픽",
+        "레터링",
+        "캐릭터",
+        "페이즐리",
+        "타이다이"
+      ],
+      "디자인 디테일": [
+        "자수",
+        "패치",
+        "패치워크",
+        "배색",
+        "포켓",
+        "턱",
+        "플리츠",
+        "셔링",
+        "프릴",
+        "슬릿",
+        "컷아웃",
+        "언발란스",
+        "레이어드",
+        "디스트로이드",
+        "스티치",
+        "스트링",
+        "롤업"
+      ]
+    },
+    "하의": {
+      "핏": [
+        "와이드",
+        "레귤러",
+        "스트레이트",
+        "슬림",
+        "스키니",
+        "부츠컷",
+        "테이퍼드",
+        "조거",
+        "벌룬",
+        "배기",
+        "H라인",
+        "A라인",
+        "플레어"
+      ],
+      "기장": [
+        "숏",
+        "하프/버뮤다",
+        "7부",
+        "9부",
+        "롱",
+        "미니",
+        "미디",
+        "맥시"
+      ],
+      "무늬": [
+        "무지",
+        "스트라이프",
+        "체크",
+        "도트",
+        "플라워",
+        "카모플라쥬",
+        "애니멀패턴",
+        "로고/그래픽",
+        "레터링",
+        "캐릭터",
+        "페이즐리",
+        "타이다이"
+      ],
+      "디자인 디테일": [
+        "자수",
+        "패치",
+        "패치워크",
+        "배색",
+        "카고",
+        "턱",
+        "플리츠",
+        "셔링",
+        "프릴",
+        "슬릿",
+        "컷아웃",
+        "언발란스",
+        "레이어드",
+        "디스트로이드",
+        "스티치",
+        "스트링",
+        "벨트",
+        "롤업",
+        "스터드"
+      ]
+    },
+    "ACC": {
+      "무늬": [
+        "무지",
+        "스트라이프",
+        "체크",
+        "도트",
+        "플라워",
+        "카모플라쥬",
+        "애니멀패턴",
+        "로고/그래픽",
+        "레터링",
+        "캐릭터",
+        "페이즐리",
+        "타이다이"
+      ],
+      "디자인 디테일": [
+        "자수",
+        "패치",
+        "패치워크",
+        "배색",
+        "퀼팅",
+        "포켓",
+        "셔링",
+        "프릴",
+        "스티치",
+        "프린지",
+        "스터드"
+      ]
+    },
+    "공통": {
+      "원단 유형": [
+        "데님",
+        "저지",
+        "니트",
+        "우븐",
+        "트윌",
+        "코듀로이",
+        "플리스",
+        "테리",
+        "레이스",
+        "메시",
+        "새틴",
+        "벨벳",
+        "트위드",
+        "시어서커",
+        "스웨이드",
+        "가죽"
+      ],
+      "생산처": [
+        "국내",
+        "중국",
+        "베트남",
+        "미얀마",
+        "방글라데시",
+        "제3국"
+      ]
+    }
+  },
+  "colors": [
+    {
+      "group": "회색",
+      "code": "TA",
+      "name": "TAUPE",
+      "row": 3
+    },
+    {
+      "group": "화이트",
+      "code": "OW",
+      "name": "OFF WHITE",
+      "row": 4
+    },
+    {
+      "group": "화이트",
+      "code": "WH",
+      "name": "WHITE",
+      "row": 5
+    },
+    {
+      "group": "화이트",
+      "code": "WM",
+      "name": "WHITE MELANGE",
+      "row": 6
+    },
+    {
+      "group": "핑크",
+      "code": "DK",
+      "name": "DUSTY PINK",
+      "row": 7
+    },
+    {
+      "group": "핑크",
+      "code": "HP",
+      "name": "HOT PINK",
+      "row": 8
+    },
+    {
+      "group": "핑크",
+      "code": "IP",
+      "name": "INDIPINK",
+      "row": 9
+    },
+    {
+      "group": "핑크",
+      "code": "LP",
+      "name": "LIGHT PINK",
+      "row": 10
+    },
+    {
+      "group": "핑크",
+      "code": "PE",
+      "name": "PEACH",
+      "row": 11
+    },
+    {
+      "group": "핑크",
+      "code": "PI",
+      "name": "PINK",
+      "row": 12
+    },
+    {
+      "group": "핑크",
+      "code": "PP",
+      "name": "PIGMENT LIGHT PINK",
+      "row": 13
+    },
+    {
+      "group": "핑크",
+      "code": "PQ",
+      "name": "PIGMENT PINK",
+      "row": 14
+    },
+    {
+      "group": "퍼플",
+      "code": "CR",
+      "name": "CORAL",
+      "row": 15
+    },
+    {
+      "group": "퍼플",
+      "code": "GE",
+      "name": "GRAPE",
+      "row": 16
+    },
+    {
+      "group": "퍼플",
+      "code": "GU",
+      "name": "GRAYISH PURPLE",
+      "row": 17
+    },
+    {
+      "group": "퍼플",
+      "code": "KP",
+      "name": "DARK PURPLE",
+      "row": 18
+    },
+    {
+      "group": "퍼플",
+      "code": "LPU",
+      "name": "LIGHT PURPLE",
+      "row": 19
+    },
+    {
+      "group": "퍼플",
+      "code": "LV",
+      "name": "LAVENDER",
+      "row": 20
+    },
+    {
+      "group": "퍼플",
+      "code": "MA",
+      "name": "MAGENTA",
+      "row": 21
+    },
+    {
+      "group": "퍼플",
+      "code": "PM",
+      "name": "PIGMENT PURPLE",
+      "row": 22
+    },
+    {
+      "group": "퍼플",
+      "code": "PU",
+      "name": "PURPLE",
+      "row": 23
+    },
+    {
+      "group": "퍼플",
+      "code": "SPU",
+      "name": "SAND PURPLE",
+      "row": 24
+    },
+    {
+      "group": "퍼플",
+      "code": "TP",
+      "name": "LIGHT PURPLE",
+      "row": 25
+    },
+    {
+      "group": "패턴",
+      "code": "BP",
+      "name": "BLUE PAISEY",
+      "row": 26
+    },
+    {
+      "group": "패턴",
+      "code": "CA",
+      "name": "CAMO",
+      "row": 27
+    },
+    {
+      "group": "패턴",
+      "code": "CK",
+      "name": "CHECK",
+      "row": 28
+    },
+    {
+      "group": "패턴",
+      "code": "FG",
+      "name": "FLAG",
+      "row": 29
+    },
+    {
+      "group": "패턴",
+      "code": "JU",
+      "name": "JUNGLE",
+      "row": 30
+    },
+    {
+      "group": "패턴",
+      "code": "LE",
+      "name": "LEOPARD",
+      "row": 31
+    },
+    {
+      "group": "패턴",
+      "code": "OM",
+      "name": "OCHER MADRAS",
+      "row": 32
+    },
+    {
+      "group": "패턴",
+      "code": "SR",
+      "name": "STRIPE",
+      "row": 33
+    },
+    {
+      "group": "패턴",
+      "code": "ZI",
+      "name": "ZIGZAG",
+      "row": 34
+    },
+    {
+      "group": "컬러 믹스",
+      "code": "CX",
+      "name": "COLOR MIX",
+      "row": 35
+    },
+    {
+      "group": "카키",
+      "code": "KB",
+      "name": "KHAKI BEIGE",
+      "row": 36
+    },
+    {
+      "group": "카키",
+      "code": "KG",
+      "name": "KHAKI GRAY",
+      "row": 37
+    },
+    {
+      "group": "카키",
+      "code": "KH",
+      "name": "KHAKI",
+      "row": 38
+    },
+    {
+      "group": "카키",
+      "code": "KW",
+      "name": "KHAKI BROWN",
+      "row": 39
+    },
+    {
+      "group": "카키",
+      "code": "LK",
+      "name": "LIGHT KHAKI",
+      "row": 40
+    },
+    {
+      "group": "카키",
+      "code": "PH",
+      "name": "PIGMENT KHAKI",
+      "row": 41
+    },
+    {
+      "group": "카멜",
+      "code": "CE",
+      "name": "CAMEL",
+      "row": 42
+    },
+    {
+      "group": "체크",
+      "code": "TG",
+      "name": "TARTAN GREEN",
+      "row": 43
+    },
+    {
+      "group": "체크",
+      "code": "TK",
+      "name": "TARTAN BLACK",
+      "row": 44
+    },
+    {
+      "group": "체크",
+      "code": "TR",
+      "name": "TARTAN BROWN",
+      "row": 45
+    },
+    {
+      "group": "와인",
+      "code": "WI",
+      "name": "WINE",
+      "row": 46
+    },
+    {
+      "group": "올리브",
+      "code": "OL",
+      "name": "OLIVE",
+      "row": 47
+    },
+    {
+      "group": "오렌지",
+      "code": "DA",
+      "name": "DARK ORANGE",
+      "row": 48
+    },
+    {
+      "group": "오렌지",
+      "code": "DS",
+      "name": "DEEP SALMON",
+      "row": 49
+    },
+    {
+      "group": "오렌지",
+      "code": "LS",
+      "name": "LIGHT SALMON",
+      "row": 50
+    },
+    {
+      "group": "오렌지",
+      "code": "OG",
+      "name": "ORANGE",
+      "row": 51
+    },
+    {
+      "group": "오렌지",
+      "code": "OR",
+      "name": "ORANGE",
+      "row": 52
+    },
+    {
+      "group": "오렌지",
+      "code": "PJ",
+      "name": "PIGMENT ORANGE",
+      "row": 53
+    },
+    {
+      "group": "오렌지",
+      "code": "RT",
+      "name": "RUST",
+      "row": 54
+    },
+    {
+      "group": "오렌지",
+      "code": "SM",
+      "name": "SALMON",
+      "row": 55
+    },
+    {
+      "group": "옐로우",
+      "code": "BT",
+      "name": "BUTTER",
+      "row": 56
+    },
+    {
+      "group": "옐로",
+      "code": "DL",
+      "name": "DUSTY YELLOW",
+      "row": 57
+    },
+    {
+      "group": "옐로",
+      "code": "GY",
+      "name": "GRANARY",
+      "row": 58
+    },
+    {
+      "group": "옐로",
+      "code": "LM",
+      "name": "LEMON",
+      "row": 59
+    },
+    {
+      "group": "옐로",
+      "code": "LY",
+      "name": "LIGHT YELLOW",
+      "row": 60
+    },
+    {
+      "group": "옐로",
+      "code": "MS",
+      "name": "MUSTARD",
+      "row": 61
+    },
+    {
+      "group": "옐로",
+      "code": "MU",
+      "name": "MUSTARD",
+      "row": 62
+    },
+    {
+      "group": "옐로",
+      "code": "PY",
+      "name": "YELLOW PAISLEY",
+      "row": 63
+    },
+    {
+      "group": "옐로",
+      "code": "SF",
+      "name": "SUNFLOWER",
+      "row": 64
+    },
+    {
+      "group": "옐로",
+      "code": "YE",
+      "name": "YELLOW",
+      "row": 65
+    },
+    {
+      "group": "옐로",
+      "code": "YL",
+      "name": "YELLOW",
+      "row": 66
+    },
+    {
+      "group": "없음",
+      "code": "XX",
+      "name": "NONE",
+      "row": 67
+    },
+    {
+      "group": "없음",
+      "code": "ZZ",
+      "name": "NONE",
+      "row": 68
+    },
+    {
+      "group": "블루",
+      "code": "AB",
+      "name": "ASH BLUE",
+      "row": 69
+    },
+    {
+      "group": "블루",
+      "code": "BL",
+      "name": "BLUE",
+      "row": 70
+    },
+    {
+      "group": "블루",
+      "code": "BM",
+      "name": "BLUE MARL",
+      "row": 71
+    },
+    {
+      "group": "블루",
+      "code": "BN",
+      "name": "BLUE GREEN",
+      "row": 72
+    },
+    {
+      "group": "블루",
+      "code": "CB",
+      "name": "PIGMENT BLUE",
+      "row": 73
+    },
+    {
+      "group": "블루",
+      "code": "CV",
+      "name": "CORVETTE",
+      "row": 74
+    },
+    {
+      "group": "블루",
+      "code": "DB",
+      "name": "DARK BLUE",
+      "row": 75
+    },
+    {
+      "group": "블루",
+      "code": "DE",
+      "name": "DENIM",
+      "row": 76
+    },
+    {
+      "group": "블루",
+      "code": "DU",
+      "name": "DUSTY BLUE",
+      "row": 77
+    },
+    {
+      "group": "블루",
+      "code": "DUB",
+      "name": "DUSTY BLUE",
+      "row": 78
+    },
+    {
+      "group": "블루",
+      "code": "EB",
+      "name": "DEEP BLUE",
+      "row": 79
+    },
+    {
+      "group": "블루",
+      "code": "GB",
+      "name": "GRAYISH BLUE",
+      "row": 80
+    },
+    {
+      "group": "블루",
+      "code": "ID",
+      "name": "INDIGO DARK",
+      "row": 81
+    },
+    {
+      "group": "블루",
+      "code": "IL",
+      "name": "INDIGO LIGHT",
+      "row": 82
+    },
+    {
+      "group": "블루",
+      "code": "IM",
+      "name": "INDIGO MEDIUM",
+      "row": 83
+    },
+    {
+      "group": "블루",
+      "code": "IN",
+      "name": "INDIGO",
+      "row": 84
+    },
+    {
+      "group": "블루",
+      "code": "IR",
+      "name": "INDIGO RAW",
+      "row": 85
+    },
+    {
+      "group": "블루",
+      "code": "LB",
+      "name": "LIGHT BLUE",
+      "row": 86
+    },
+    {
+      "group": "블루",
+      "code": "LQ",
+      "name": "LIGHT AQUA",
+      "row": 87
+    },
+    {
+      "group": "블루",
+      "code": "LT",
+      "name": "LIGHT BLUE",
+      "row": 88
+    },
+    {
+      "group": "블루",
+      "code": "MR",
+      "name": "MARINE",
+      "row": 89
+    },
+    {
+      "group": "블루",
+      "code": "OC",
+      "name": "OCEAN",
+      "row": 90
+    },
+    {
+      "group": "블루",
+      "code": "PD",
+      "name": "PIGMENT INDIGO",
+      "row": 91
+    },
+    {
+      "group": "블루",
+      "code": "RB",
+      "name": "ROYAL BLUE",
+      "row": 92
+    },
+    {
+      "group": "블루",
+      "code": "SA",
+      "name": "SAX",
+      "row": 93
+    },
+    {
+      "group": "블루",
+      "code": "SB",
+      "name": "SKY BLUE",
+      "row": 94
+    },
+    {
+      "group": "블루",
+      "code": "TB",
+      "name": "TEAL BLUE",
+      "row": 95
+    },
+    {
+      "group": "블루",
+      "code": "TE",
+      "name": "TURQUOISE BLUE",
+      "row": 96
+    },
+    {
+      "group": "블랙",
+      "code": "BA",
+      "name": "BLACK RAW",
+      "row": 97
+    },
+    {
+      "group": "블랙",
+      "code": "BB",
+      "name": "BLACK/BLACK",
+      "row": 98
+    },
+    {
+      "group": "블랙",
+      "code": "BD",
+      "name": "BLACK DOT",
+      "row": 99
+    },
+    {
+      "group": "블랙",
+      "code": "BK",
+      "name": "BLACK",
+      "row": 100
+    },
+    {
+      "group": "블랙",
+      "code": "BS",
+      "name": "BLACK WASHED",
+      "row": 101
+    },
+    {
+      "group": "블랙",
+      "code": "FB",
+      "name": "FADED BLACK",
+      "row": 102
+    },
+    {
+      "group": "블랙",
+      "code": "IB",
+      "name": "IVORY BLACK",
+      "row": 103
+    },
+    {
+      "group": "블랙",
+      "code": "JB",
+      "name": "JET BLACK",
+      "row": 104
+    },
+    {
+      "group": "블랙",
+      "code": "PK",
+      "name": "PAISLEY BLACK",
+      "row": 105
+    },
+    {
+      "group": "블랙",
+      "code": "PS",
+      "name": "PIGMENT BLACK",
+      "row": 106
+    },
+    {
+      "group": "블랙",
+      "code": "VB",
+      "name": "VINTAGE BLACK",
+      "row": 107
+    },
+    {
+      "group": "블랙",
+      "code": "WB",
+      "name": "WARM BLACK",
+      "row": 108
+    },
+    {
+      "group": "브라운",
+      "code": "BR",
+      "name": "BROWN",
+      "row": 109
+    },
+    {
+      "group": "브라운",
+      "code": "CL",
+      "name": "CHOCOLATE",
+      "row": 110
+    },
+    {
+      "group": "브라운",
+      "code": "CN",
+      "name": "CHESTNUT",
+      "row": 111
+    },
+    {
+      "group": "브라운",
+      "code": "DW",
+      "name": "DEEP BROWN",
+      "row": 112
+    },
+    {
+      "group": "브라운",
+      "code": "HI",
+      "name": "HICKORY",
+      "row": 113
+    },
+    {
+      "group": "브라운",
+      "code": "KR",
+      "name": "DARK BROWN",
+      "row": 114
+    },
+    {
+      "group": "브라운",
+      "code": "LTB",
+      "name": "LIGHT BROWN",
+      "row": 115
+    },
+    {
+      "group": "브라운",
+      "code": "LW",
+      "name": "LIGHT BROWN",
+      "row": 116
+    },
+    {
+      "group": "브라운",
+      "code": "MB",
+      "name": "MELANGE BROWN",
+      "row": 117
+    },
+    {
+      "group": "브라운",
+      "code": "MO",
+      "name": "MOCA",
+      "row": 118
+    },
+    {
+      "group": "브라운",
+      "code": "PW",
+      "name": "PIGMENT BROWN",
+      "row": 119
+    },
+    {
+      "group": "브라운",
+      "code": "RS",
+      "name": "BRASS",
+      "row": 120
+    },
+    {
+      "group": "브라운",
+      "code": "SI",
+      "name": "SIENNA",
+      "row": 121
+    },
+    {
+      "group": "브라운",
+      "code": "SN",
+      "name": "SIENNA",
+      "row": 122
+    },
+    {
+      "group": "브라운",
+      "code": "WD",
+      "name": "WOOD",
+      "row": 123
+    },
+    {
+      "group": "베이지",
+      "code": "BE",
+      "name": "BEIGE",
+      "row": 124
+    },
+    {
+      "group": "베이지",
+      "code": "GG",
+      "name": "GREIGE",
+      "row": 125
+    },
+    {
+      "group": "베이지",
+      "code": "IE",
+      "name": "LIGHT BEIGE",
+      "row": 126
+    },
+    {
+      "group": "베이지",
+      "code": "PB",
+      "name": "PIGMENT BEIGE",
+      "row": 127
+    },
+    {
+      "group": "베이지",
+      "code": "SD",
+      "name": "SAND",
+      "row": 128
+    },
+    {
+      "group": "베이지",
+      "code": "SE",
+      "name": "SAND BEIGE",
+      "row": 129
+    },
+    {
+      "group": "베이지",
+      "code": "TS",
+      "name": "TUSK",
+      "row": 130
+    },
+    {
+      "group": "베이지",
+      "code": "WT",
+      "name": "WHITE",
+      "row": 131
+    },
+    {
+      "group": "버건디",
+      "code": "BU",
+      "name": "BURGUNDY",
+      "row": 132
+    },
+    {
+      "group": "버건디",
+      "code": "PG",
+      "name": "BURGUNDY PAISLEY",
+      "row": 133
+    },
+    {
+      "group": "멀티",
+      "code": "BW",
+      "name": "BLACK/WHITE",
+      "row": 134
+    },
+    {
+      "group": "멀티",
+      "code": "DX",
+      "name": "DENIM MIX",
+      "row": 135
+    },
+    {
+      "group": "멀티",
+      "code": "MT",
+      "name": "MULTI",
+      "row": 136
+    },
+    {
+      "group": "멀티",
+      "code": "MX",
+      "name": "MIX",
+      "row": 137
+    },
+    {
+      "group": "레드",
+      "code": "BC",
+      "name": "BRICK",
+      "row": 138
+    },
+    {
+      "group": "레드",
+      "code": "CY",
+      "name": "CHERRY",
+      "row": 139
+    },
+    {
+      "group": "레드",
+      "code": "DR",
+      "name": "DEEP RED",
+      "row": 140
+    },
+    {
+      "group": "레드",
+      "code": "PR",
+      "name": "POPRED",
+      "row": 141
+    },
+    {
+      "group": "레드",
+      "code": "RD",
+      "name": "RED",
+      "row": 142
+    },
+    {
+      "group": "레드",
+      "code": "RO",
+      "name": "ROSE",
+      "row": 143
+    },
+    {
+      "group": "뉴트럴",
+      "code": "CM",
+      "name": "CREAM",
+      "row": 144
+    },
+    {
+      "group": "뉴트럴",
+      "code": "CNV",
+      "name": "CHANVRE",
+      "row": 145
+    },
+    {
+      "group": "뉴트럴",
+      "code": "EC",
+      "name": "ECRU",
+      "row": 146
+    },
+    {
+      "group": "뉴트럴",
+      "code": "IV",
+      "name": "IVORY",
+      "row": 147
+    },
+    {
+      "group": "뉴트럴",
+      "code": "IV1",
+      "name": "IVORY",
+      "row": 148
+    },
+    {
+      "group": "뉴트럴",
+      "code": "NG",
+      "name": "NEIGE",
+      "row": 149
+    },
+    {
+      "group": "뉴트럴",
+      "code": "NT",
+      "name": "NATURAL",
+      "row": 150
+    },
+    {
+      "group": "뉴트럴",
+      "code": "OA",
+      "name": "OATMEAL",
+      "row": 151
+    },
+    {
+      "group": "뉴트럴",
+      "code": "OT",
+      "name": "OATMEAL",
+      "row": 152
+    },
+    {
+      "group": "뉴트럴",
+      "code": "PC",
+      "name": "PIGMENT CREAM",
+      "row": 153
+    },
+    {
+      "group": "네이비",
+      "code": "DN",
+      "name": "DARK NAVY",
+      "row": 154
+    },
+    {
+      "group": "네이비",
+      "code": "DY",
+      "name": "DUSTY NAVY",
+      "row": 155
+    },
+    {
+      "group": "네이비",
+      "code": "FN",
+      "name": "FRENCH NAVY",
+      "row": 156
+    },
+    {
+      "group": "네이비",
+      "code": "MY",
+      "name": "MELANGE NAVY",
+      "row": 157
+    },
+    {
+      "group": "네이비",
+      "code": "NA",
+      "name": "NAVY",
+      "row": 158
+    },
+    {
+      "group": "네이비",
+      "code": "NB",
+      "name": "NAVY BLUE",
+      "row": 159
+    },
+    {
+      "group": "네이비",
+      "code": "NM",
+      "name": "NAVY MARL",
+      "row": 160
+    },
+    {
+      "group": "네이비",
+      "code": "NY",
+      "name": "NAVY2",
+      "row": 161
+    },
+    {
+      "group": "네온",
+      "code": "NE",
+      "name": "NEON",
+      "row": 162
+    },
+    {
+      "group": "그린",
+      "code": "AG",
+      "name": "APPLE GREEN",
+      "row": 163
+    },
+    {
+      "group": "그린",
+      "code": "BG",
+      "name": "BRITISH GREEN",
+      "row": 164
+    },
+    {
+      "group": "그린",
+      "code": "CG",
+      "name": "CELTIC GREEN",
+      "row": 165
+    },
+    {
+      "group": "그린",
+      "code": "CO",
+      "name": "CLOVER",
+      "row": 166
+    },
+    {
+      "group": "그린",
+      "code": "DO",
+      "name": "DARK OLIVE",
+      "row": 167
+    },
+    {
+      "group": "그린",
+      "code": "DP",
+      "name": "DARK PINE",
+      "row": 168
+    },
+    {
+      "group": "그린",
+      "code": "EM",
+      "name": "EMERALD",
+      "row": 169
+    },
+    {
+      "group": "그린",
+      "code": "FE",
+      "name": "FOREST GREEN",
+      "row": 170
+    },
+    {
+      "group": "그린",
+      "code": "GN",
+      "name": "GREEN",
+      "row": 171
+    },
+    {
+      "group": "그린",
+      "code": "GP",
+      "name": "PIGMENT GREEN",
+      "row": 172
+    },
+    {
+      "group": "그린",
+      "code": "KK",
+      "name": "DARK KHAKI",
+      "row": 173
+    },
+    {
+      "group": "그린",
+      "code": "KO",
+      "name": "KHAKI OLIVE",
+      "row": 174
+    },
+    {
+      "group": "그린",
+      "code": "LI",
+      "name": "LIME",
+      "row": 175
+    },
+    {
+      "group": "그린",
+      "code": "LL",
+      "name": "LIGHT LIME",
+      "row": 176
+    },
+    {
+      "group": "그린",
+      "code": "LN",
+      "name": "LIGHT GREEN",
+      "row": 177
+    },
+    {
+      "group": "그린",
+      "code": "LO",
+      "name": "LIGHT OLIVE",
+      "row": 178
+    },
+    {
+      "group": "그린",
+      "code": "ME",
+      "name": "MELANGE GREEN",
+      "row": 179
+    },
+    {
+      "group": "그린",
+      "code": "MI",
+      "name": "MINT",
+      "row": 180
+    },
+    {
+      "group": "그린",
+      "code": "ML",
+      "name": "MELON",
+      "row": 181
+    },
+    {
+      "group": "그린",
+      "code": "MM",
+      "name": "MELANGE MINT",
+      "row": 182
+    },
+    {
+      "group": "그린",
+      "code": "MN",
+      "name": "LIGHT MINT",
+      "row": 183
+    },
+    {
+      "group": "그린",
+      "code": "OS",
+      "name": "MOSS",
+      "row": 184
+    },
+    {
+      "group": "그린",
+      "code": "PF",
+      "name": "PINE FOREST",
+      "row": 185
+    },
+    {
+      "group": "그린",
+      "code": "PL",
+      "name": "PALM",
+      "row": 186
+    },
+    {
+      "group": "그린",
+      "code": "PN",
+      "name": "PINE",
+      "row": 187
+    },
+    {
+      "group": "그린",
+      "code": "PT",
+      "name": "PISTACHIO",
+      "row": 188
+    },
+    {
+      "group": "그린",
+      "code": "RG",
+      "name": "DARK GREEN",
+      "row": 189
+    },
+    {
+      "group": "그린",
+      "code": "RM",
+      "name": "ROSEMARY",
+      "row": 190
+    },
+    {
+      "group": "그린",
+      "code": "SC",
+      "name": "SAND CITRUS GREEN",
+      "row": 191
+    },
+    {
+      "group": "그린",
+      "code": "SG",
+      "name": "SAGE GREEN",
+      "row": 192
+    },
+    {
+      "group": "그린",
+      "code": "SP",
+      "name": "SOUR ALPPLE",
+      "row": 193
+    },
+    {
+      "group": "그린",
+      "code": "TN",
+      "name": "TEAL GREEN",
+      "row": 194
+    },
+    {
+      "group": "그린",
+      "code": "TU",
+      "name": "TURQUOISE",
+      "row": 195
+    },
+    {
+      "group": "그린",
+      "code": "VG",
+      "name": "VINTAGE GREEN",
+      "row": 196
+    },
+    {
+      "group": "그레이지",
+      "code": "GI",
+      "name": "GRAY BEIGE",
+      "row": 197
+    },
+    {
+      "group": "그레이",
+      "code": "AS",
+      "name": "ASH",
+      "row": 198
+    },
+    {
+      "group": "그레이",
+      "code": "CC",
+      "name": "CHARCOAL/MULTI",
+      "row": 199
+    },
+    {
+      "group": "그레이",
+      "code": "CH",
+      "name": "CHARCOAL",
+      "row": 200
+    },
+    {
+      "group": "그레이",
+      "code": "DG",
+      "name": "DARK GRAY",
+      "row": 201
+    },
+    {
+      "group": "그레이",
+      "code": "DH",
+      "name": "DARK HEATHER",
+      "row": 202
+    },
+    {
+      "group": "그레이",
+      "code": "DI",
+      "name": "DARK INK",
+      "row": 203
+    },
+    {
+      "group": "그레이",
+      "code": "GM",
+      "name": "GRAY MARL",
+      "row": 204
+    },
+    {
+      "group": "그레이",
+      "code": "GR",
+      "name": "GRAY",
+      "row": 205
+    },
+    {
+      "group": "그레이",
+      "code": "GT",
+      "name": "PIGMENT GRAY",
+      "row": 206
+    },
+    {
+      "group": "그레이",
+      "code": "GW",
+      "name": "GRAY/WHITE",
+      "row": 207
+    },
+    {
+      "group": "그레이",
+      "code": "HG",
+      "name": "HEATHER GRAY",
+      "row": 208
+    },
+    {
+      "group": "그레이",
+      "code": "LG",
+      "name": "LIGHT GRAY",
+      "row": 209
+    },
+    {
+      "group": "그레이",
+      "code": "MC",
+      "name": "MELANGE CHACOAL",
+      "row": 210
+    },
+    {
+      "group": "그레이",
+      "code": "MG",
+      "name": "MELANGE GRAY",
+      "row": 211
+    },
+    {
+      "group": "그레이",
+      "code": "OY",
+      "name": "OATMEAL GREY",
+      "row": 212
+    },
+    {
+      "group": "그레이",
+      "code": "PO",
+      "name": "PIGMENT CHARCOAL",
+      "row": 213
+    },
+    {
+      "group": "골드",
+      "code": "GD",
+      "name": "GOLD",
+      "row": 214
+    }
+  ],
+  "categories": [
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "CP",
+      "name": "면바지",
+      "gender": "",
+      "row": 3
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "IK",
+      "name": "청치마",
+      "gender": "여성",
+      "row": 4
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "IP",
+      "name": "청바지",
+      "gender": "",
+      "row": 5
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "IS",
+      "name": "청반바지",
+      "gender": "",
+      "row": 6
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "JP",
+      "name": "조거팬츠",
+      "gender": "",
+      "row": 7
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "JS",
+      "name": "저지반바지",
+      "gender": "",
+      "row": 8
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "LG",
+      "name": "래깅스",
+      "gender": "여성",
+      "row": 9
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "OR",
+      "name": "오버롤",
+      "gender": "",
+      "row": 10
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "PT",
+      "name": "팬츠",
+      "gender": "",
+      "row": 11
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "SO",
+      "name": "반바지",
+      "gender": "",
+      "row": 12
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "SP",
+      "name": "슬랙스",
+      "gender": "",
+      "row": 13
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "01",
+      "middle": "BOTTOM",
+      "code": "SR",
+      "name": "스커트",
+      "gender": "여성",
+      "row": 14
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "AK",
+      "name": "아노락",
+      "gender": "",
+      "row": 15
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "CT",
+      "name": "코트",
+      "gender": "",
+      "row": 16
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "DC",
+      "name": "다운코트",
+      "gender": "",
+      "row": 17
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "DP",
+      "name": "다운파카",
+      "gender": "",
+      "row": 18
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "DV",
+      "name": "다운베스트",
+      "gender": "",
+      "row": 19
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "IJ",
+      "name": "청자켓",
+      "gender": "",
+      "row": 20
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "JD",
+      "name": "덤블자켓",
+      "gender": "",
+      "row": 21
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "JK",
+      "name": "자켓",
+      "gender": "",
+      "row": 22
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "JU",
+      "name": "점퍼",
+      "gender": "",
+      "row": 23
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "02",
+      "middle": "OUTER",
+      "code": "WC",
+      "name": "울코트",
+      "gender": "",
+      "row": 24
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "03",
+      "middle": "SWIM",
+      "code": "RG",
+      "name": "래쉬가드",
+      "gender": "",
+      "row": 25
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "03",
+      "middle": "SWIM",
+      "code": "SW",
+      "name": "스윔웨어",
+      "gender": "",
+      "row": 26
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "BL",
+      "name": "블라우스",
+      "gender": "여성",
+      "row": 27
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "CD",
+      "name": "가디건",
+      "gender": "",
+      "row": 28
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "CR",
+      "name": "크루넥",
+      "gender": "",
+      "row": 29
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "HD",
+      "name": "후드티",
+      "gender": "",
+      "row": 30
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "HZ",
+      "name": "후드집업",
+      "gender": "",
+      "row": 31
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "KT",
+      "name": "니트",
+      "gender": "",
+      "row": 32
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "LT",
+      "name": "긴팔 티셔츠",
+      "gender": "",
+      "row": 33
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "OP",
+      "name": "원피스",
+      "gender": "여성",
+      "row": 34
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "SH",
+      "name": "셔츠",
+      "gender": "",
+      "row": 35
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "SL",
+      "name": "슬리브리스",
+      "gender": "",
+      "row": 36
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "SS",
+      "name": "반팔 셔츠",
+      "gender": "",
+      "row": 37
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "ST",
+      "name": "반팔티셔츠",
+      "gender": "",
+      "row": 38
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "SU",
+      "name": "셋업",
+      "gender": "",
+      "row": 39
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "04",
+      "middle": "TOP",
+      "code": "VT",
+      "name": "베스트",
+      "gender": "",
+      "row": 40
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "05",
+      "middle": "UNDERWEAR",
+      "code": "DR",
+      "name": "드로우즈",
+      "gender": "",
+      "row": 41
+    },
+    {
+      "major_code": "01",
+      "major": "APPAREL",
+      "middle_code": "05",
+      "middle": "UNDERWEAR",
+      "code": "UD",
+      "name": "언더웨어",
+      "gender": "",
+      "row": 42
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "07",
+      "middle": "ACC",
+      "code": "DG",
+      "name": "애견",
+      "gender": "",
+      "row": 43
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "07",
+      "middle": "ACC",
+      "code": "GV",
+      "name": "장갑",
+      "gender": "",
+      "row": 44
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "07",
+      "middle": "ACC",
+      "code": "JW",
+      "name": "쥬얼리",
+      "gender": "",
+      "row": 45
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "07",
+      "middle": "ACC",
+      "code": "MU",
+      "name": "머플러",
+      "gender": "",
+      "row": 46
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "07",
+      "middle": "ACC",
+      "code": "SK",
+      "name": "양말",
+      "gender": "",
+      "row": 47
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "07",
+      "middle": "ACC",
+      "code": "SM",
+      "name": "스마트 액세서리",
+      "gender": "",
+      "row": 48
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "07",
+      "middle": "ACC",
+      "code": "TC",
+      "name": "기타(악세사리)",
+      "gender": "",
+      "row": 49
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "BG",
+      "name": "가방",
+      "gender": "",
+      "row": 50
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "BP",
+      "name": "백팩",
+      "gender": "",
+      "row": 51
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "BT",
+      "name": "보틀백",
+      "gender": "",
+      "row": 52
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "CB",
+      "name": "크로스",
+      "gender": "",
+      "row": 53
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "EC",
+      "name": "에코백",
+      "gender": "",
+      "row": 54
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "MB",
+      "name": "메신저백",
+      "gender": "",
+      "row": 55
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "PB",
+      "name": "파우치",
+      "gender": "",
+      "row": 56
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "SB",
+      "name": "숄더백",
+      "gender": "",
+      "row": 57
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "SG",
+      "name": "슬링백",
+      "gender": "",
+      "row": 58
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "TB",
+      "name": "토트",
+      "gender": "",
+      "row": 59
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "08",
+      "middle": "BAG",
+      "code": "WA",
+      "name": "메신저백",
+      "gender": "",
+      "row": 60
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "09",
+      "middle": "CAP",
+      "code": "BK",
+      "name": "버킷햇",
+      "gender": "",
+      "row": 61
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "09",
+      "middle": "CAP",
+      "code": "BN",
+      "name": "비니",
+      "gender": "",
+      "row": 62
+    },
+    {
+      "major_code": "02",
+      "major": "EQUIPMENT",
+      "middle_code": "09",
+      "middle": "CAP",
+      "code": "CA",
+      "name": "모자",
+      "gender": "",
+      "row": 63
+    },
+    {
+      "major_code": "03",
+      "major": "FOOTWEAR",
+      "middle_code": "10",
+      "middle": "SHOES",
+      "code": "SD",
+      "name": "샌들",
+      "gender": "",
+      "row": 64
+    },
+    {
+      "major_code": "03",
+      "major": "FOOTWEAR",
+      "middle_code": "10",
+      "middle": "SHOES",
+      "code": "SE",
+      "name": "슬리퍼",
+      "gender": "",
+      "row": 65
+    },
+    {
+      "major_code": "03",
+      "major": "FOOTWEAR",
+      "middle_code": "10",
+      "middle": "SHOES",
+      "code": "SN",
+      "name": "신발",
+      "gender": "",
+      "row": 66
+    }
+  ]
+}

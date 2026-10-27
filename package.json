@@ -6,7 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write src next.config.ts",
+    "test:browser": "node tests/browser-smoke.cjs",
+    "test:workflows": "node tests/workflows.cjs && node tests/reconstruction-save.cjs && PYTHONPATH=. .venv/bin/python tests/cleanup_workflows.py",
+    "test:edges": "node tests/edge-cases.cjs",
+    "test:labels": "node tests/label-editor.cjs && PYTHONPATH=. .venv/bin/python tests/cleanup_labels.py",
+    "test:taxonomy": "node tests/taxonomy-browser.cjs",
+    "test:taxonomy-labels": "node tests/taxonomy-label-save.cjs && PYTHONPATH=. .venv/bin/python tests/cleanup_labels.py"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.5.0",
@@ -19,10 +26,12 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4.1.14",
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4.1.14",
     "typescript": "^5.9.3"
   }

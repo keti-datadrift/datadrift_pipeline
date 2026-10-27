@@ -1,0 +1,14 @@
+[Unit]
+Description=DataDrift Pipeline API
+After=network.target
+[Service]
+WorkingDirectory=/home/hslim/Code/datadrift/datadrift_pipeline
+Environment=DATADRIFT_STATE=/home/hslim/Code/datadrift/datadrift_pipeline/.runtime
+Environment=DATADRIFT_PUBLIC_ORIGIN=http://121.126.210.3:18091
+Environment=DATADRIFT_INPUT_ROOT=/home/hslim/Code/datadrift
+ExecStart=/home/hslim/Code/datadrift/datadrift_pipeline/.venv/bin/uvicorn backend.api:app --host 127.0.0.1 --port 18092
+Restart=always
+RestartSec=3
+UMask=0077
+[Install]
+WantedBy=default.target
