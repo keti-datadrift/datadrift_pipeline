@@ -1,28 +1,7 @@
-# Ignore everything:
-**
-
-# Except:
-!deploy/docker-entrypoint.d/**
-!deploy/docker-entrypoint.sh
-!deploy/heroku_run.sh
-!deploy/uwsgi.ini
-!deploy/default.conf
-!label_studio/**
-!static/**
-!static_build/**
-# Re-ignore pyc files and frontend
-label_studio/frontend
-label_studio/**/*.pyc
-
-# FRONTEND
-!web
-!.git
-# Re-ignore node_modules and nx cache
-**/node_modules
-**/.nx
-
-!README.md
-!licenses/**
-!LICENSE
-!pyproject.toml
-!poetry.lock
+.git
+node_modules
+.next
+.venv
+.runtime
+.env*
+__pycache__

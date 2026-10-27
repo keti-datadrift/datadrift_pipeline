@@ -46,3 +46,10 @@ next-env.d.ts
 
 # LLM
 CODE_REVIEW.md
+
+# Python/runtime data
+.venv/
+__pycache__/
+*.pyc
+.runtime/
+.pytest_cache/
