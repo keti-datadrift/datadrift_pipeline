@@ -12,7 +12,8 @@ import re
 import sys
 import time
 from pathlib import Path
-from . import taxonomy as taxonomy
+
+from backend.schemas import taxonomy
 
 FIELDS = [
     "pattern",
@@ -30,7 +31,7 @@ FIELDS = [
     "graphic_location",
     "graphic_scale",
 ]
-SCHEMA = json.loads(Path(__file__).with_name("attribute_schema.json").read_text())
+SCHEMA = taxonomy.LEGACY_SCHEMA
 PROMPT = (
     "이미지 중앙에서 가장 크게 제시된 의류 하나의 시각적 속성을 추출하세요. "
     "전신 착장에서 상하의가 비슷하게 보이면 가장 바깥 상의/아우터를 대상으로 합니다. "
@@ -83,7 +84,7 @@ def metrics(rows, predictions, schema_id=taxonomy.LEGACY):
     fields = list(taxonomy.schema(schema_id))
     by_field = {f: {"correct": 0, "count": 0} for f in fields}
     exact = 0
-    for row, pred in zip(rows, predictions):
+    for row, pred in zip(rows, predictions, strict=False):
         correct = True
         scored = 0
         for field in fields:
@@ -107,7 +108,7 @@ def metrics(rows, predictions, schema_id=taxonomy.LEGACY):
         "parse_failures": sum(p is None for p in predictions),
         "schema_failures": sum(
             not valid_schema(p, schema_id, r.get("category"))
-            for r, p in zip(rows, predictions)
+            for r, p in zip(rows, predictions, strict=False)
         ),
         "fields": {
             f: v | {"accuracy": v["correct"] / v["count"] if v["count"] else None}
@@ -137,8 +138,8 @@ def evaluation_rows(rows, limit, seed, sampling="random"):
 def main(path):
     import torch
     import torch.nn.functional as F
-    from PIL import Image, ImageOps
     from peft import LoraConfig, PeftModel, get_peft_model
+    from PIL import Image, ImageOps
     from transformers import AutoProcessor, Qwen3_5ForConditionalGeneration
 
     payload = json.loads(Path(path).read_text())
@@ -168,11 +169,12 @@ def main(path):
         progress.update(values, elapsed_seconds=round(time.monotonic() - started, 2))
         write(out / "progress.json", progress)
 
-    report()
+    report(phase="loading_processor")
     processor = AutoProcessor.from_pretrained(
         payload["base_model"], local_files_only=True
     )
     processor.tokenizer.padding_side = "left"
+    report(phase="loading_model")
     model = Qwen3_5ForConditionalGeneration.from_pretrained(
         payload["base_model"],
         local_files_only=True,
@@ -186,10 +188,12 @@ def main(path):
     model.generation_config.pad_token_id = processor.tokenizer.pad_token_id
     is_training = req["kind"] == "training"
     if payload["model"].get("adapter"):
+        report(phase="loading_adapter")
         model = PeftModel.from_pretrained(
             model, payload["model"]["adapter"], is_trainable=is_training
         )
     elif is_training:
+        report(phase="preparing_training")
         targets = [
             n
             for n, m in model.named_modules()
@@ -213,7 +217,7 @@ def main(path):
             ),
         )
 
-    def encode(row, answer=None):
+    def conversation(row, answer=None):
         if sha(Path(row["image"])) != row["sha256"]:
             raise ValueError("Source image changed")
         with Image.open(row["image"]) as src:
@@ -235,8 +239,11 @@ def main(path):
             messages.append(
                 {"role": "assistant", "content": [{"type": "text", "text": answer}]}
             )
+        return messages
+
+    def encode(row, answer=None):
         return processor.apply_chat_template(
-            [messages],
+            [conversation(row, answer)],
             tokenize=True,
             return_dict=True,
             return_tensors="pt",
@@ -250,18 +257,25 @@ def main(path):
     rng.shuffle(rows)
     if req["kind"] in ("labeling", "inference"):
         from collections import Counter
-        from .relabeling import convert
+
+        from backend.relabeling import convert
 
         metadata = {
             "model": payload["base_model"],
             "model_id": payload["model"]["id"],
             "model_name": payload["model"]["name"],
-            "policy": "bkave-selected-model-v1" if schema_id == taxonomy.CURRENT else "visual-selected-model-v1",
+            "policy": "bkave-selected-model-v1"
+            if schema_id == taxonomy.CURRENT
+            else "visual-selected-model-v1",
             "schema_id": schema_id,
             "created_at": payload["created_at"],
             "parent_dataset_id": payload["dataset_id"],
             "prompt_sha256": hashlib.sha256(prompt_text.encode()).hexdigest(),
-            "taxonomy_sha256": taxonomy.BOOK["source_sha256"] if schema_id == taxonomy.CURRENT else hashlib.sha256(json.dumps(taxonomy.LEGACY_SCHEMA, sort_keys=True).encode()).hexdigest(),
+            "taxonomy_sha256": taxonomy.BOOK["source_sha256"]
+            if schema_id == taxonomy.CURRENT
+            else hashlib.sha256(
+                json.dumps(taxonomy.LEGACY_SCHEMA, sort_keys=True).encode()
+            ).hexdigest(),
             "image_only": True,
             "adapter_sha256": sha(
                 Path(payload["model"]["adapter"]) / "adapter_model.safetensors"
@@ -329,6 +343,7 @@ def main(path):
         before = parameter_hash(model)
         model.train()
         used = []
+        report(phase="training", step=0)
         for step in range(req["max_steps"]):
             row = rows[step % len(rows)]
             used.append(row["id"])
@@ -440,42 +455,80 @@ def main(path):
         model.eval()
         predictions = []
         records = []
-        for i, row in enumerate(rows):
-            batch = encode(row).to("cuda:0")
+        report(phase="evaluating", step=0)
+        import gc
+        import os
+
+        from backend.models.evaluation import generate_batches
+
+        batch_size = int(os.environ.get("DATADRIFT_EVAL_BATCH_SIZE", "8"))
+        if not 1 <= batch_size <= 32:
+            raise ValueError("평가 배치 크기는 1~32 사이로 설정하세요.")
+
+        def generate(batch_rows):
+            report(phase="evaluating", step=len(records), batch_size=len(batch_rows))
+            batch = processor.apply_chat_template(
+                [conversation(row) for row in batch_rows],
+                tokenize=True,
+                return_dict=True,
+                return_tensors="pt",
+                padding=True,
+                add_generation_prompt=True,
+                enable_thinking=False,
+            ).to("cuda:0")
             with torch.inference_mode():
                 output = model.generate(
                     **batch, max_new_tokens=512, do_sample=False, use_cache=True
                 )
-            raw = processor.tokenizer.decode(
-                output[0, batch["input_ids"].shape[1] :], skip_special_tokens=True
+            return processor.batch_decode(
+                output[:, batch["input_ids"].shape[1] :], skip_special_tokens=True
             )
-            pred = parse(raw)
-            predictions.append(pred)
-            records.append(
-                {
-                    "sample_id": row["id"],
-                    "source": row["source"],
-                    "split": row["split"],
-                    "raw": raw,
-                    "prediction": pred,
-                    "schema_valid": valid_schema(pred, schema_id, row.get("category")),
-                    "target": row["target"],
-                    "human_verified": row["human_verified"],
-                    "label_source": row["label_source"],
-                }
-            )
-            report(phase="evaluating", step=i + 1)
+
+        def clear_memory():
+            gc.collect()
+            torch.cuda.empty_cache()
+
+        sizes = []
+        for batch_rows, responses, actual_size in generate_batches(
+            rows, batch_size, generate, torch.cuda.OutOfMemoryError, clear_memory
+        ):
+            sizes.append(len(batch_rows))
+            for row, raw in zip(batch_rows, responses, strict=False):
+                pred = parse(raw)
+                predictions.append(pred)
+                records.append(
+                    {
+                        "sample_id": row["id"],
+                        "source": row["source"],
+                        "split": row["split"],
+                        "raw": raw,
+                        "prediction": pred,
+                        "schema_valid": valid_schema(
+                            pred, schema_id, row.get("category")
+                        ),
+                        "target": row["target"],
+                        "human_verified": row["human_verified"],
+                        "label_source": row["label_source"],
+                    }
+                )
+            report(phase="evaluating", step=len(records), batch_size=actual_size)
         result = metrics(rows, predictions, schema_id) | {
             "schema_id": schema_id,
             "count": len(rows),
             "split": req["split"],
             "predictions": records,
             "by_source": {},
+            "batch_sizes": sizes,
+            "framework": "transformers+peft",
             "prompt_sha256": hashlib.sha256(prompt_text.encode()).hexdigest(),
             "note": "AI 레이블과의 일치도이며 사람 검증 정답에 대한 성능을 뜻하지 않습니다.",
         }
         for source in sorted({r["source"] for r in rows}):
-            pairs = [(r, p) for r, p in zip(rows, predictions) if r["source"] == source]
+            pairs = [
+                (r, p)
+                for r, p in zip(rows, predictions, strict=False)
+                if r["source"] == source
+            ]
             result["by_source"][source] = metrics(
                 [r for r, p in pairs], [p for r, p in pairs], schema_id
             ) | {"count": len(pairs)}

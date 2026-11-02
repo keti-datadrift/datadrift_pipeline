@@ -1,5 +1,6 @@
 const { chromium, expect } = require("@playwright/test");
 const assert = require("node:assert/strict");
+const { mockPagedModels } = require("./fixtures/models.cjs");
 const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
 (async () => {
   const b = await chromium.launch();
@@ -7,6 +8,7 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
   try {
     const errors = [];
     p.on("pageerror", (e) => errors.push(e.message));
+    await mockPagedModels(p);
     await p.goto(base + "/ko/models");
     let nav = p.getByRole("navigation", {
       name: "모델 목록 페이지",
@@ -25,6 +27,22 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
       p.getByText("표시할 항목이 없습니다.", { exact: true }),
     ).toBeVisible();
     await p.goto(base + "/ko/evaluation");
+    const evaluations = await (
+      await p.request.get(base + "/api/jobs?kind=evaluation")
+    ).json();
+    const pagedResult = evaluations.find(
+      (job) => job.status === "succeeded" && job.result?.count > 10,
+    );
+    assert(pagedResult, "Need a completed evaluation with multiple pages");
+    await p
+      .getByRole("button", {
+        name: pagedResult.id.slice(0, 8),
+        exact: true,
+      })
+      .click();
+    await expect(p.locator(".run-head")).toContainText(
+      pagedResult.id.slice(0, 8),
+    );
     const results = p.locator(".evaluation-results");
     await results.locator("summary").first().click();
     nav = p.getByRole("navigation", { name: "평가 결과 페이지", exact: true });
@@ -48,7 +66,7 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
         .locator(".evaluation-results-list > details")
         .last()
         .locator("summary"),
-    ).toContainText("이미지 64");
+    ).toContainText(`이미지 ${pagedResult.result.count}`);
     const history = p.getByRole("navigation", {
       name: "실행 이력 페이지",
       exact: true,

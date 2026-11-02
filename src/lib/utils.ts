@@ -5,8 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Display imported names without punctuation used as visual separators.
-// Stored names, taxonomy values and request payloads retain their original values.
+// Normalize display text without changing stored names or taxonomy values.
 export function displayName(value?: string) {
   return (value || "")
     .replace(/\s*[·ㆍ]\s*/g, " ")

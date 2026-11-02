@@ -4,7 +4,8 @@ import json
 import time
 import urllib.request
 from pathlib import Path
-from backend import taxonomy as t
+
+from backend.schemas import taxonomy as t
 
 BASE = "http://127.0.0.1:18092/api"
 REPORT = Path(".runtime/bkave-experiment.json")

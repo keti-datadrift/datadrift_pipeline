@@ -1,0 +1,20 @@
+[Unit]
+Description=DataDrift on-demand Qwen3.5-2B vLLM API
+After=network.target
+
+[Service]
+WorkingDirectory=/home/hslim/Code/datadrift/datadrift_pipeline
+Environment=CUDA_VISIBLE_DEVICES=1
+Environment=HF_HUB_OFFLINE=1
+Environment=TRANSFORMERS_OFFLINE=1
+Environment=VLLM_NO_USAGE_STATS=1
+Environment=VLLM_ALLOW_RUNTIME_LORA_UPDATING=True
+ExecStart=/data/hslim/venvs/gemma4-12b-transformers-dev/bin/vllm serve /data/hslim/models/Qwen3.5-2B --served-model-name qwen35_2b --host 127.0.0.1 --port 18093 --dtype bfloat16 --enable-lora --max-lora-rank 8 --max-loras 2 --max-cpu-loras 64 --max-model-len 8192 --max-num-seqs 8 --gpu-memory-utilization 0.141 --enforce-eager --limit-mm-per-prompt '{"image":1,"video":0}' --mm-processor-kwargs '{"size":{"longest_edge":262144,"shortest_edge":65536}}' --no-enable-prefix-caching
+Restart=always
+RestartSec=10
+KillMode=control-group
+TimeoutStopSec=30
+UMask=0077
+
+[Install]
+WantedBy=default.target

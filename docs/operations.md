@@ -6,9 +6,10 @@
 - API: FastAPI, loopback `127.0.0.1:18092` (UI의 `/api/*`로 프록시)
 - API 문서: 서버에서 `http://127.0.0.1:18092/api/docs`
 - 저장소: `.runtime/catalog.sqlite`, SQLite WAL; 단일 호스트/단일 워커 구성
-- GPU: 기존 전용 Python 환경 `/data/hslim/venvs/gemma4-12b-transformers-dev/bin/python`
+- GPU 0: 학습·평가, 기존 전용 Python 환경 `/data/hslim/venvs/gemma4-12b-transformers-dev/bin/python`
+- GPU 1: 접수 상태에 따라 기동·종료하는 모델 API용 vLLM 2B·4B 서버. 기존 다른 프로젝트의 vLLM 프로세스는 유지합니다.
 - 기본 모델: `/data/hslim/models/Qwen3.5-2B`, `/data/hslim/models/Qwen3.5-4B`
-- 삭제 항목: SQLite `deleted_objects` / `deletion_batches`에 보관하며 [삭제 목록에서 복원](data-deletion.md)합니다. 원본 파일은 삭제하지 않으므로 삭제로 디스크 공간이 확보되지는 않습니다.
+- 삭제 항목: SQLite `deleted_objects` / `deletion_batches`에 보관하며 [운영 복원 API](data-deletion.md)합니다. 원본 파일은 삭제하지 않으므로 삭제로 디스크 공간이 확보되지는 않습니다.
 - 업로드한 이미지: `.runtime/uploads/<asset-id>/` (파일 원본), 레이블/이미지 경로/모델 출처는 SQLite에 저장
 - 모델·로그·입력 스냅샷: `.runtime/jobs/<job-id>/`
 - 로그인 없음. 기존 내부망 접근 범위에서 운영하며 방화벽이나 외부 공개 설정은 변경하지 않습니다.
@@ -33,7 +34,7 @@ transformers 5.18.0.dev0, peft 0.20.0이며 Qwen3_5ForConditionalGeneration을 �
 ```sh
 cp deploy/datadrift-pipeline-*.service ~/.config/systemd/user/
 systemctl --user daemon-reload
-systemctl --user enable --now datadrift-pipeline-api datadrift-pipeline-worker datadrift-pipeline-web
+systemctl --user enable --now datadrift-pipeline-api datadrift-pipeline-worker datadrift-pipeline-web datadrift-pipeline-vllm-runtime
 ```
 
 `DATADRIFT_STATE`, `DATADRIFT_INPUT_ROOT`, `DATADRIFT_MODELS`,
@@ -73,16 +74,74 @@ API/UI 재시작은 실행 중인 워커 학습을 끊지 않습니다. 워커 �
 unknown과 평가 제외 속성 값은 손실에서 마스킹합니다. 학습 스텝 수는 전체 에포크 수와 다릅니다.
 성공한 학습은 레지스트리에 새 어댑터 모델로 등록됩니다.
 평가는 검증/테스트 분할에서 생성한 JSON과 AI 레이블의 일치도를 측정하며 파싱 실패도 오답으로 계산합니다.
+평가 엔진은 Transformers+PEFT이며 기본 8장 배치입니다. `DATADRIFT_EVAL_BATCH_SIZE`로
+1~32를 지정할 수 있습니다. 마지막 남은 이미지도 처리하며 CUDA OOM이면 미완료 배치만
+절반으로 줄여 재시도합니다. 단일 이미지도 메모리 부족이면 실패를 보고합니다.
+진행 화면은 입력 준비·모델 로딩·학습 가중치 적용·평가·결과 정리 단계, 배치 크기와 경과 시간을 표시합니다.
 화면은 테스트 분할 전체 평가가 기본이며 검증을 선택하면 해당 검증 분할 전체를 평가합니다.
 최대 샘플 수 입력은 제공하지 않습니다. API의 `sample_limit` 생략 또는 null도 전체 평가이고,
 기존 자동화가 명시한 양수 제한은 유지합니다. 학습·평가의 모델 선택은 검색과 스크롤을 지원하며
 긴 모델 이름은 펼친 목록에서 줄바꿈하여 표시합니다.
+현재 속성 사전이 기본값입니다. 화면에서 `기존 속성 기준`이나 `비케이브 기준`으로
+구분하지 않으며, 구형 학습 모델은 모델 목록·상세·실행 대상에서 제외합니다.
+평가는 선택한 현재 데이터의 테스트 또는 검증 분할만 사용합니다.
+모델의 학습 데이터를 다시 선택하도록 요구하지 않습니다. 평가 분할이 비어 있으면
+실행 버튼과 제출 검사를 통해 접수를 막습니다.
+목록 안쪽은 마우스로 잡아 위아래로 끌 수 있으며, 드래그를 마쳐도 모델을 선택하지 않습니다.
+오른쪽 스크롤바, 휠, 터치 스크롤과 클릭·키보드 선택도 지원합니다.
+
+## 모델 API의 vLLM 시작·종료
+
+`datadrift-pipeline-vllm-2b`는 loopback `127.0.0.1:18093`,
+`datadrift-pipeline-vllm-4b`는 `127.0.0.1:18094`에서 실행합니다.
+두 서비스 모두 GPU 1, BF16, 최대 동시 8개, 컨텍스트 8192, GPU LoRA 2개,
+CPU LoRA 64개 설정을 사용합니다. 이미지 입력은 기존과 같이 최대 512px로 전처리합니다.
+`gpu-memory-utilization`은 2B `0.141`, 4B `0.291`입니다.
+메모리 한도를 낮추려고 동시 처리 수·컨텍스트·캐시 관련 옵션을 줄이지 않았습니다.
+현재 환경의 기동 프로파일은 8192 토큰 최대 동시 요청에 2B 8.00x·4B 8.11x 캐시 용량을 보고했고,
+각 가족의 기본 모델·LoRA 3개 전환과 실제 이미지 요청 8개 동시 응답을 확인했습니다.
+이 값은 현재 모델·GPU·입력 설정에서 확인한 값이며 다른 모델이나 GPU에서는 다시 확인해야 합니다.
+
+API 워커는 `DATADRIFT_INFERENCE_BACKEND=vllm`과 `DATADRIFT_VLLM_2B_URL`,
+`DATADRIFT_VLLM_4B_URL`로 연결합니다. 기존 영속 큐·비동기 202 응답·결과 조회는 유지하며,
+선택한 모델과 LoRA를 요청마다 지정합니다. 기본 모델을 이미지마다 다시 로딩하지 않습니다.
+서버 기동 중에는 최대 600초 준비를 기다리고, 서버 오류를 다른 엔진으로 조용히 우회하지 않습니다.
+학습·평가는 이 설정의 영향을 받지 않고 GPU 0에서 Transformers+PEFT를 사용합니다.
+
+```sh
+# API·워커에도 DATADRIFT_VLLM_MANAGED=1을 설정합니다.
+# 엔진을 별도로 부팅하지 않고 실행 관리자가 저장된 접수 상태를 복구합니다.
+systemctl --user disable datadrift-pipeline-vllm-2b datadrift-pipeline-vllm-4b
+systemctl --user enable --now datadrift-pipeline-vllm-runtime
+systemctl --user status datadrift-pipeline-vllm-2b datadrift-pipeline-vllm-4b
+journalctl --user -u datadrift-pipeline-vllm-2b -u datadrift-pipeline-vllm-4b -f
+systemctl --user status datadrift-pipeline-vllm-runtime
+journalctl --user -u datadrift-pipeline-vllm-runtime -n 100
+systemctl --user restart datadrift-pipeline-vllm-runtime
+# 엔진은 화면의 접수 중지·시작으로 조작합니다. 수동 stop은 접수 중이면 다시 기동됩니다.
+curl -f http://127.0.0.1:18093/health
+curl -f http://127.0.0.1:18094/health
+```
+
+`datadrift-pipeline-vllm-runtime`은 `Restart=always`·부팅 자동 시작·사용자 linger로 상시 실행합니다. 1초 간격으로 SQLite의 접수 상태와 대기/실행 중인 API 요청을 확인해 이 프로젝트의 두 엔진 유닛만 제어합니다. `접수 중지`는 새 요청을 409로 차단하며 이미 받은 요청은 모두 처리한 뒤 종료합니다. 같은 기본 모델의 다른 API가 접수 중이면 서버를 유지합니다. 완료·실패·취소된 요청은 서버를 붙잡지 않습니다. 학습·평가 작업은 엔진 기동 조건에 포함하지 않습니다.
+
+두 엔진의 부팅 자동 시작은 비활성화합니다. 접수 설정은 SQLite에 보존하고 실행 관리자가 필요한 엔진만 복구합니다. 엔진의 `Restart=always`는 접수 중 발생한 장애를 복구하며, 관리자의 명시적 stop 뒤에는 재시작하지 않습니다. 시작을 요청한 뒤 HTTP 준비까지 기다려 화면에 모델 로딩 상태를 표시합니다. 종료 도중 다시 접수를 시작한 요청은 이전 프로세스에 보내지 않고 새 서버가 준비될 때까지 기다립니다. 관리자의 시작 명령 실패는 화면에 표시하고 30초 간격으로 재시도합니다. 기동 후 엔진 장애는 엔진 서비스의 10초 재시작 설정을 따릅니다. 관리자의 상태가 15초 이상 갱신되지 않으면 실행 상태 확인 경고를 표시하고 새 추론 실행을 보류합니다.
+
+같은 GPU의 동시 기동이 vLLM 메모리 프로파일에 영향을 주므로 한 엔진의 HTTP 준비가 끝난 뒤 다음 엔진을 기동합니다. 다른 엔진이 로딩 중이면 GPU 메모리를 반환하는 종료도 잠시 기다립니다. 동시 처리·캐시·메모리 비율 설정은 위와 같습니다. 재부팅은 실제 시험하지 않았습니다.
+실측 비교와 측정 조건은 [평가 엔진 비교](inference-engines.md)에 있습니다.
+
+## 기본 속성과 데이터 전환
+
+구형 카탈로그의 명시적 전환에는 `.venv/bin/python -m backend.standardize_catalog --apply`를
+사용합니다. 대기·실행 중인 작업이 있으면 중단하며, 변경 전 SQLite 온라인 백업을
+`.runtime/backups/before-standardize-*.sqlite`에 남깁니다. 현재 이미지·분할을 유지하고
+기존 최신 속성 레이블을 사용하되 이후 수동 수정은 이력을 보존해 보수적으로 변환합니다.
+새 속성을 검토하지 않은 수동 검토 완료 표시는 재검토 대기로 바뀝니다.
+구형 모델에는 `retired_at`을 기록합니다. 원본 데이터·완료 작업과 모델 파일은 보존하며,
+이전 카탈로그의 복구는 백업과 함께 기존 데이터 복구 절차를 따릅니다.
 2스텝/소수 샘플 검증은 작동 확인이며 모델 품질 검증이나 전체 학습을 의미하지 않습니다.
 
-드리프트는 선택한 레이블 기준의 속성별 Jensen–Shannon divergence (base 2, 0~1)와
-이미지 RGB 히스토그램 JS를 계산합니다. 소스/도메인 차이이며 시간 순서 드리프트,
-성능 저하, 통계적 유의성, 임베딩 기반 검출을 주장하지 않습니다.
-GS SHOP과 무신사의 레이블 생성 방식 차이도 분포 결과에 영향을 줍니다.
+새 드리프트 분석은 속성·카테고리의 JS 변화량과 통계 검정, 고정 이미지 임베딩 MMD를 함께 사용합니다. 전체 검정에 Holm 보정을 적용하며 RGB 히스토그램 JS는 참고값으로 보존합니다. [복합 판정과 표본 조건](drift-detection.md)을 참고하세요. 소스/도메인 차이이며 시간 경과나 모델 성능 저하를 확정하지 않습니다. GS SHOP과 무신사의 레이블 생성 방식 차이도 속성 결과에 영향을 줍니다.
 
 ## 검증
 
@@ -121,7 +180,7 @@ POST에는 해당 기준의 키를 모두 가진 `target`, `unscored_fields`, `h
 ## 비케이브 엑셀 기준
 
 현재 기준은 `bkave-106baf22f720`입니다. 첨부된 `비케이브_Taxonomy_공유.xlsx`의
-SHA256은 `106baf22f720`로 시작하며 전체 해시는 `backend/bkave_taxonomy.json`에 있습니다.
+SHA256은 `106baf22f720`로 시작하며 전체 해시는 `backend/schemas/bkave_taxonomy.json`에 있습니다.
 `python scripts/extract_taxonomy.py INPUT.xlsx OUTPUT.json`으로 엑셀 세 시트를 읽습니다.
 원문 카테고리 64개, 색상 코드 212개, 카테고리별 속성·공통 속성의 철자를 그대로 보존합니다.
 색상군의 옐로/옐로우, 같은 이름에 여러 코드가 있는 경우도 임의로 합치지 않습니다.
@@ -156,6 +215,10 @@ SHA256은 `106baf22f720`로 시작하며 전체 해시는 `backend/bkave_taxonom
 `/api/label-schema`의 기본 응답은 비케이브 기준입니다. 기존 14개 속성 사전이 필요한 클라이언트는
 `schema_id=visual-v1`을 명시해야 합니다. 비케이브 카테고리별 값은 `category=상의`처럼 함께 지정하세요.
 
+## 복합 드리프트 탐지
+
+[복합 탐지 기준·캐시·CPU 실행·호환성](drift-detection.md)을 참고하세요. 기존 워커 서비스가 CPU 하위 프로세스로 실행하며, 기준·비교 입력과 진행·결과는 `.runtime/jobs/{job_id}`에 보존합니다. 고정 ResNet18 가중치는 사용자 torch 캐시에서 전체 SHA256을 확인해 읽고, 이미지 특징은 `.runtime/image-features`에 저장합니다. 워커 재시작 전에는 기존과 같이 실행·대기 작업을 확인하세요.
+
 ## AI 재레이블링·드리프트 실험
 
 [실행 조건·API·비교 방법](ai-relabel-drift.md)을 참고하세요. 레이블링은 학습과 같은 GPU 큐에서 순차 처리하며 원본을 보존하는 새 버전을 생성합니다.
@@ -172,7 +235,7 @@ API 초기화 시 `dataset_summaries`와 `dataset_images` 파생 테이블을 �
 
 `workspace_data(workspace_id, dataset_id)`가 화면에서 사용하는 이미지 목록을 가리킵니다. 초기 적용은 각 워크스페이스의 가장 최근 데이터를 지정하고 기존 객체 본문은 보존합니다. 데이터 전체 삭제 시 포인터를 NULL로 유지하여 과거 내부 데이터가 화면에 다시 나타나지 않도록 합니다. 이 테이블도 SQLite 전체 백업에 포함되며, 복원 시 임의로 삭제하거나 최신 시각만으로 다시 계산하지 않습니다.
 
-모델 API는 [모델 API 운영](model-api.md)을 참조합니다. 별도 포트 없이 기존 웹/API/워커 서비스를 사용하며, 학습과 추론을 같은 GPU 대기열에서 실행합니다.
+모델 API는 [모델 API 운영](model-api.md)을 참조합니다. 외부 요청은 기존 웹 주소로 받으며, 영속 작업 큐를 공유합니다. 학습·평가는 GPU 0의 Transformers+PEFT, API 추론은 GPU 1의 vLLM에서 실행합니다.
 
 ### 재구성 결과 저장
 

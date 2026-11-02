@@ -4,8 +4,9 @@ import copy
 import hashlib
 import json
 from collections import Counter
-from . import store as s
-from . import taxonomy as t
+
+from backend.data import store as s
+from backend.schemas import taxonomy as t
 
 POLICY = "conservative-v1"
 

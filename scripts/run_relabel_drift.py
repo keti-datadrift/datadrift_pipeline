@@ -10,8 +10,10 @@ import json
 import random
 import time
 from collections import Counter
-from backend import store as s, taxonomy as t
-from backend.drift_statistics import analyze
+
+from backend.data import store as s
+from backend.drift.statistics import analyze
+from backend.schemas import taxonomy as t
 from scripts.run_bkave_experiment import api
 
 REPORT = s.ROOT / "relabel-drift-experiment.json"

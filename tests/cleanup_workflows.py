@@ -5,7 +5,8 @@ Training/evaluation history and model artifacts are intentionally retained.
 
 import json
 from pathlib import Path
-from backend import store as s
+
+from backend.data import store as s
 
 path = Path(".runtime/ui-verification/workflows.json")
 report = json.loads(path.read_text())

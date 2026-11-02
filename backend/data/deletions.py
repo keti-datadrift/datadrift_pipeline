@@ -5,8 +5,9 @@ import hashlib
 import json
 
 from fastapi import HTTPException
-from . import store as s
-from . import workspace_data as wd
+
+from backend.data import store as s
+from backend.data import workspace_data as wd
 
 
 def plan(kind, key, sample_ids, con):

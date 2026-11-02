@@ -1,21 +1,30 @@
 import copy
 
-from backend import store as s, workspace_data as wd, taxonomy as t
+from backend.data import store as s
+from backend.data import workspace_data as wd
+from backend.schemas import taxonomy as t
 
 
 def tracked():
     original = s.get("dataset", "d")
     for row in original["rows"]:
-        row["target"] = {field: [] if field == "details" else values[0] for field, values in t.schema(t.LEGACY).items()}
+        row["target"] = {
+            field: [] if field == "details" else values[0]
+            for field, values in t.schema(t.LEGACY).items()
+        }
     with s.db() as con:
         wd.publish(original, con)
     return copy.deepcopy(original)
 
 
 def move(client, did="d", ids=None, split="test"):
-    return client.post(f"/api/datasets/{did}/samples/split", json={
-        "sample_ids": ids if ids is not None else ["0", "1"], "split": split,
-    })
+    return client.post(
+        f"/api/datasets/{did}/samples/split",
+        json={
+            "sample_ids": ids if ids is not None else ["0", "1"],
+            "split": split,
+        },
+    )
 
 
 def test_bulk_split_preserves_original_labels_and_updates_counts(client):
@@ -26,9 +35,10 @@ def test_bulk_split_preserves_original_labels_and_updates_counts(client):
     assert data["changed_count"] == 2
     assert data["dataset"]["splits"] == {"train": 6, "validation": 2, "test": 4}
     active = s.get("dataset", data["dataset"]["id"])
-    for before, after in zip(original["rows"], active["rows"]):
-        assert {k: v for k, v in after.items() if k not in ("split", "split_history")} == {
-            k: v for k, v in before.items() if k not in ("split", "split_history")}
+    for before, after in zip(original["rows"], active["rows"], strict=False):
+        assert {
+            k: v for k, v in after.items() if k not in ("split", "split_history")
+        } == {k: v for k, v in before.items() if k not in ("split", "split_history")}
         if before["id"] in ["0", "1"]:
             assert after["split"] == "test"
             assert after["split_history"][-1]["before"] == "train"
@@ -40,7 +50,10 @@ def test_bulk_split_preserves_original_labels_and_updates_counts(client):
     repeat = move(client, active["id"]).json()
     assert repeat["changed_count"] == 0
     assert repeat["dataset"]["id"] == active["id"]
-    assert client.get(f'/api/datasets/{active["id"]}/samples?split=test').json()["total"] == 4
+    assert (
+        client.get(f"/api/datasets/{active['id']}/samples?split=test").json()["total"]
+        == 4
+    )
 
 
 def test_bulk_rejects_stale_invalid_and_missing_selection_atomically(client):
@@ -70,7 +83,10 @@ def test_detail_split_save_review_and_conflict(client):
     assert s.get("dataset", "d") == original
     did = updated["dataset"]["id"]
     assert move(client, did, ["0"], "test").status_code == 200
-    assert client.post(f"/api/datasets/{did}/samples/0/labels", json=body).status_code == 409
+    assert (
+        client.post(f"/api/datasets/{did}/samples/0/labels", json=body).status_code
+        == 409
+    )
     # Older clients that do not submit a split preserve the latest split.
     body.pop("split")
     result = client.post(f"/api/datasets/{did}/samples/0/labels", json=body)
@@ -84,7 +100,9 @@ def test_labeling_completion_preserves_split_changes(client):
     rows = copy.deepcopy(source["rows"])
     for row in rows:
         row["label_source"] = "test model"
-    labeled = wd.revision(source, rows, labeling_job_id="job", labeling_model_id="model")
+    labeled = wd.revision(
+        source, rows, labeling_job_id="job", labeling_model_id="model"
+    )
     with s.db() as con:
         con.execute("BEGIN IMMEDIATE")
         active, applied = wd.apply_labels(source, labeled, con)

@@ -64,11 +64,15 @@ const dir = ".runtime/deletion-verification";
     receipt.batches.push(result.id);
     await save();
   };
-  const openTrash = async () => {
-    await page.goto(base + "/ko/workspaces");
-    await page.getByRole("button", { name: "삭제 목록", exact: true }).click();
-    return page.getByRole("dialog", { name: "삭제 목록", exact: true });
+  const restoreLast = async () => {
+    const batch = receipt.batches.at(-1);
+    const response = await page.request.post(
+      base + "/api/deletions/" + batch + "/restore",
+      { data: {} },
+    );
+    assert.equal(response.status(), 200, await response.text());
   };
+
   try {
     const workspace = await (
       await page.request.post(base + "/api/workspaces", {
@@ -89,10 +93,22 @@ const dir = ".runtime/deletion-verification";
     await expect(page.getByLabel("데이터셋 버전")).toHaveCount(0);
     await expect(page.getByText("변경 이력", { exact: true })).toHaveCount(0);
     // Save a label directly onto an image, then reload the same workspace.
+    const reviewedId = (
+      await read("/datasets/" + (await current()).id + "/samples")
+    ).items[0].id;
+    const checkSavedLabel = async (value) => {
+      const samples = (
+        await read("/datasets/" + (await current()).id + "/samples")
+      ).items;
+      const sample = samples.find((row) => row.id === reviewedId);
+      assert.equal(sample.target.fit, value);
+      assert.equal(sample.human_verified, true);
+    };
     await page.locator(".sample-review").first().click();
     let dialog = page.getByRole("dialog", { name: "레이블 상세", exact: true });
-    const category = dialog.getByLabel("상품 카테고리", { exact: true });
-    if (await category.count()) await category.selectOption("상의");
+    const category = dialog.getByLabel("상품 카테고리");
+    await expect(category).toBeVisible();
+    await category.selectOption("상의");
     const fit = dialog.getByLabel("핏", { exact: true });
     await expect(fit).toBeEnabled();
     const options = await fit
@@ -112,7 +128,7 @@ const dir = ".runtime/deletion-verification";
     await save();
     await page.reload();
     await expect(page.locator(".sample-card")).toHaveCount(2);
-    await expect(page.locator(".sample-card").first()).toContainText(value);
+    await checkSavedLabel(value);
     // Delete only the second image; the first image's label must survive restoration.
     await page.locator(".sample-checkbox").nth(1).check();
     await page.getByRole("button", { name: "선택 삭제", exact: true }).click();
@@ -127,18 +143,14 @@ const dir = ".runtime/deletion-verification";
     await confirmDelete("선택 이미지 삭제");
     await expect(page.locator(".sample-card")).toHaveCount(1);
     await page.setViewportSize({ width: 390, height: 1000 });
-    dialog = await openTrash();
-    await dialog
-      .locator("li")
-      .filter({ hasText: "선택 이미지 삭제" })
-      .filter({ hasText: workspace.name })
-      .getByRole("button", { name: "복원", exact: true })
-      .click();
-    await expect(dialog).toContainText("복원했습니다.");
-    await page.keyboard.press("Escape");
+    await page.goto(base + "/ko/workspaces");
+    await expect(
+      page.getByRole("button", { name: "삭제 목록", exact: true }),
+    ).toHaveCount(0);
+    await restoreLast();
     await page.goto(url);
     await expect(page.locator(".sample-card")).toHaveCount(2);
-    await expect(page.locator(".sample-card").first()).toContainText(value);
+    await checkSavedLabel(value);
     assert.equal(
       (await read("/datasets?current=true")).filter(
         (d) => d.workspace_id === workspace.id,
@@ -166,14 +178,7 @@ const dir = ".runtime/deletion-verification";
       page.getByText("이미지 업로드로 데이터를 추가하세요.", { exact: false }),
     ).toBeVisible();
     assert.equal(await current(), undefined);
-    dialog = await openTrash();
-    await dialog
-      .locator("li")
-      .filter({ hasText: "전체 데이터 삭제" })
-      .filter({ hasText: workspace.name })
-      .getByRole("button", { name: "복원", exact: true })
-      .click();
-    await page.keyboard.press("Escape");
+    await restoreLast();
     await page.goto(url);
     await expect(page.locator(".sample-card")).toHaveCount(2);
     // Workspace removal and restore must return one collection, not every snapshot.
@@ -193,16 +198,10 @@ const dir = ".runtime/deletion-verification";
       .fill(workspace.name);
     await confirmDelete("워크스페이스 삭제");
     await expect(page).toHaveURL(base + "/ko/workspaces");
-    dialog = await openTrash();
-    await dialog
-      .locator("li")
-      .filter({ hasText: workspace.name })
-      .getByRole("button", { name: "복원", exact: true })
-      .click();
-    await page.keyboard.press("Escape");
+    await restoreLast();
     await page.goto(url);
     await expect(page.locator(".sample-card")).toHaveCount(2);
-    await expect(page.locator(".sample-card").first()).toContainText(value);
+    await checkSavedLabel(value);
     assert.equal(
       (await read("/workspaces")).find((w) => w.id === workspace.id).datasets
         .length,
@@ -210,7 +209,7 @@ const dir = ".runtime/deletion-verification";
     );
     assert.deepEqual(errors, []);
     console.log(
-      "PASS: consecutive uploads append, duplicates preserve labels, no version/history selector, label save/reload, selected/all/workspace delete and restore keep one collection, mobile, no JS errors",
+      "PASS: consecutive uploads append, duplicates preserve labels, no version/history/deletion-list UI, label save/reload, selected/all/workspace delete and restore keep one collection, mobile, no JS errors",
     );
   } finally {
     await save();

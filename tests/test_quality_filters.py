@@ -1,4 +1,4 @@
-from backend import store as s
+from backend.data import store as s
 
 
 def test_review_counts_and_drift_filter_exclude_unscored(client):

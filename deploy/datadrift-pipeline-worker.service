@@ -4,8 +4,14 @@ After=network.target
 [Service]
 WorkingDirectory=/home/hslim/Code/datadrift/datadrift_pipeline
 Environment=DATADRIFT_STATE=/home/hslim/Code/datadrift/datadrift_pipeline/.runtime
+Environment=DATADRIFT_MODELS=/data/hslim/models
 Environment=DATADRIFT_TRAIN_PYTHON=/data/hslim/venvs/gemma4-12b-transformers-dev/bin/python
 Environment=DATADRIFT_GPU=0
+Environment=DATADRIFT_EVAL_BATCH_SIZE=8
+Environment=DATADRIFT_INFERENCE_BACKEND=vllm
+Environment=DATADRIFT_VLLM_MANAGED=1
+Environment=DATADRIFT_VLLM_2B_URL=http://127.0.0.1:18093
+Environment=DATADRIFT_VLLM_4B_URL=http://127.0.0.1:18094
 ExecStart=/home/hslim/Code/datadrift/datadrift_pipeline/.venv/bin/python -m backend.worker
 Restart=always
 RestartSec=3

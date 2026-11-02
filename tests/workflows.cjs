@@ -149,6 +149,9 @@ fs.mkdirSync(folder, { recursive: true });
       "browser evaluation of saved adapter and result persistence",
     );
     await page.goto(base + "/ko/monitoring/drift");
+    const driftSettings = page.locator(".drift-settings-section");
+    if ((await driftSettings.getAttribute("open")) === null)
+      await driftSettings.locator("summary").first().click();
     await page.getByLabel("기준 데이터셋").selectOption(mus.id);
     await page.getByLabel("비교 데이터셋").selectOption(gs.id);
     let d = await submit("탐지 실행");

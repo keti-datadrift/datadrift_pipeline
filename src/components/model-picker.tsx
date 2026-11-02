@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, ChevronDown, Search } from "lucide-react";
 import {
   useEffect,
   useId,
@@ -8,11 +9,11 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, Check, Search } from "lucide-react";
 
-type Option = { id: string; name: string; disabled?: boolean };
+type Option = { id: string; name: string; disabled?: boolean; note?: string };
 
 export function ModelPicker({
   label,
@@ -31,6 +32,14 @@ export function ModelPicker({
   const search = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const dragOffset = useRef<number | null>(null);
+  const listDrag = useRef<{
+    pointerId: number;
+    startY: number;
+    top: number;
+    moved: boolean;
+  } | null>(null);
+  const suppressClick = useRef(false);
+  const [dragging, setDragging] = useState(false);
   const [scroll, setScroll] = useState({ top: 0, height: 0, total: 0 });
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -65,6 +74,46 @@ export function ModelPicker({
     if (list.current)
       list.current.scrollTop =
         Math.max(0, Math.min(1, fraction)) * (scroll.total - scroll.height);
+  }
+  function startListDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    suppressClick.current = false;
+    const element = event.currentTarget;
+    // Touch keeps the browser's native scrolling and momentum.
+    if (
+      event.pointerType === "touch" ||
+      !event.isPrimary ||
+      event.button !== 0 ||
+      element.scrollHeight <= element.clientHeight
+    )
+      return;
+    listDrag.current = {
+      pointerId: event.pointerId,
+      startY: event.clientY,
+      top: element.scrollTop,
+      moved: false,
+    };
+  }
+  function moveListDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    const drag = listDrag.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const delta = drag.startY - event.clientY;
+    if (!drag.moved) {
+      if (Math.abs(delta) < 6) return;
+      drag.moved = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+      setDragging(true);
+    }
+    event.preventDefault();
+    event.currentTarget.scrollTop = drag.top + delta;
+  }
+  function endListDrag(event: ReactPointerEvent<HTMLDivElement>) {
+    const drag = listDrag.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    suppressClick.current = drag.moved && event.type === "pointerup";
+    listDrag.current = null;
+    setDragging(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
   }
   useLayoutEffect(() => {
     if (!open || !list.current) return;
@@ -211,6 +260,19 @@ export function ModelPicker({
               <div
                 ref={list}
                 onScroll={readScroll}
+                onPointerDown={startListDrag}
+                onPointerMove={moveListDrag}
+                onPointerUp={endListDrag}
+                onPointerCancel={endListDrag}
+                onLostPointerCapture={endListDrag}
+                onClickCapture={(event) => {
+                  if (suppressClick.current) {
+                    suppressClick.current = false;
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                }}
+                data-dragging={dragging || undefined}
                 role="listbox"
                 id={`${id}-options`}
                 aria-label={`${label} 목록`}
@@ -232,6 +294,7 @@ export function ModelPicker({
                     <span>
                       {option.name}
                       {option.disabled ? " (파일 없음)" : ""}
+                      {option.note && <small>{option.note}</small>}
                     </span>
                     {option.id === value && <Check size={16} />}
                   </div>

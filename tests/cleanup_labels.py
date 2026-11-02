@@ -2,7 +2,8 @@
 
 import json
 from pathlib import Path
-from backend import store as s
+
+from backend.data import store as s
 
 path = Path(".runtime/ui-verification/labels.json")
 report = json.loads(path.read_text())

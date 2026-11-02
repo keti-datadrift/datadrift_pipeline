@@ -1,6 +1,7 @@
 const { chromium, expect } = require("@playwright/test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const { mockPagedModels } = require("./fixtures/models.cjs");
 const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
 const near = (a, b, label) =>
   assert(Math.abs(a - b) < 2, `${label}: ${a} -> ${b}`);
@@ -24,6 +25,7 @@ async function geometry(locator) {
     for (const width of [1440, 390]) {
       const page = await browser.newPage({ viewport: { width, height: 1000 } });
       try {
+        await mockPagedModels(page);
         await page.goto(base + "/ko/models");
         const models = page.getByRole("navigation", {
           name: "모델 목록 페이지",

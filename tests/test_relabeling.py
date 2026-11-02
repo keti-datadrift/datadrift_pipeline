@@ -1,8 +1,10 @@
 import copy
 import json
-from backend import taxonomy as t, store as s
+
+from backend.data import store as s
+from backend.drift.statistics import analyze
 from backend.relabeling import convert, prompt
-from backend.drift_statistics import analyze
+from backend.schemas import taxonomy as t
 
 
 def sample(i=0, fit="레귤러핏", category="상의"):

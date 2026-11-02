@@ -2,14 +2,17 @@
 
 import json
 from collections import Counter
+
 import numpy as np
-from . import taxonomy as t
+
+from backend.schemas import taxonomy as t
 
 
 def value(row, field):
     v = row["target"].get(field)
     if (
-        field in row.get("unscored_fields", [])
+        row.get("label_state") == "unlabeled"
+        or field in row.get("unscored_fields", [])
         or v is None
         or v in ("unknown", "not_applicable")
     ):
@@ -48,7 +51,7 @@ def adjust(results, pkey, qkey):
         r[qkey] = previous
 
 
-def analyze(reference, current, repeats=999, seed=42):
+def analyze(reference, current, repeats=999, seed=42, min_category_samples=10):
     rng = np.random.default_rng(seed)
     results = []
     for field in t.schema(reference[0].get("schema_id", t.LEGACY)):
@@ -72,12 +75,12 @@ def analyze(reference, current, repeats=999, seed=42):
                 p_value=float((1 + np.sum(null >= score - 1e-12)) / (repeats + 1)),
             )
             strata = []
-            for category in sorted({c for c, v in a + b}, key=str):
+            for category in sorted({c for c, v in a + b if c in t.CATEGORIES}, key=str):
                 x, y = (
                     Counter(v for c, v in a if c == category),
                     Counter(v for c, v in b if c == category),
                 )
-                if min(sum(x.values()), sum(y.values())) < 10:
+                if min(sum(x.values()), sum(y.values())) < min_category_samples:
                     continue
                 observed, control = test_counts(x, y, rng, repeats)
                 strata.append(
@@ -101,6 +104,6 @@ def analyze(reference, current, repeats=999, seed=42):
         "fields": results,
         "permutations": repeats,
         "seed": seed,
-        "method": "pooled-count permutation; BH correction within each test family; category strata min 10/domain",
+        "method": f"pooled-count permutation; BH correction within each test family; category strata min {min_category_samples}/domain",
         "note": "카테고리 구성 차이를 보정한 탐색적 비교입니다. AI 레이블과 표본 독립성 가정에 의존하며 시계열 변화·성능 저하의 증거는 아닙니다.",
     }

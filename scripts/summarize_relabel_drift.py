@@ -2,9 +2,12 @@
 
 import json
 from collections import Counter
+
 import numpy as np
 from PIL import Image
-from backend import store as s, taxonomy as t
+
+from backend.data import store as s
+from backend.schemas import taxonomy as t
 from scripts.run_relabel_drift import REPORT, save
 
 

@@ -1,10 +1,15 @@
 import json
 from pathlib import Path
-import pytest
 
-from backend import store as s, worker, model_endpoints as me, taxonomy as t
+import pytest
 from test_uploads import image_bytes
+
+from backend import worker
+from backend.data import store as s
+from backend.jobs import execution as job_execution
+from backend.models import endpoints as me
 from backend.relabeling import convert, prompt
+from backend.schemas import taxonomy as t
 
 
 def create(client, **overrides):
@@ -91,9 +96,11 @@ def test_endpoint_lifecycle_and_input_contract(client, monkeypatch):
     explicit = submit(client, endpoint, category="아우터")
     assert explicit.status_code == 202
     assert explicit.json()["category"] == "아우터"
-    parameters = client.get("/api/openapi.json").json()["paths"][
-        "/api/model-endpoints/{eid}/predictions"
-    ]["post"].get("parameters", [])
+    parameters = (
+        client.get("/api/openapi.json")
+        .json()["paths"]["/api/model-endpoints/{eid}/predictions"]["post"]
+        .get("parameters", [])
+    )
     assert not any(p["name"] == "category" for p in parameters)
     monkeypatch.setattr(me, "MAX_IMAGE", 10)
     assert submit(client, endpoint).status_code == 413
@@ -155,14 +162,20 @@ def test_api_worker_propagates_selected_adapter_and_does_not_publish_labels(
         def poll(self):
             return 0
 
-    monkeypatch.setattr(worker.subprocess, "Popen", Process)
+    monkeypatch.setattr(job_execution.subprocess, "Popen", Process)
     worker.run(worker.claim())
     result = client.get(response["result_url"]).json()
     assert result["status"] == "succeeded"
     valid = category == "하의"
-    assert result["category"] == result["result"]["category"] == ("하의" if valid else None)
+    assert (
+        result["category"]
+        == result["result"]["category"]
+        == ("하의" if valid else None)
+    )
     assert result["result"]["category_valid"] is valid
-    assert result["result"]["attributes"]["fit"] == (attributes["fit"] if valid else "unknown")
+    assert result["result"]["attributes"]["fit"] == (
+        attributes["fit"] if valid else "unknown"
+    )
     assert result["result"]["teacher"]["adapter_sha256"] == "verified"
     assert result["result"]["parse_valid"]
     assert result["result"]["schema_valid"] is valid
@@ -192,18 +205,28 @@ def test_queue_bound_and_legacy_rejected(client):
 def test_prediction_history_pagination(client):
     endpoint = create(client).json()
     for index in range(25):
-        s.save("job", {
-            "id": f"prediction-{index:02d}",
-            "status": "succeeded",
-            "created_at": s.now(),
-            "request": {"kind": "inference", "endpoint_id": endpoint["id"], "model_id": "qwen35_2b", "category": "상의"},
-        })
+        s.save(
+            "job",
+            {
+                "id": f"prediction-{index:02d}",
+                "status": "succeeded",
+                "created_at": s.now(),
+                "request": {
+                    "kind": "inference",
+                    "endpoint_id": endpoint["id"],
+                    "model_id": "qwen35_2b",
+                    "category": "상의",
+                },
+            },
+        )
     path = endpoint["path"]
     legacy = client.get(path).json()
     assert len(legacy) == 20
     all_ids = []
     for offset, expected in [(0, 10), (10, 10), (20, 5)]:
-        response = client.get(path, params={"paginated": True, "offset": offset, "limit": 10})
+        response = client.get(
+            path, params={"paginated": True, "offset": offset, "limit": 10}
+        )
         assert response.status_code == 200
         page = response.json()
         assert page["total"] == 25
@@ -212,4 +235,82 @@ def test_prediction_history_pagination(client):
     assert all_ids == [f"prediction-{index:02d}" for index in reversed(range(25))]
     assert client.get(path, params={"offset": -1}).status_code == 422
     assert client.get(path, params={"limit": 101}).status_code == 422
-    assert client.get(path, params={"paginated": True, "offset": 30}).json() == {"items": [], "total": 25}
+    assert client.get(path, params={"paginated": True, "offset": 30}).json() == {
+        "items": [],
+        "total": 25,
+    }
+
+
+def test_wait_mode_returns_completed_result_in_one_request(client, monkeypatch):
+    import threading
+    import time
+
+    endpoint = create(client).json()
+    original = me.enqueue
+    threads = []
+
+    def enqueue(*args):
+        prediction = original(*args)
+
+        def finish():
+            time.sleep(0.05)
+            s.patch(
+                "job",
+                prediction["id"],
+                status="succeeded",
+                finished_at=s.now(),
+                result={"attributes": {"fit": "레귤러핏"}, "engine": "vllm"},
+            )
+
+        thread = threading.Thread(target=finish)
+        threads.append(thread)
+        thread.start()
+        return prediction
+
+    monkeypatch.setattr(me, "enqueue", enqueue)
+    response = submit(client, endpoint, wait="true")
+    for thread in threads:
+        thread.join(timeout=2)
+    assert response.status_code == 200
+    value = response.json()
+    assert value["status"] == "succeeded"
+    assert value["result"]["attributes"]["fit"] == "레귤러핏"
+    assert "input_row" not in value
+    assert client.get(value["result_url"]).json() == value
+
+
+def test_wait_timeout_keeps_durable_request_and_returns_lookup_url(client, monkeypatch):
+    endpoint = create(client).json()
+    monkeypatch.setattr(me, "WAIT_SECONDS", 0)
+    response = submit(client, endpoint, wait="true")
+    assert response.status_code == 202
+    value = response.json()
+    assert value["status"] == "queued"
+    assert client.get(value["result_url"]).json()["status"] == "queued"
+    assert not s.get("job", value["id"])["cancel_requested"]
+    assert submit(client, endpoint).status_code == 202
+    assert submit(client, endpoint, wait="invalid").status_code == 422
+
+
+@pytest.mark.parametrize("status", ["failed", "cancelled"])
+def test_wait_mode_reports_terminal_outcomes_without_retry(client, monkeypatch, status):
+    endpoint = create(client).json()
+    original = me.enqueue
+
+    def enqueue(*args):
+        prediction = original(*args)
+        s.patch(
+            "job",
+            prediction["id"],
+            status=status,
+            finished_at=s.now(),
+            error="실행 종료",
+        )
+        return prediction
+
+    monkeypatch.setattr(me, "enqueue", enqueue)
+    response = submit(client, endpoint, wait="true")
+    assert response.status_code == 200
+    assert response.json()["status"] == status
+    assert response.json()["error"] == "실행 종료"
+    assert len(s.all_of("job")) == 1

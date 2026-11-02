@@ -1,4 +1,4 @@
-"""Append validated images to a workspace collection without overwriting labels."""
+"""Image validation, deduplication and workspace uploads."""
 
 import hashlib
 import io
@@ -9,8 +9,10 @@ import warnings
 from pathlib import Path
 
 from PIL import Image
-from . import store as s
-from . import workspace_data as wd, taxonomy as t
+
+from backend.data import store as s
+from backend.data import workspace_data as wd
+from backend.schemas import taxonomy as t
 
 MAX_BATCH = 100 * 1024 * 1024
 MAX_IMAGE = 20 * 1024 * 1024

@@ -31,6 +31,7 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
         if (route === "workspaces/gsshop")
           await page.locator(".sample-card").first().waitFor();
         if (route === "monitoring/drift") {
+          await page.locator(".drift-distribution-details > summary").click();
           await page.locator(".metric-row").first().waitFor();
           const report = page.getByTestId("relabel-report");
           await expect(report).not.toHaveAttribute("open");

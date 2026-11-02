@@ -1,10 +1,12 @@
-"""One editable data collection per workspace; job inputs remain immutable."""
+"""Workspace collection revisions and labeling updates."""
 
 import copy
 import hashlib
 import json
+
 from fastapi import HTTPException
-from . import store as s
+
+from backend.data import store as s
 
 
 def current(wid, con):
@@ -68,7 +70,7 @@ def label_signature(row):
 
 def editable(original, sid, con):
     active = current(original["workspace_id"], con)
-    # Legacy/direct API datasets without an assigned collection remain supported.
+    # Direct API datasets may not have a workspace collection pointer.
     tracked = con.execute(
         "SELECT 1 FROM workspace_data WHERE workspace_id=?", (original["workspace_id"],)
     ).fetchone()
@@ -97,7 +99,7 @@ def apply_labels(source, labeled, con):
         old = before.get(row["id"])
         prediction = predictions.get(row["id"])
         if old and prediction and label_signature(row) == label_signature(old):
-            # A labeling job must not undo a split edited while it was running.
+            # Retain split edits made during labeling.
             updated = copy.deepcopy(prediction)
             updated["split"] = row["split"]
             if "split_history" in row:
