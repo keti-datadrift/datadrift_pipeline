@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
 (async () => {
   const browser = await chromium.launch();
-  const page = await browser.newPage();
+  const page = await browser.newPage({ hasTouch: true });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   try {
@@ -61,6 +61,48 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
         );
         const last = popup.locator('[role=option][data-model-id="picker-44"]');
         const list = popup.locator(".model-picker-options");
+        const content = await list.boundingBox();
+        const x = content.x + content.width / 2;
+        const top = content.y + 25;
+        const bottom = content.y + content.height - 25;
+        await page.mouse.move(x, bottom);
+        await page.mouse.down();
+        await page.mouse.move(x, top, { steps: 12 });
+        await page.mouse.up();
+        await expect
+          .poll(() => list.evaluate((element) => element.scrollTop))
+          .toBeGreaterThan(80);
+        await expect(popup).toBeVisible();
+        await expect(control).toHaveAttribute("data-model-id", "picker-0");
+        assert.equal(
+          await page.evaluate(() => window.getSelection()?.toString()),
+          "",
+          "dragging the list must not select model name text",
+        );
+        await page.mouse.move(x, top);
+        await page.mouse.down();
+        await page.mouse.move(x, bottom, { steps: 12 });
+        await page.mouse.up();
+        await expect
+          .poll(() => list.evaluate((element) => element.scrollTop))
+          .toBe(0);
+        // Capture must keep scrolling and prevent selection outside the popup.
+        await page.mouse.move(x, bottom);
+        await page.mouse.down();
+        await page.mouse.move(x, content.y - 15, { steps: 12 });
+        await page.mouse.up();
+        await expect
+          .poll(() => list.evaluate((element) => element.scrollTop))
+          .toBeGreaterThan(80);
+        await expect(popup).toBeVisible();
+        await expect(control).toHaveAttribute("data-model-id", "picker-0");
+        await expect(list).not.toHaveAttribute("data-dragging", "true");
+        // Wheel and the original scrollbar must still work after a list drag.
+        await list.hover();
+        await page.mouse.wheel(0, -10000);
+        await expect
+          .poll(() => list.evaluate((element) => element.scrollTop))
+          .toBe(0);
         const track = popup.getByRole("scrollbar");
         const listBox = await track.boundingBox();
         const thumb = await track.locator("[data-scroll-thumb]").boundingBox();
@@ -102,7 +144,18 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
         await page.screenshot({
           path: `.runtime/model-picker/${route}-${width}.png`,
         });
-        await last.click();
+        // Small hand movement is still a click, rather than a scroll gesture.
+        const lastBounds = await last.boundingBox();
+        await page.mouse.move(
+          lastBounds.x + lastBounds.width / 2,
+          lastBounds.y + lastBounds.height / 2,
+        );
+        await page.mouse.down();
+        await page.mouse.move(
+          lastBounds.x + lastBounds.width / 2,
+          lastBounds.y + lastBounds.height / 2 + 2,
+        );
+        await page.mouse.up();
         await expect(control).toHaveAttribute("data-model-id", "picker-44");
         await expect(popup).toHaveCount(0);
         await control.click();
@@ -169,9 +222,43 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
         );
       }
     }
+    // Real touch events exercise native panning, including pointer cancellation.
+    const control = page.getByRole("combobox", { name: "모델", exact: true });
+    await control.click();
+    const list = page.getByRole("listbox");
+    const track = page.getByRole("scrollbar");
+    await track.focus();
+    await track.press("Home");
+    await expect
+      .poll(() => list.evaluate((element) => element.scrollTop))
+      .toBe(0);
+    const content = await list.boundingBox();
+    const session = await page.context().newCDPSession(page);
+    const x = content.x + content.width / 2;
+    const y = content.y + content.height - 30;
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x, y }],
+    });
+    for (let step = 1; step <= 12; step++)
+      await session.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x, y: y - (step / 12) * (content.height - 60) }],
+      });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await expect
+      .poll(() => list.evaluate((element) => element.scrollTop))
+      .toBeGreaterThan(80);
+    await expect(control).toHaveAttribute("data-model-id", "picker-1");
+    await expect(list).not.toHaveAttribute("data-dragging", "true");
+    await page.keyboard.press("Escape");
+    await session.detach();
     assert.deepEqual(errors, []);
     console.log(
-      "Training/evaluation picker: 45 models, wrapping/scrolling, viewport bounds, search, disabled files, keyboard and no accidental submit; full test/validation payloads passed. Jobs mocked.",
+      "Training/evaluation picker: 45 models, list drag in both directions and outside popup without selecting, small-movement click, native touch pan, wheel/scrollbar, wrapping, viewport bounds, search, disabled files, keyboard and no accidental submit; full test/validation payloads passed. Jobs mocked.",
     );
   } finally {
     await browser.close();

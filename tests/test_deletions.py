@@ -2,7 +2,8 @@ import copy
 from pathlib import Path
 
 import pytest
-from backend import store as s
+
+from backend.data import store as s
 from tests.test_uploads import upload
 
 

@@ -8,6 +8,8 @@
 - [API 문서](http://121.126.210.3:18091/api/docs)
 - [운영·설치·데이터 해석](docs/operations.md)
 - [검증 결과](docs/verification.md)
+- [프로그램 실행·사용 방법](docs/program-user-guide.md)
+- [소스 구조·제출 ZIP 생성](docs/source-structure.md)
 
 ## 포함 기능
 
@@ -16,13 +18,15 @@
 - 워크스페이스 생성, 이미지 업로드, 레이블 조회, 검색, 분할 필터, JSONL 내보내기.
 - 이미지 업로드 후 기본 Qwen 또는 학습된 LoRA 모델을 선택해 자동 레이블링. 워크스페이스의 이미지별 레이블에 반영합니다.
 - [이미지 업로드와 자동 레이블링 사용법](docs/image-upload.md).
-- [데이터 삭제와 복원 사용법](docs/data-deletion.md).
+- [데이터 삭제와 운영 복원 API](docs/data-deletion.md).
 - 균형 혼합 기본 재구성: 원본별 비율과 속성 분포를 고려하며, 레이블이 있는 학습·미지정 운영 데이터를 후보로 사용합니다. 검증/테스트는 제외합니다.
-- [모델 API](docs/model-api.md) 등록, 비동기 이미지 추론, 카테고리 자동 판별과 요청 이력 관리.
+- [모델 API](docs/model-api.md) 등록, 접수 상태에 따른 vLLM 기동·종료와 이미지 추론, 카테고리 자동 판별과 요청 이력 관리.
 - Qwen3.5-2B/4B 모델 레지스트리, 이름 변경·보관, SFT+LoRA 학습과 어댑터 등록.
 - 검증/테스트 이미지의 실제 생성 평가, 속성별 일치도와 원문 응답 조회.
+- Transformers+PEFT 평가 8장 배치, 메모리 부족 시 배치 축소와 단계·배치 크기·경과 시간 표시.
+- [평가 엔진 실측 비교](docs/inference-engines.md).
 - 영속 작업 큐, 단일 GPU 워커, 진행률·손실·로그, 취소와 재시작 실패 복구, SSE API.
-- 속성 및 이미지 RGB 히스토그램의 Jensen–Shannon 분포 비교.
+- [복합 드리프트 탐지](docs/drift-detection.md): 속성·카테고리 통계와 고정 이미지 임베딩 MMD를 함께 비교하고 표본 부족·감지 근거를 표시합니다.
 
 ## 로컬 개발
 
@@ -46,7 +50,7 @@ DATADRIFT_TRAIN_PYTHON=/path/to/gpu-env/bin/python .venv/bin/python -m backend.w
 레이블은 사람 검증 정답이 아닙니다. 작은 GPU 실행 검증은 전체 학습이나 품질 평가를 의미하지 않습니다.
 분포 탐지는 소스/도메인 비교이며 시간 경과나 정확도 저하를 단정하지 않습니다.
 현재는 SQLite WAL을 쓰는 단일 호스트 구성입니다. 다중 호스트 스케줄링, SSO,
-오브젝트 스토리지, 임베딩 기반 검출은 후속 범위입니다.
+오브젝트 스토리지는 후속 범위입니다.
 
 ## 변경 기반
 

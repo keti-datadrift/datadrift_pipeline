@@ -4,7 +4,8 @@ import json
 import shutil
 import sys
 from pathlib import Path
-from backend import store as s
+
+from backend.data import store as s
 
 folder = Path(sys.argv[1]).resolve()
 receipt = json.loads((folder / "receipt.json").read_text())

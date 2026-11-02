@@ -1,7 +1,7 @@
 # 비케이브 기준 적용
 
 사용자가 제공한 `비케이브_Taxonomy_공유.xlsx`의 세 시트를 파싱했습니다.
-원문 SHA256과 행 번호는 `backend/bkave_taxonomy.json`에 보존합니다.
+원문 SHA256과 행 번호는 `backend/schemas/bkave_taxonomy.json`에 보존합니다.
 기준 ID: `bkave-106baf22f720`. 이전 14속성 기준은 `visual-v1`입니다.
 
 | 구분 | 적용 |

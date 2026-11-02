@@ -4,8 +4,11 @@ from pathlib import Path
 
 import pytest
 from PIL import Image
-from backend import store as s, taxonomy as t
+
+from backend.data import store as s
+from backend.jobs import execution as job_execution
 from backend.relabeling import convert
+from backend.schemas import taxonomy as t
 
 
 def image_bytes(color="red"):
@@ -93,7 +96,7 @@ def test_upload_atomic_failure_limits_and_duplicate_files(client, monkeypatch):
     assert upload(
         client, [("files", ("two.png", image_bytes("blue")))], split="test"
     ).json()["dataset"]["splits"] == {"train": 1, "test": 1}
-    from backend import uploads
+    from backend.data import uploads
 
     monkeypatch.setattr(uploads, "MAX_IMAGE", 20)
     assert upload(client).status_code == 422
@@ -263,7 +266,7 @@ def test_worker_uses_selected_adapter_and_publishes_new_version(
         def poll(self):
             return 0
 
-    monkeypatch.setattr(worker.subprocess, "Popen", Process)
+    monkeypatch.setattr(job_execution.subprocess, "Popen", Process)
     job = worker.claim()
     worker.run(job)
     completed = s.get("job", job["id"])

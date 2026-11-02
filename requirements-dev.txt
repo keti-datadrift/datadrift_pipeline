@@ -1,0 +1,2 @@
+-r requirements.lock.txt
+ruff==0.17.3

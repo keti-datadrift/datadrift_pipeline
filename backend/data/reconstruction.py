@@ -1,9 +1,9 @@
-"""Deterministic reconstruction of training candidates; source snapshots stay immutable."""
+"""Training data selection and source mixing."""
 
-from collections import Counter, defaultdict
 import json
 import math
 import random
+from collections import Counter, defaultdict
 
 MISSING = "__missing__"
 CANDIDATE_SPLITS = ("train", "unassigned")
@@ -18,8 +18,11 @@ def value(row, field):
         result = row.get("target", {}).get(field)
     if result is None or result in ("unknown", "not_applicable", ""):
         return MISSING
-    return json.dumps(sorted(result) if isinstance(result, list) else result,
-                      ensure_ascii=False, sort_keys=True)
+    return json.dumps(
+        sorted(result) if isinstance(result, list) else result,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
 
 
 def divergence(a, b):
@@ -43,11 +46,15 @@ def counters(rows, fields):
 
 def distance(rows, reference_counts, fields):
     observed = counters(rows, fields)
-    return sum(divergence(observed[field], reference_counts[field]) for field in fields) / len(fields)
+    return sum(
+        divergence(observed[field], reference_counts[field]) for field in fields
+    ) / len(fields)
 
 
 def distribution_sample(rows, reference, count, seed):
-    names = sorted({"category"} | {key for row in reference for key in row.get("target", {})})
+    names = sorted(
+        {"category"} | {key for row in reference for key in row.get("target", {})}
+    )
     reference_counts = counters(reference, names)
     # Excluded/unknown attributes never become a target label distribution.
     for counts in reference_counts.values():
@@ -65,7 +72,8 @@ def distribution_sample(rows, reference, count, seed):
         rng.shuffle(bucket)
     targets = {
         (field, token): count * n / sum(reference_counts[field].values())
-        for field in fields for token, n in reference_counts[field].items()
+        for field in fields
+        for token, n in reference_counts[field].items()
     }
     selected_counts = Counter()
     chosen = []
@@ -74,18 +82,25 @@ def distribution_sample(rows, reference, count, seed):
         chosen = list(rows)
     else:
         for _ in range(count):
-            # Bounded candidate search keeps previews responsive for diverse collections.
-            candidates = available if len(available) <= 256 else rng.sample(available, 256)
-            signature = max(candidates, key=lambda keys: sum(
-                2 * (targets.get(key, 0) - selected_counts[key]) - 1 for key in keys
-            ))
+            # Limit the candidate search for interactive previews.
+            candidates = (
+                available if len(available) <= 256 else rng.sample(available, 256)
+            )
+            signature = max(
+                candidates,
+                key=lambda keys: sum(
+                    2 * (targets.get(key, 0) - selected_counts[key]) - 1 for key in keys
+                ),
+            )
             chosen.append(buckets[signature].pop())
             selected_counts.update(signature)
             if not buckets[signature]:
                 available.remove(signature)
-        # Never return a worse distribution than the reproducible random baseline.
+        # Use the seeded random sample when it matches the target more closely.
         baseline = random.Random(seed).sample(rows, count)
-        if distance(baseline, reference_counts, fields) < distance(chosen, reference_counts, fields):
+        if distance(baseline, reference_counts, fields) < distance(
+            chosen, reference_counts, fields
+        ):
             chosen = baseline
     return chosen, {
         "fields": fields,
@@ -107,12 +122,18 @@ def balanced_mix(parents, count, seed, weights=None):
     if weights and set(weights) != set(ids):
         raise ValueError("선택한 원본별 혼합 비율을 지정하세요.")
     raw_weights = [float((weights or {}).get(did, 1)) for did in ids]
-    if any(not math.isfinite(w) or w < 0 or w > 100 for w in raw_weights) or not sum(raw_weights):
-        raise ValueError("혼합 비율은 0~100으로 입력하고 하나 이상을 0보다 크게 지정하세요.")
+    if any(not math.isfinite(w) or w < 0 or w > 100 for w in raw_weights) or not sum(
+        raw_weights
+    ):
+        raise ValueError(
+            "혼합 비율은 0~100으로 입력하고 하나 이상을 0보다 크게 지정하세요."
+        )
     proportions = [w / sum(raw_weights) for w in raw_weights]
     exact = [count * w for w in proportions]
     quotas = [math.floor(n) for n in exact]
-    for i in sorted(range(len(ids)), key=lambda i: (-(exact[i] - quotas[i]), ids[i]))[:count - sum(quotas)]:
+    for i in sorted(range(len(ids)), key=lambda i: (-(exact[i] - quotas[i]), ids[i]))[
+        : count - sum(quotas)
+    ]:
         quotas[i] += 1
 
     pools, representatives, membership = [], {}, {}
@@ -126,7 +147,8 @@ def balanced_mix(parents, count, seed, weights=None):
             if previous and (
                 previous["target"] != row["target"]
                 or previous.get("category") != row.get("category")
-                or set(previous.get("unscored_fields", [])) != set(row.get("unscored_fields", []))
+                or set(previous.get("unscored_fields", []))
+                != set(row.get("unscored_fields", []))
             ):
                 raise ValueError("중복 이미지의 레이블 또는 제외 속성이 서로 다릅니다.")
             pool.setdefault(key, row)
@@ -138,36 +160,52 @@ def balanced_mix(parents, count, seed, weights=None):
 
     subsets = list(range(1, 1 << len(groups)))
     pattern_counts = Counter(membership.values())
-    capacity = {s: sum(n for mask, n in pattern_counts.items() if mask & s) for s in subsets}
+    capacity = {
+        s: sum(n for mask, n in pattern_counts.items() if mask & s) for s in subsets
+    }
     demand = {s: sum(q for i, q in enumerate(quotas) if s & (1 << i)) for s in subsets}
     for subset in sorted(subsets, key=lambda s: (s.bit_count(), s)):
         if demand[subset] > capacity[subset]:
-            names = ", ".join(groups[i]["name"] for i in range(len(groups)) if subset & (1 << i))
+            names = ", ".join(
+                groups[i]["name"] for i in range(len(groups)) if subset & (1 << i)
+            )
             raise ValueError(
                 f"{names}: 목표 {demand[subset]}개를 채우려면 중복 제외 데이터가 부족합니다. "
                 f"사용 가능한 데이터는 {capacity[subset]}개입니다. 데이터 수나 혼합 비율을 조정하세요."
             )
 
-    names = sorted({"category"} | {k for row in representatives.values() for k in row.get("target", {})})
+    names = sorted(
+        {"category"}
+        | {k for row in representatives.values() for k in row.get("target", {})}
+    )
     profiles = [counters(list(pool.values()), names) for pool in pools]
     for profile in profiles:
         for counts in profile.values():
             counts.pop(MISSING, None)
-    fields = [f for f in names if any(proportions[i] and profile[f] for i, profile in enumerate(profiles))]
+    fields = [
+        f
+        for f in names
+        if any(proportions[i] and profile[f] for i, profile in enumerate(profiles))
+    ]
     if not fields:
         raise ValueError("원본에 비교할 속성 레이블이 없습니다.")
     mixed_profile = {f: Counter() for f in fields}
     for f in fields:
-        observed_weight = sum(proportions[i] for i, profile in enumerate(profiles) if profile[f])
+        observed_weight = sum(
+            proportions[i] for i, profile in enumerate(profiles) if profile[f]
+        )
         for i, profile in enumerate(profiles):
             total = sum(profile[f].values())
             if total and proportions[i]:
                 for token, n in profile[f].items():
-                    mixed_profile[f][token] += proportions[i] * n / total / observed_weight
+                    mixed_profile[f][token] += (
+                        proportions[i] * n / total / observed_weight
+                    )
     group_fields = [[f for f in fields if profile[f]] for profile in profiles]
     targets = {
         (i, f, token): quotas[i] * n / sum(profile[f].values())
-        for i, profile in enumerate(profiles) for f in group_fields[i]
+        for i, profile in enumerate(profiles)
+        for f in group_fields[i]
         for token, n in profile[f].items()
     }
     bucket_rows = defaultdict(list)
@@ -190,17 +228,23 @@ def balanced_mix(parents, count, seed, weights=None):
             tight = [s for s in subsets if caps[s] == needs[s]]
             allowed_cache = {}
 
-            def options(bucket):
+            def options(
+                bucket, allowed_cache=allowed_cache, active=active, tight=tight
+            ):
                 mask = bucket[0]
                 if mask not in allowed_cache:
                     allowed = mask & active
                     for subset in tight:
                         if mask & subset:
                             allowed &= subset
-                    allowed_cache[mask] = [i for i in range(len(groups)) if allowed & (1 << i)]
+                    allowed_cache[mask] = [
+                        i for i in range(len(groups)) if allowed & (1 << i)
+                    ]
                 return allowed_cache[mask]
 
-            candidates = available if len(available) <= 256 else rng.sample(available, 256)
+            candidates = (
+                available if len(available) <= 256 else rng.sample(available, 256)
+            )
             if not use_distribution:
                 candidates = rng.sample(candidates, len(candidates))
             best, best_score = None, -math.inf
@@ -211,15 +255,26 @@ def balanced_mix(parents, count, seed, weights=None):
                     break
                 for i in eligible:
                     score = sum(
-                        2 * (targets.get((i, f, bucket[1][field_indexes[f]]), 0)
-                             - seen[(i, f, bucket[1][field_indexes[f]])]) - 1
+                        2
+                        * (
+                            targets.get((i, f, bucket[1][field_indexes[f]]), 0)
+                            - seen[(i, f, bucket[1][field_indexes[f]])]
+                        )
+                        - 1
                         for f in group_fields[i]
                     ) / max(1, len(group_fields[i]))
                     if score > best_score:
                         best, best_score = (bucket, i), score
             if best is None:
                 # A bounded search may miss a feasible bucket near quota completion.
-                best = next(( (bucket, options(bucket)[0]) for bucket in available if options(bucket) ), None)
+                best = next(
+                    (
+                        (bucket, options(bucket)[0])
+                        for bucket in available
+                        if options(bucket)
+                    ),
+                    None,
+                )
             if best is None:
                 raise RuntimeError("혼합 비율에 맞는 데이터를 배정하지 못했습니다.")
             bucket, i = best
@@ -240,8 +295,14 @@ def balanced_mix(parents, count, seed, weights=None):
 
     def fit(rows, assigned):
         return sum(
-            proportions[i] * distance([r for r, owner in zip(rows, assigned) if owner == i], profiles[i], group_fields[i])
-            for i in range(len(groups)) if quotas[i] and group_fields[i]
+            proportions[i]
+            * distance(
+                [r for r, owner in zip(rows, assigned, strict=False) if owner == i],
+                profiles[i],
+                group_fields[i],
+            )
+            for i in range(len(groups))
+            if quotas[i] and group_fields[i]
         )
 
     chosen, assigned = sample(True)
@@ -254,10 +315,16 @@ def balanced_mix(parents, count, seed, weights=None):
         "before_js": distance(list(representatives.values()), mixed_profile, fields),
         "after_js": distance(chosen, mixed_profile, fields),
         "mix": [
-            {"dataset_id": d["id"], "name": d["name"], "workspace_id": d["workspace_id"],
-             "target_ratio": proportions[i], "target_count": quotas[i],
-             "actual_ratio": selected_counts[i] / count, "selected_count": selected_counts[i],
-             "available_count": len(pools[i])}
+            {
+                "dataset_id": d["id"],
+                "name": d["name"],
+                "workspace_id": d["workspace_id"],
+                "target_ratio": proportions[i],
+                "target_count": quotas[i],
+                "actual_ratio": selected_counts[i] / count,
+                "selected_count": selected_counts[i],
+                "available_count": len(pools[i]),
+            }
             for i, d in enumerate(groups)
         ],
     }

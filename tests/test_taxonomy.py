@@ -1,7 +1,10 @@
 import copy
+
 import pytest
-from backend import taxonomy as t, store as s
+
+from backend.data import store as s
 from backend.migrate_taxonomy import convert
+from backend.schemas import taxonomy as t
 from backend.training import metrics
 
 

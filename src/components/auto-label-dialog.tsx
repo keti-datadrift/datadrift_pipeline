@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
 import { displayName } from "@/lib/utils";
+import { X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 type LabelModel = {
   id: string;
   name: string;

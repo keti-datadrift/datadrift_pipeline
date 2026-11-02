@@ -1,7 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
-from backend import store as s
+
 from backend.api import app
+from backend.data import store as s
 
 
 @pytest.fixture

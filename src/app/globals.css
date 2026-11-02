@@ -1536,7 +1536,7 @@ hr {
   }
 }
 
-/* Keep actions attached to the content they operate on. */
+/* Contextual actions */
 .page-actions {
   display: flex;
   align-items: center;
@@ -1700,7 +1700,7 @@ summary:focus-visible {
   border-radius: 4px;
 }
 
-/* Drift results: aligned scales and explicit comparisons. */
+/* Drift comparison results */
 .drift-overview {
   display: flex;
   justify-content: space-between;
@@ -2172,7 +2172,7 @@ summary:focus-visible {
   }
 }
 
-/* Destructive actions stay in contextual controls, with no decorative accents. */
+/* Deletion controls */
 .button.danger {
   background: #b42318;
   border-color: #b42318;
@@ -2215,32 +2215,6 @@ summary:focus-visible {
   height: 20px;
   accent-color: var(--blue);
   cursor: pointer;
-}
-.deleted-content {
-  padding: 24px;
-}
-.deleted-items {
-  padding: 0;
-  list-style: none;
-  margin-top: 20px;
-}
-.deleted-items li {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 0;
-  border-top: 1px solid var(--line);
-}
-.deleted-items li > div {
-  flex: 1;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.deleted-items p,
-.deleted-items time {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 6px;
 }
 
 .dataset-current {
@@ -2287,11 +2261,77 @@ summary:focus-visible {
   border-bottom: 1px solid #e2e6eb;
 }
 .api-content .api-create {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
   padding: 0 0 20px;
+}
+.api-content .api-create .field {
+  width: 100%;
+  max-width: 480px;
+  min-width: 0;
+}
+.api-content .api-create > .button {
+  justify-self: end;
+}
+.api-image-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 132px;
+  padding: 20px;
+  border: 1px dashed #a1a1aa;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.api-image-dropzone small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.api-image-dropzone.is-dragging {
+  border-color: var(--blue);
+  background: #eff6ff;
 }
 .api-create .field {
   flex: 1;
   min-width: 180px;
+  margin: 0;
+}
+.api-call-steps {
+  list-style: decimal;
+  padding-left: 20px;
+  margin: 16px 0;
+}
+.api-call-steps li + li {
+  margin-top: 20px;
+}
+.api-call-steps .api-code {
+  margin: 8px 0;
+  padding: 12px;
+}
+.api-call-steps .muted {
+  font-size: 12px;
+}
+.api-help-heading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.api-help-heading a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .api-code {
   padding: 16px;
@@ -2724,6 +2764,20 @@ textarea,
 .api-registration .api-create {
   padding: 20px 0;
 }
+.api-registration .api-create input,
+.api-registration .api-create select,
+.api-registration .api-create > .button {
+  height: 44px;
+  min-height: 44px;
+}
+.api-registration .api-create select {
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
 .endpoint-card {
   padding: 0;
   border-radius: 6px;
@@ -2788,6 +2842,14 @@ textarea,
 .api-reception-state {
   margin: 0;
   font-size: 14px;
+}
+.api-runtime-state {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+.api-runtime-state p + p {
+  margin-top: 6px;
 }
 .endpoint-card.selected .endpoint-selection {
   color: var(--blue);
@@ -2879,7 +2941,7 @@ textarea,
   }
 }
 
-/* Page titles live in the content; no separate top navigation row. */
+/* Page headings */
 .app-shell {
   padding-top: 0;
 }
@@ -3043,7 +3105,7 @@ h3 {
   }
 }
 
-/* Keep list geometry stable across pages, loading and shorter final pages. */
+/* List sizing and loading states */
 html {
   scrollbar-gutter: stable;
 }
@@ -3350,7 +3412,7 @@ html {
   }
 }
 
-/* Model choices use a viewport-bounded overlay so cards cannot clip the list. */
+/* Model picker overlay */
 .model-picker {
   min-width: 0;
 }
@@ -3415,6 +3477,12 @@ html {
   overscroll-behavior: contain;
   scrollbar-width: none;
   padding: 4px;
+  touch-action: pan-y;
+  user-select: none;
+}
+.model-picker-options[data-dragging],
+.model-picker-options[data-dragging] .model-picker-option {
+  cursor: grabbing;
 }
 .model-picker-options::-webkit-scrollbar {
   display: none;
@@ -3451,6 +3519,19 @@ html {
 .model-picker-option > span {
   overflow-wrap: anywhere;
 }
+.model-picker-option small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+.model-dataset-notice {
+  margin: 12px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.model-dataset-notice p {
+  margin: 0 0 4px;
+}
 .model-picker-option > svg {
   flex-shrink: 0;
   color: var(--blue);
@@ -3466,4 +3547,182 @@ html {
 .model-picker-option[aria-disabled="true"] {
   color: var(--muted);
   cursor: default;
+}
+
+.drift-composite-verdict {
+  font-size: 32px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin: 0 0 12px;
+}
+.drift-composite-verdict[data-decision="detected"],
+.drift-found {
+  color: #b45309;
+}
+.drift-composite-verdict[data-decision="insufficient"] {
+  color: var(--muted);
+}
+.drift-signal-table {
+  width: 100%;
+  margin-top: 20px;
+  table-layout: fixed;
+}
+.drift-signal-table th:first-child {
+  width: 30%;
+}
+.drift-signal-table td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.drift-analysis-note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+@media (max-width: 640px) {
+  .drift-signal-table th,
+  .drift-signal-table td {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+}
+
+.drift-decision {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 20px;
+}
+.drift-result-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.drift-decision-explanation {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 18px;
+  max-width: 75ch;
+}
+.drift-result-datasets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 24px;
+}
+.drift-result-datasets > div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+.drift-result-datasets dt {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.drift-result-datasets dd {
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.drift-signal-summary {
+  width: 100%;
+  table-layout: fixed;
+  margin-top: 24px;
+}
+.drift-signal-summary th:first-child {
+  width: 27%;
+}
+.drift-signal-summary th:nth-child(2) {
+  width: 22%;
+}
+.drift-signal-summary th,
+.drift-signal-summary td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  padding: 14px 10px;
+}
+.drift-signal-summary th {
+  color: var(--muted);
+  font-weight: 500;
+}
+.drift-results-details,
+.drift-settings-section,
+.drift-history-section {
+  border-bottom: 1px solid var(--line);
+}
+.drift-results-details > summary,
+.drift-settings-section > summary,
+.drift-history-section > summary {
+  padding: 18px 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.drift-numbers {
+  border: 0;
+  margin-top: 12px;
+}
+.drift-numbers > summary {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  padding-bottom: 0;
+}
+.drift-numbers[open] > summary {
+  padding-bottom: 12px;
+}
+.drift-distribution-details > .panel,
+.drift-history-section > .panel {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+}
+.drift-partial-note {
+  color: #854d0e;
+  margin: 12px 0;
+}
+.drift-comparison-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 16px;
+  padding: 6px 0 22px;
+}
+.drift-comparison-form > .field {
+  margin: 0;
+  min-width: 0;
+}
+.drift-advanced-options {
+  grid-column: 1 / -1;
+  font-size: 13px;
+}
+.drift-advanced-options > summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+.drift-advanced-options > .field {
+  width: 240px;
+  max-width: 100%;
+  margin: 16px 0 0;
+}
+@media (max-width: 640px) {
+  .drift-composite-verdict {
+    font-size: 27px;
+  }
+  .drift-result-datasets {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .drift-signal-summary th,
+  .drift-signal-summary td {
+    padding: 12px 5px;
+    font-size: 12px;
+  }
+  .drift-comparison-form {
+    grid-template-columns: 1fr;
+  }
 }

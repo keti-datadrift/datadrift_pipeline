@@ -7,14 +7,16 @@ are retained; unknown/invalid/nonvisual fields are excluded from training/scorin
 import copy
 import hashlib
 import json
+import os
 import time
 from collections import Counter
 from pathlib import Path
 
-from . import taxonomy as t
-from .training import PROMPT as LEGACY_PROMPT, parse, sha, write
+from backend.schemas import taxonomy as t
+from backend.training import PROMPT as LEGACY_PROMPT
+from backend.training import parse, sha, write
 
-TEACHER = Path("/data/hslim/models/gemma-4-12B-it")
+TEACHER = Path(os.environ.get("DATADRIFT_MODELS", "models")) / "gemma-4-12B-it"
 POLICY = "bkave-image-teacher-v1"
 PROMPT = (
     "비케이브 상품 속성을 이미지에서 새로 판독하세요. 기존 레이블은 제공되지 않습니다. "
@@ -52,19 +54,26 @@ def convert(row, raw, metadata, schema_id=t.CURRENT):
         text = text[8:-3].strip()
     pred = parse(text)
     legacy = schema_id == t.LEGACY
-    automatic_category = not legacy and t.category(row.get("category")) not in t.CATEGORIES
+    automatic_category = (
+        not legacy and t.category(row.get("category")) not in t.CATEGORIES
+    )
     predicted_category = (pred or {}).get("category")
     if legacy:
         scope = row.get("category")
     elif automatic_category:
-        scope = t.category(predicted_category) if isinstance(predicted_category, str) else None
+        scope = (
+            t.category(predicted_category)
+            if isinstance(predicted_category, str)
+            else None
+        )
     else:
         scope = t.category(row["category"])
     category_valid = legacy or scope in t.CATEGORIES
     scope = scope if category_valid else None
     attributes = (
         {k: v for k, v in pred.items() if k != "category"}
-        if automatic_category and isinstance(pred, dict) else pred
+        if automatic_category and isinstance(pred, dict)
+        else pred
     )
     allowed = t.schema(schema_id, scope)
     target, excluded, rejected = {}, [], {}
@@ -157,8 +166,14 @@ def main(path):
         "policy": POLICY if schema_id == t.CURRENT else "visual-image-teacher-v1",
         "schema_id": schema_id,
         "created_at": payload["created_at"],
-        "prompt_sha256": hashlib.sha256((PROMPT if schema_id == t.CURRENT else LEGACY_PROMPT).encode()).hexdigest(),
-        "taxonomy_sha256": t.BOOK["source_sha256"] if schema_id == t.CURRENT else hashlib.sha256(json.dumps(t.LEGACY_SCHEMA, sort_keys=True).encode()).hexdigest(),
+        "prompt_sha256": hashlib.sha256(
+            (PROMPT if schema_id == t.CURRENT else LEGACY_PROMPT).encode()
+        ).hexdigest(),
+        "taxonomy_sha256": t.BOOK["source_sha256"]
+        if schema_id == t.CURRENT
+        else hashlib.sha256(
+            json.dumps(t.LEGACY_SCHEMA, sort_keys=True).encode()
+        ).hexdigest(),
         "parent_dataset_id": payload["dataset_id"],
         "teacher_config_sha256": sha(TEACHER / "config.json"),
         "image_only": True,
@@ -222,9 +237,12 @@ def main(path):
             ).to("cuda:0")
             with torch.inference_mode():
                 tokens = model.generate(
-                    **inputs, max_new_tokens=max_new_tokens, do_sample=False, use_cache=True
+                    **inputs,
+                    max_new_tokens=max_new_tokens,
+                    do_sample=False,
+                    use_cache=True,
                 )
-            for row, token in zip(batch, tokens):
+            for row, token in zip(batch, tokens, strict=False):
                 raw = processor.tokenizer.decode(
                     token[inputs["input_ids"].shape[1] :], skip_special_tokens=True
                 )

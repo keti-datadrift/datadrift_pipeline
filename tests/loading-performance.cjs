@@ -72,7 +72,11 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
     const drift = (
       await (await page.request.get(base + "/api/jobs?kind=drift")).json()
     )[0];
-    await expect(page.locator(".run-head")).toContainText(drift.id.slice(0, 8));
+    await expect(page.locator(".drift-decision-header")).toHaveAttribute(
+      "data-run-id",
+      drift.id,
+    );
+    await page.locator(".drift-distribution-details > summary").click();
     await expect(
       page.getByRole("heading", {
         name: "속성별 분포",
@@ -86,11 +90,13 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
       (j) => j.id !== drift.id && j.status === "succeeded" && j.result?.fields,
     );
     if (older) {
+      await page.locator(".drift-history-section > summary").click();
       await page
         .getByRole("button", { name: older.id.slice(0, 8), exact: true })
         .click();
-      await expect(page.locator(".run-head")).toContainText(
-        older.id.slice(0, 8),
+      await expect(page.locator(".drift-decision-header")).toHaveAttribute(
+        "data-run-id",
+        older.id,
       );
       await expect(page.locator(".metric-row")).toHaveCount(
         older.result.fields.length,
@@ -100,7 +106,9 @@ const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
     const catalogPath = "/api/datasets?current=true";
     const old = requests.filter((u) => u === catalogPath).length;
     await page.getByRole("button", { name: "새로고침", exact: true }).click();
-    await expect(page.getByRole("status")).toContainText("새로고침했습니다");
+    await expect(
+      page.getByRole("status").filter({ hasText: "새로고침했습니다" }),
+    ).toBeVisible();
     assert.equal(requests.filter((u) => u === catalogPath).length - old, 1);
     // Returning from a hidden tab refreshes immediately, instead of waiting 30s.
     await page.goto(base + "/ko/evaluation");

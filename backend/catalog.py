@@ -1,10 +1,11 @@
-"""Import only approved labeled inputs; preserve original splits and provenance."""
+"""Labeled dataset import and base model registration."""
 
 import hashlib
 import json
 import os
 from pathlib import Path
-from . import store as s
+
+from backend.data import store as s
 
 FIELDS = [
     "pattern",
@@ -48,7 +49,7 @@ def initialize():
 
 def model_path(family):
     return (
-        Path(os.environ.get("DATADRIFT_MODELS", "/data/hslim/models"))
+        Path(os.environ.get("DATADRIFT_MODELS", "models"))
         / {"qwen35_2b": "Qwen3.5-2B", "qwen35_4b": "Qwen3.5-4B"}[family]
     )
 
@@ -102,7 +103,7 @@ def import_labeled(root=None):
         ).read_text()
     )
     result = []
-    # Complete validation before making any changes.
+    # Validate the full batch before saving.
     datasets = []
     seen = {}
     for source, items in sources.items():
@@ -135,7 +136,7 @@ def import_labeled(root=None):
                     ),
                 }
             )
-        # Content-addressed dataset IDs make repeated imports idempotent and preserve prior snapshots.
+        # Content hashes identify repeated imports without replacing older snapshots.
         digest = hashlib.sha256(
             json.dumps(normalized, sort_keys=True, ensure_ascii=False).encode()
         ).hexdigest()
@@ -171,7 +172,7 @@ def import_labeled(root=None):
                     "workspace",
                     {
                         "id": wid,
-                        "name": "무신사 · BKAVE" if wid == "musinsa" else "GS SHOP",
+                        "name": "무신사" if wid == "musinsa" else "GS SHOP",
                         "description": d["provenance"],
                         "task": "attribute_extraction",
                         "created_at": s.now(),

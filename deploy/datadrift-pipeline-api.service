@@ -4,8 +4,10 @@ After=network.target
 [Service]
 WorkingDirectory=/home/hslim/Code/datadrift/datadrift_pipeline
 Environment=DATADRIFT_STATE=/home/hslim/Code/datadrift/datadrift_pipeline/.runtime
+Environment=DATADRIFT_MODELS=/data/hslim/models
 Environment=DATADRIFT_PUBLIC_ORIGIN=http://121.126.210.3:18091
 Environment=DATADRIFT_INPUT_ROOT=/home/hslim/Code/datadrift
+Environment=DATADRIFT_VLLM_MANAGED=1
 ExecStart=/home/hslim/Code/datadrift/datadrift_pipeline/.venv/bin/uvicorn backend.api:app --host 127.0.0.1 --port 18092
 Restart=always
 RestartSec=3

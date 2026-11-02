@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { displayName } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export function ModelDatasetName({
   datasetId,

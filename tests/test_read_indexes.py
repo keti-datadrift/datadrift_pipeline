@@ -2,7 +2,7 @@ import copy
 import json
 from pathlib import Path
 
-from backend import store as s
+from backend.data import store as s
 
 
 def test_backfill_keeps_original_data_and_order(tmp_path, monkeypatch):
@@ -61,7 +61,7 @@ def test_list_projection_matches_full_and_avoids_loading_rows(client, monkeypatc
     dataset = s.get("dataset", "d")
     expected = s.public_dataset(dataset)
     Path(dataset["rows"][0]["image"]).write_bytes(b"image fixture")
-    from backend import workspace_data as wd
+    from backend.data import workspace_data as wd
 
     with s.db() as con:
         wd.point("w", "d", con)

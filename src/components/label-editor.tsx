@@ -1,8 +1,7 @@
 "use client";
 
-import { displayName } from "@/lib/utils";
 import { LabelStatus } from "@/components/label-status";
-import { useEffect, useRef, useState } from "react";
+import { displayName } from "@/lib/utils";
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,6 +13,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 type LabelHistory = {
   at?: string | null;

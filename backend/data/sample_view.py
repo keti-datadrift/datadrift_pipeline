@@ -1,10 +1,8 @@
-"""Read-only image names and labeling provenance for the review UI."""
+"""Image metadata and label provenance for the review screen."""
 
 from pathlib import PurePosixPath
 
-
-# The user corrected the model name for these two original import sources.
-# Keep the stored source strings and immutable dataset fingerprints unchanged.
+# Display aliases for imported labels; stored provenance is unchanged.
 INITIAL_MODEL_NAMES = {
     "Codex primary agent, direct visual inspection": "GPT-Astra",
     "Gemma4 E2B initial LoRA image-only pseudo label, not human gold": "GPT-Astra",
@@ -16,9 +14,11 @@ def public_sample(row):
     path = row.get("upload_filename") or row.get("image") or row["product_id"]
     result["filename"] = PurePosixPath(str(path).replace("\\", "/")).name
     history = row.get("label_history", [])
-    source = row.get("original_label_source") or (
-        history[0].get("before", {}).get("label_source") if history else None
-    ) or row.get("label_source")
+    source = (
+        row.get("original_label_source")
+        or (history[0].get("before", {}).get("label_source") if history else None)
+        or row.get("label_source")
+    )
     initial_model = INITIAL_MODEL_NAMES.get(source)
     if initial_model:
         result["initial_label"] = {

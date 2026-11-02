@@ -1,24 +1,27 @@
-"""Published model endpoints backed by the durable, serialized GPU queue."""
+"""Image prediction endpoints and request history."""
 
+import asyncio
 import hashlib
 import io
 import json
 import shutil
 import warnings
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request, Response
 from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.concurrency import run_in_threadpool
 from starlette.datastructures import UploadFile
 from starlette.formparsers import MultiPartException, MultiPartParser
 
-from . import store as s
-from . import taxonomy as t
-from .catalog import model_available
-from .uploads import FORMATS, MAX_IMAGE, MAX_PIXELS, empty_target
+from backend import vllm_runtime
+from backend.catalog import model_available
+from backend.data import store as s
+from backend.data.uploads import FORMATS, MAX_IMAGE, MAX_PIXELS, empty_target
+from backend.schemas import taxonomy as t
 
 router = APIRouter(prefix="/api")
+WAIT_SECONDS = 120
 
 
 class CreateEndpoint(BaseModel):
@@ -37,11 +40,11 @@ def eligible(model_id, con=None):
     if model["status"] != "ready" or not model_available(model):
         raise HTTPException(409, "모델이 보관되었거나 모델 파일을 사용할 수 없습니다.")
     if model["kind"] != "base" and model.get("schema_id") != t.CURRENT:
-        raise HTTPException(422, "비케이브 기준 모델을 선택하세요.")
+        raise HTTPException(422, "현재 속성으로 학습한 모델을 선택하세요.")
     return model
 
 
-def public_endpoint(endpoint):
+def public_endpoint(endpoint, targets=None, records=None):
     try:
         model = eligible(endpoint["model_id"])
         available, reason = True, None
@@ -53,13 +56,37 @@ def public_endpoint(endpoint):
         "unavailable_reason": reason,
         "model_name": model["name"] if model else endpoint.get("model_name"),
         "path": f"/api/model-endpoints/{endpoint['id']}/predictions",
+        "status_url": f"/api/model-endpoints/{endpoint['id']}/status",
         "response_mode": "async",
+        "runtime": vllm_runtime.endpoint_runtime(endpoint, model, targets, records),
     }
 
 
 @router.get("/model-endpoints")
 def endpoints():
-    return [public_endpoint(e) for e in s.all_of("model_endpoint")]
+    with s.db() as con:
+        con.execute("BEGIN")
+        items = s.all_of("model_endpoint", con)
+        targets = vllm_runtime.demand(con) if vllm_runtime.managed() else None
+        records = vllm_runtime.runtime_records(con) if targets is not None else None
+    return [public_endpoint(e, targets, records) for e in items]
+
+
+@router.get("/model-endpoints/{eid}/status")
+def endpoint_status(eid: str, response: Response):
+    endpoint = public_endpoint(s.get("model_endpoint", eid))
+    accepting = endpoint["enabled"] and endpoint["available"]
+    runtime = endpoint["runtime"]
+    response.headers["Cache-Control"] = "no-store"
+    return {
+        "endpoint_id": eid,
+        "name": endpoint["name"],
+        "model_id": endpoint["model_id"],
+        "accepting_requests": accepting,
+        "ready": accepting and (runtime is None or runtime["state"] == "ready"),
+        "unavailable_reason": endpoint["unavailable_reason"],
+        "runtime": runtime,
+    }
 
 
 @router.post("/model-endpoints", status_code=201)
@@ -263,6 +290,7 @@ def enqueue(eid, category, content):
 @router.post(
     "/model-endpoints/{eid}/predictions",
     status_code=202,
+    responses={200: {"description": "wait=true 요청의 처리가 완료됐습니다."}},
     openapi_extra={
         "requestBody": {
             "required": True,
@@ -279,7 +307,13 @@ def enqueue(eid, category, content):
     },
 )
 async def predict(
-    eid: str, request: Request,
+    eid: str,
+    request: Request,
+    response: Response,
+    wait: bool = Query(
+        default=False,
+        description="결과를 최대 120초 기다립니다. 완료 시 200, 대기 중이면 202와 result_url을 반환합니다.",
+    ),
     category: str | None = Query(default=None, include_in_schema=False),
 ):
     if (
@@ -318,6 +352,18 @@ async def predict(
         ):
             raise ValueError("file 항목에 이미지 한 장을 첨부하세요.")
         content = await items[0][1].read(MAX_IMAGE + 1)
-        return await run_in_threadpool(enqueue, eid, category, content)
+        prediction = await run_in_threadpool(enqueue, eid, category, content)
     finally:
         await form.close()
+    if not wait:
+        return prediction
+    deadline = asyncio.get_running_loop().time() + WAIT_SECONDS
+    while True:
+        job = await run_in_threadpool(s.get, "job", prediction["id"])
+        if job["status"] in ("succeeded", "failed", "cancelled"):
+            response.status_code = 200
+            return await run_in_threadpool(public_prediction, job)
+        remaining = deadline - asyncio.get_running_loop().time()
+        if remaining <= 0 or await request.is_disconnected():
+            return await run_in_threadpool(public_prediction, job)
+        await asyncio.sleep(min(0.25, remaining))

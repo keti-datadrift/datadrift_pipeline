@@ -1,7 +1,11 @@
 import copy
-from backend import store as s, workspace_data as wd, taxonomy as t
-from tests.test_uploads import upload, image_bytes
+
+from backend.data import store as s
+from backend.data import workspace_data as wd
+from backend.routes import workspaces as workspace_routes
+from backend.schemas import taxonomy as t
 from tests.test_deletions import remove
+from tests.test_uploads import image_bytes, upload
 
 
 def head(client):
@@ -116,10 +120,10 @@ def test_restore_deleted_images_preserves_later_labels(client):
 def test_legacy_import_initializes_collection_without_replacing_user_data(
     client, monkeypatch
 ):
-    from backend import api, migrate_taxonomy
+    from backend import migrate_taxonomy
 
     dataset = s.public_dataset(s.get("dataset", "d"))
-    monkeypatch.setattr(api, "import_labeled", lambda: [dataset])
+    monkeypatch.setattr(workspace_routes, "import_labeled", lambda: [dataset])
     monkeypatch.setattr(migrate_taxonomy, "migrate", lambda ids: [dataset])
     assert client.post("/api/imports/labeled").status_code == 200
     assert head(client)["id"] == "d"

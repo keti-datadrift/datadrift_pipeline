@@ -1,10 +1,21 @@
 import copy
 import hashlib
+from pathlib import Path
+
 import pytest
-from backend import store as s
-from backend.api import reconstruct, Reconstruction
+
+from backend.api import Reconstruction, reconstruct
+from backend.catalog import model_path
+from backend.data import store as s
 from backend.training import metrics
 from backend.worker import claim
+
+
+def test_model_paths_use_configured_root_or_project_models(monkeypatch, tmp_path):
+    monkeypatch.delenv("DATADRIFT_MODELS", raising=False)
+    assert model_path("qwen35_2b") == Path("models/Qwen3.5-2B")
+    monkeypatch.setenv("DATADRIFT_MODELS", str(tmp_path / "models"))
+    assert model_path("qwen35_4b") == tmp_path / "models/Qwen3.5-4B"
 
 
 def test_task_and_pagination(client):
@@ -133,8 +144,10 @@ def test_missing_adapter_is_unavailable_and_rejected_before_queue(client, tmp_pa
 
 def test_import_is_atomic_idempotent_and_retains_provenance(client, tmp_path):
     import json
+
     from PIL import Image
-    from backend.catalog import import_labeled, FIELDS
+
+    from backend.catalog import FIELDS, import_labeled
 
     folder = tmp_path / "inputs/bkcave_drift/experiments"
     review = folder / "vlm_methods_review1000_20261006"
@@ -201,7 +214,7 @@ def test_import_is_atomic_idempotent_and_retains_provenance(client, tmp_path):
 
 
 def test_drift_same_distribution_is_zero():
-    from backend.drift import js
+    from backend.drift.detection import js
 
     assert js({"a": 10, "b": 5}, {"a": 100, "b": 50}) == 0
     assert js({"a": 10}, {"b": 5}) == pytest.approx(1)

@@ -1,0 +1,15 @@
+[Unit]
+Description=DataDrift model API vLLM lifecycle controller
+After=network.target
+
+[Service]
+WorkingDirectory=/home/hslim/Code/datadrift/datadrift_pipeline
+Environment=DATADRIFT_STATE=/home/hslim/Code/datadrift/datadrift_pipeline/.runtime
+Environment=DATADRIFT_MODELS=/data/hslim/models
+ExecStart=/home/hslim/Code/datadrift/datadrift_pipeline/.venv/bin/python -m backend.vllm_runtime
+Restart=always
+RestartSec=3
+UMask=0077
+
+[Install]
+WantedBy=default.target

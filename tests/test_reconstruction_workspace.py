@@ -1,10 +1,15 @@
 import copy
+
 import pytest
-from backend import store as s, workspace_data as wd
+
+from backend.data import store as s
+from backend.data import workspace_data as wd
 
 
 def payload(**changes):
-    return dict(name="재구성 워크스페이스", dataset_ids=["d"], train_budget=3, **changes)
+    return dict(
+        name="재구성 워크스페이스", dataset_ids=["d"], train_budget=3, **changes
+    )
 
 
 def test_preview_does_not_create_workspace_and_save_publishes(client):
@@ -35,8 +40,10 @@ def test_failed_reconstruction_creates_nothing(client, monkeypatch):
     assert client.post("/api/reconstructions", json=body).status_code == 422
     assert len(s.all_of("workspace")) == before
     assert len(s.all_of("dataset")) == 1
+
     def fail(*args):
         raise RuntimeError("publish failed")
+
     monkeypatch.setattr(wd, "publish", fail)
     with pytest.raises(RuntimeError):
         client.post("/api/reconstructions", json=payload())

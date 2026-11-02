@@ -56,3 +56,7 @@ __pycache__/
 
 # Local verification images can contain private source imagery
 docs/verification/*.png
+
+# Validation and source submission artifacts
+.ruff_cache/
+dist/

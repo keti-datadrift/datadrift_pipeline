@@ -1,4 +1,4 @@
-"""Versioned schemas: workbook values are preserved exactly; abstention is system metadata."""
+"""Attribute schemas and workbook taxonomy values."""
 
 import json
 from pathlib import Path
@@ -28,7 +28,7 @@ def category(value):
     return {"바지": "하의"}.get(value, value)
 
 
-def schema(schema_id=LEGACY, scope=None):
+def schema(schema_id=CURRENT, scope=None):
     if schema_id == LEGACY:
         return LEGACY_SCHEMA
     if schema_id != CURRENT:
@@ -59,7 +59,7 @@ def schema(schema_id=LEGACY, scope=None):
     return result
 
 
-def valid(target, schema_id=LEGACY, scope=None):
+def valid(target, schema_id=CURRENT, scope=None):
     allowed = schema(schema_id, scope)
     if not isinstance(target, dict) or set(target) != set(allowed):
         return False

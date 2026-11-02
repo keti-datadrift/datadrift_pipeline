@@ -3,7 +3,8 @@
 import json
 import shutil
 from pathlib import Path
-from backend import store as s
+
+from backend.data import store as s
 
 folder = Path(".runtime/deletion-verification").resolve()
 receipt = json.loads((folder / "receipt.json").read_text())

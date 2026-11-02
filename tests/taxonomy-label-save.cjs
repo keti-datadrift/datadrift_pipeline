@@ -1,7 +1,7 @@
 const { chromium, expect } = require("@playwright/test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const taxonomy = require("../backend/bkave_taxonomy.json");
+const taxonomy = require("../backend/schemas/bkave_taxonomy.json");
 const base = process.env.TEST_BASE_URL || "http://121.126.210.3:18091";
 const report = { datasets: [], checks: [] };
 (async () => {
